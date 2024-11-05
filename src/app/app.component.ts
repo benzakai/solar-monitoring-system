@@ -1,13 +1,69 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { CommonModule } from '@angular/common';
+import { MatCard } from '@angular/material/card';
+import { DataService } from './data.service';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    MatTableModule,
+    MatIconModule,
+    MatSortModule,
+    MatCard,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'solar-monitoring-system';
+  dataService = inject(DataService);
+
+  data: Observable<any[]> = this.dataService.getData().pipe(
+    map((data) => data || []),
+    startWith([])
+  );
+
+  displayedColumns: string[] = [
+    'notes',
+    'actions',
+    'openAlerts',
+    'clearedAlerts',
+    'startOfYear',
+    'startOfMonth',
+    'lastMonth',
+    'today',
+    'monthly',
+    'weekly',
+    'threeDays',
+    'yesterday',
+    'communication',
+    'portal',
+    'kWp',
+    'systemName',
+    'tested',
+  ];
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  onSort(sortState: Sort) {
+    const direction = sortState.direction
+      ? `${sortState.active},${sortState.direction}`
+      : '';
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { sort: direction },
+      queryParamsHandling: 'merge',
+    });
+  }
 }
