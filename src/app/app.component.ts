@@ -7,6 +7,13 @@ import { CommonModule } from '@angular/common';
 import { MatCard } from '@angular/material/card';
 import { DataService } from './data.service';
 import { map, Observable, startWith } from 'rxjs';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {MatInputModule} from '@angular/material/input';
+import {FormsModule} from '@angular/forms';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatButtonModule} from '@angular/material/button';
+import {FiltersComponent} from './components/filters/filters.component';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +25,7 @@ import { map, Observable, startWith } from 'rxjs';
     MatIconModule,
     MatSortModule,
     MatCard,
+    MatButtonModule, MatMenuModule, FiltersComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
