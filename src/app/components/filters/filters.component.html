@@ -1,41 +1,35 @@
-<mat-form-field>
-  <mat-label>System Status</mat-label>
-  <mat-select>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="systemStatus">
     <mat-option *ngFor="let status of systemStatuses" [value]="status">{{ status }}</mat-option>
   </mat-select>
 </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Filter by Portal</mat-label>
-  <mat-select>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="portal">
     <mat-option *ngFor="let portal of portals" [value]="portal">{{ portal }}</mat-option>
   </mat-select>
 </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Tags</mat-label>
-  <mat-select multiple>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="tag">
     <mat-option [value]="tag" *ngFor="let tag of tags">{{tag}}</mat-option>
   </mat-select>
 </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Filter by Region</mat-label>
-  <mat-select>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="region">
     <mat-option *ngFor="let region of regions" [value]="region">{{ region }}</mat-option>
   </mat-select>
 </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Filter by Customer</mat-label>
-  <mat-select>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="customer">
     <mat-option *ngFor="let customer of customers" [value]="customer">{{ customer }}</mat-option>
   </mat-select>
 </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Filter by System</mat-label>
-  <mat-select>
+<mat-form-field appearance="outline" class="custom-select">
+  <mat-select multiple [(value)]="system">
     <mat-option *ngFor="let system of systems" [value]="system">{{ system }}</mat-option>
   </mat-select>
 </mat-form-field>

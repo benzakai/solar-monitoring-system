@@ -1,3 +1,274 @@
 @use '@angular/material' as mat;
 
 @include mat.core();
+body {
+  background-color: rgb(219 226 235);
+}
+:root {
+  --mat-form-field-container-height: 30px;
+  --mat-form-field-container-vertical-padding: 10px;
+  --mat-table-row-item-container-height: 39px;
+  --mat-table-header-headline-font: 'Inter', sans-serif;
+  --mat-table-row-item-label-text-font: 'Inter', sans-serif;
+  --mat-select-trigger-text-font:  'Inter', sans-serif;
+  --mdc-filled-text-field-label-text-font: 'Inter', sans-serif;
+  --mdc-filled-text-field-label-text-size: 12px;
+  --mdc-filled-text-field-label-text-tracking: 12px;
+  --mdc-filled-text-field-label-text-weight: 500;
+  --mdc-outlined-text-field-label-text-font: 'Inter', sans-serif;
+  --mdc-outlined-text-field-label-text-size: 12px;
+  --mdc-outlined-text-field-label-text-tracking: 12px;
+  --mdc-outlined-text-field-label-text-weight: 400;
+  --mat-form-field-container-text-font: 'Inter', sans-serif;
+  --mat-form-field-container-text-line-height: 12px;
+  --mat-form-field-container-text-size: 12px;
+  --mat-form-field-container-text-tracking: 12px;
+  --mat-form-field-container-text-weight: 500;
+  --mat-form-field-outlined-label-text-populated-size: 12px;
+  --mat-form-field-subscript-text-font: 'Inter', sans-serif;
+  --mat-form-field-subscript-text-line-height: 20px;
+  --mat-form-field-subscript-text-size: 12px;
+  --mat-form-field-subscript-text-tracking: 12px;
+  --mat-form-field-subscript-text-weight: 500;
+  --mat-table-header-headline-size: 12px;
+  --mat-table-row-item-label-text-size: 12px;
+  --mat-select-trigger-text-size: 12px;
+  --mat-select-trigger-text-line-height: 22px;
+  //--mat-form-field-container-text-size: 40px;
+}
+.main-header {
+  border-bottom: 2px solid #60b952;
+
+  .inner {
+    height: 90px;
+    background: #fff;
+    border-bottom: 2px solid #fcd22a;
+    margin-bottom:2px;
+
+    img {
+      margin: 0 17px;
+    }
+  }
+}
+
+.mat-mdc-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.mat-mdc-row:nth-child(even) {
+
+}
+
+mat-icon {
+  vertical-align: middle;
+}
+
+[matColumnDef="notes"] mat-icon {
+  color: grey;
+}
+
+[matColumnDef="communication"] mat-icon {
+  color: #4caf50;
+}
+
+button[mat-button][mat-flat-button] {
+  color: #ffffff;
+  background-color: #d32f2f;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+button[mat-button][mat-flat-button] mat-icon {
+  margin-right: 4px;
+}
+
+button[mat-button][mat-flat-button]:hover {
+  background-color: #c62828;
+}
+
+mat-select {
+  min-width: 150px;
+  margin-right: 12px;
+}
+
+mat-form-field {
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+th.mat-header-cell {
+  background-color: #e0e0e0;
+  font-weight: 600;
+}
+
+mat-form-field {
+  width: 200px;
+  margin-right: 12px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+mat-form-field .mat-form-field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+mat-select {
+  font-size: 14px;
+  color: #333;
+}
+
+mat-option {
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+mat-select[multiple] {
+  padding: 4px 0;
+}
+
+.mat-select-arrow {
+  color: #555;
+  right: 8px;
+}
+
+.mat-select-panel {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.mat-option.mat-active, .mat-option:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.mat-form-field-underline {
+  background-color: #d3d3d3;
+}
+
+.mat-form-field-underline.mat-form-field-underline-focus {
+  background-color: #3f51b5;
+}
+
+.mat-chip-list-wrapper {
+  max-height: 40px;
+  overflow: hidden;
+}
+
+app-filters {
+  margin-top: 6px;
+  margin-bottom: -25px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+//mine
+mat-form-field {
+  background-color: transparent;
+
+  .mdc-text-field {
+    background-color: #fff;
+    border-radius:4px;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding:0;
+  }
+
+  .mat-mdc-select-trigger {
+    flex-direction: row-reverse;
+
+    .mat-mdc-select-value {
+      text-align: right;
+      color: rgb(192 192 192);
+    }
+  }
+
+
+
+
+}
+
+.mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
+  padding: 0!important;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #c3c3c3;
+  background-color: #fff;
+  border-radius: 4px;
+
+  margin:8px 17px;
+
+  & > * {
+    margin: 4px;
+  }
+}
+
+.mat-cell, .mat-header-cell, .mat-mdc-cell, .mat-mdc-header-cell {
+  border: none !important;
+}
+
+.mat-typography, .mat-form-field, .mat-button, .mat-card, body, mat-table {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px;
+}
+
+.headline-1 {
+  display:flex;
+  flex: 0 0 20px;
+  margin: 8px;
+  justify-content: center;
+  align-items: center;
+  span {
+    color: #5FD35E;
+    padding: 0 2px;
+  }
+}
+
+.mat-mdc-table {
+  min-width: unset!important;
+  margin-top:-4px;
+}
+
+.headline-2 {
+  display:flex;
+  flex: 0 0 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  border-bottom: 2px #eee solid;
+
+  div {
+    padding: 12px 0 14px 0;
+  }
+}
+
+.link {
+  color: #2297D8;
+}
+
+body {
+  margin: 0;
+}
+
+.mdc-notched-outline__leading {
+  border-color: #c3c3c3 !important;
+}
+.mdc-notched-outline__notch {
+  border-color: #c3c3c3 !important;
+}
+.mdc-notched-outline__trailing {
+  border-color: #c3c3c3 !important;
+}
+
+.mat-mdc-select-min-line {
+  //line-height: 35px!important;
+}
