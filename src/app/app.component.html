@@ -32,8 +32,8 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-button mat-flat-button [matMenuTriggerFor]="menu">
-          <mat-icon>arrow_drop_down</mat-icon> Actions</button>
+        <button class="bell-button" mat-button mat-flat-button [matMenuTriggerFor]="menu">
+          <mat-icon>arrow_drop_down</mat-icon> <img src="bell_p.png"/></button>
         <mat-menu #menu="matMenu">
           <button mat-menu-item>Action 1</button>
           <button mat-menu-item>Action 2</button>
