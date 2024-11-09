@@ -4,11 +4,12 @@ import {MatSliderModule} from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {CommonModule} from '@angular/common';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-filters',
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatSelectModule, MatSelectModule, MatSliderModule, MatCheckboxModule],
+  imports: [CommonModule, MatFormFieldModule, MatSelectModule, MatSelectModule, MatSliderModule, MatCheckboxModule, MatIcon],
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css'
 })

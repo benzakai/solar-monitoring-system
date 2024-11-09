@@ -1,4 +1,24 @@
 :host{
   display: flex;
-  gap: 20px;
+  gap: 21px;
+}
+
+mat-form-field {
+  width: 182px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+}
+
+.range {
+  flex: 1 1 1px;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  mat-icon {
+    color: #4585e0;
+  }
+}
+
+.mat-mdc-slider {
+  height: 30px;
 }

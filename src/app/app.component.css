@@ -1,11 +1,17 @@
 :host {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
+
 .table-container {
   overflow: auto;
 }
 
 mat-icon {
   vertical-align: middle;
+}
+
+.container {
+  margin: auto;
 }
