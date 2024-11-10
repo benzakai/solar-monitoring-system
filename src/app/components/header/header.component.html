@@ -1,0 +1,23 @@
+<div class="inner">
+  <div class="header-container">
+    <img src="logo.png"/>
+    <div class="controls">
+      <div class="control-text">{{text$ | async}}</div>
+      <div class="control-form">
+        <mat-form-field appearance="outline" class="custom-select-single">
+          <mat-select [formControl]="personControl">
+            <mat-option *ngFor="let status of people" [value]="status">{{ status }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-icon class="pref" >search</mat-icon>
+          <input class="inp" matInput placeholder="System/client search" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="nav">
+      <span>Monitoring Table</span>
+      <mat-icon>east</mat-icon>
+    </div>
+  </div>
+</div>

@@ -14,6 +14,7 @@ import {FormsModule} from '@angular/forms';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
 import {FiltersComponent} from './components/filters/filters.component';
+import {HeaderComponent} from './components/header/header.component';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,7 @@ import {FiltersComponent} from './components/filters/filters.component';
     MatIconModule,
     MatSortModule,
     MatCard,
-    MatButtonModule, MatMenuModule, FiltersComponent
+    MatButtonModule, MatMenuModule, FiltersComponent, HeaderComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',

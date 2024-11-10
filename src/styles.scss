@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 
 @include mat.core();
+
 body {
   background-color: rgb(219 226 235);
 }
@@ -39,21 +40,7 @@ body {
 
   //--mat-form-field-container-text-size: 40px;
 }
-.main-header {
-  border-bottom: 2px solid #60b952;
 
-  .inner {
-    height: 90px;
-    background: #fff;
-    border-bottom: 2px solid #fcd22a;
-    margin-bottom:2px;
-    display: flex;
-
-    img {
-      margin: 0 17px;
-    }
-  }
-}
 
 .mat-mdc-row:nth-child(odd) {
   background-color: #f2f2f2;
@@ -81,7 +68,7 @@ mat-icon {
 }
 button[mat-button][mat-flat-button] {
   color: #ffffff;
-  background-color: #c62828;
+  background-color: #C80005;
   border-radius: 4px;
   font-size: 12px;
   padding: 0 0 0 20px;
@@ -188,12 +175,6 @@ app-filters {
   width: var(--max-width);
 }
 
-.header-container {
-  display: flex;
-  flex: 0 1 var(--max-width);
-  margin: 0 auto;
-  max-width: var(--max-width);
-}
 //mine
 mat-form-field {
   background-color: transparent;
@@ -212,7 +193,7 @@ mat-form-field {
 
     .mat-mdc-select-value {
       text-align: right;
-      color: rgb(192 192 192);
+      color: #8E8B8B;
     }
   }
 
@@ -311,7 +292,7 @@ mat-form-field {
 }
 
 .link {
-  color: #2297D8;
+  color: #1287DE;
 }
 
 body {
@@ -360,9 +341,13 @@ body {
 }
 
 :root {
-  --mdc-slider-focus-handle-color: #4585e0;
-  --mdc-slider-handle-color: #4585e0;
-  --mdc-slider-active-track-color: #4585e0;
+  --mdc-slider-focus-handle-color: #1287DE;
+  --mdc-slider-handle-color: #1287DE;
+  --mdc-slider-active-track-color: #1287DE;
+  --mdc-slider-inactive-track-height: 1px;
+  --mdc-slider-active-track-height: 2px;
+  --mdc-slider-handle-width: 10px;
+  --mdc-slider-handle-height: 10px;
 }
 mat-slider {
   .mat-ripple {
@@ -373,3 +358,19 @@ mat-slider {
   }
 }
 
+.mat-mdc-form-field-input-control.mat-mdc-form-field-input-control  {
+  letter-spacing: 0.375px!important;
+}
+
+.mat-mdc-form-field-infix {
+  display: flex;
+  align-items: center;
+}
+
+:root {
+  --mdc-outlined-text-field-input-text-placeholder-color: #8E8B8B;
+}
+
+input {
+  font-weight: 400!important;
+}
