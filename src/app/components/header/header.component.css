@@ -1,5 +1,6 @@
 :host {
   border-bottom: 2px solid #60b952;
+  background-color: #fff;
 
   .inner {
     height: 90px;

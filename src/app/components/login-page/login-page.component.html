@@ -1,0 +1,24 @@
+<div class="fullscreen-container">
+  <app-header></app-header>
+  <div class="content">
+    <form class="form-container" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <h1>Login</h1>
+
+      <mat-form-field  appearance="outline" class="full-width">
+        <label>User name</label>
+        <input class="inp" formControlName="username" matInput />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <label>Password</label>
+        <input matInput formControlName="password" type="password" />
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit">
+        Sign In
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {addDoc, collection, collectionData, Firestore} from '@angular/fire/firestore';
+import {addDoc, collection, collectionData, Firestore, limit, query} from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +10,7 @@ export class DataService {
 
   getData(): Observable<any[]> {
     const dataCollection = collection(this.firestore, 'systems');
+    const limitedQuery = query(dataCollection, limit(10));
     return collectionData(dataCollection, { idField: 'id' });
   }
 

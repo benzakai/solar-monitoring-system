@@ -1,6 +1,61 @@
 @use '@angular/material' as mat;
+@use './app/theme/palette' as palette;
 
-@include mat.core();
+$theme: mat.define-theme((
+  color: (
+    primary: palette.$custom-primary-palette,
+  ),
+  typography: (
+    brand-family: 'Inter',
+    regular-weight:400,
+    bold-weight: 600,
+    medium-weight: 600
+
+  ),
+  density: (
+    scale: -1
+  )
+));
+
+html {
+  @include mat.core-theme($theme);
+  //@include mat.card-theme($theme);
+  //@include mat.progress-bar-theme($theme);
+  //@include mat.tooltip-theme($theme);
+  @include mat.form-field-theme($theme);
+  @include mat.input-theme($theme);
+  @include mat.select-theme($theme);
+  @include mat.autocomplete-theme($theme);
+  //@include mat.dialog-theme($theme);
+  //@include mat.chips-theme($theme);
+  //@include mat.slide-toggle-theme($theme);
+  //@include mat.radio-theme($theme);
+  //@include mat.slider-theme($theme);
+  @include mat.menu-theme($theme);
+  //@include mat.list-theme($theme);
+  @include mat.paginator-theme($theme);
+  //@include mat.tabs-theme($theme);
+  @include mat.checkbox-theme($theme);
+  @include mat.button-theme($theme);
+  @include mat.icon-button-theme($theme);
+  //@include mat.fab-theme($theme);
+  //@include mat.snack-bar-theme($theme);
+  @include mat.table-theme($theme);
+  //@include mat.progress-spinner-theme($theme);
+  //@include mat.badge-theme($theme);
+  //@include mat.bottom-sheet-theme($theme);
+  //@include mat.button-toggle-theme($theme);
+  //@include mat.datepicker-theme($theme);
+  //@include mat.divider-theme($theme);
+  //@include mat.expansion-theme($theme);
+  //@include mat.grid-list-theme($theme);
+  @include mat.icon-theme($theme);
+  //@include mat.sidenav-theme($theme);
+  //@include mat.stepper-theme($theme);
+  @include mat.sort-theme($theme);
+  //@include mat.toolbar-theme($theme);
+  //@include mat.tree-theme($theme);
+}
 
 body {
   background-color: rgb(219 226 235);
@@ -25,7 +80,7 @@ body {
   --mat-form-field-container-text-font: 'Inter', sans-serif;
   --mat-form-field-container-text-line-height: 12px;
   --mat-form-field-container-text-size: 12px;
-  --mat-form-field-container-text-tracking: 12px;
+  --mat-form-field-container-text-tracking: normal;
   --mat-form-field-container-text-weight: 500;
   --mat-form-field-outlined-label-text-populated-size: 12px;
   --mat-form-field-subscript-text-font: 'Inter', sans-serif;
@@ -37,17 +92,14 @@ body {
   --mat-table-row-item-label-text-size: 12px;
   --mat-select-trigger-text-size: 12px;
   --mat-select-trigger-text-line-height: 18px;
-
+  --mdc-filled-button-container-shape: 2px;
+  --mdc-filled-button-label-text-weight: 500;
+  --mdc-filled-button-label-text-size: 12px;
   //--mat-form-field-container-text-size: 40px;
 }
 
-
 .mat-mdc-row:nth-child(odd) {
   background-color: #f2f2f2;
-}
-
-.mat-mdc-row:nth-child(even) {
-
 }
 
 mat-icon {
@@ -61,7 +113,6 @@ mat-icon {
 [matColumnDef="communication"] mat-icon {
   color: #4caf50;
 }
-
 
 :root {
   --mdc-filled-button-container-height: 25px;
@@ -161,9 +212,6 @@ mat-select[multiple] {
   background-color: #d3d3d3;
 }
 
-.mat-form-field-underline.mat-form-field-underline-focus {
-  background-color: #3f51b5;
-}
 
 .mat-chip-list-wrapper {
   max-height: 40px;
@@ -178,6 +226,8 @@ app-filters {
 //mine
 mat-form-field {
   background-color: transparent;
+  margin: 24px 0 0 0;
+  position:relative;
 
   .mdc-text-field {
     background-color: #fff;
@@ -197,7 +247,19 @@ mat-form-field {
     }
   }
 
-
+  label {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: -14px;
+    text-align: end;
+    color: #8D8A8A;
+    font-size: 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 20px;
+  }
 
 
 }
@@ -309,10 +371,6 @@ body {
   border-color: #c3c3c3 !important;
 }
 
-.mat-mdc-select-min-line {
-  //line-height: 35px!important;
-}
-
 .bell-button {
   img {
     width: 18px;
@@ -373,4 +431,31 @@ mat-slider {
 
 input {
   font-weight: 400!important;
+}
+
+.fullscreen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: url('./../public/background.jpg') no-repeat center center / cover;
+}
+
+:root {
+  --mdc-filled-button-container-color: #2196F3;
+  --mat-app-primary: #2196F3;
+}
+
+h1 {
+  color: #2196F3;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+button.mat-flat-button {
+  color: white !important;
+  font-weight: 500;
+  text-transform: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
 }

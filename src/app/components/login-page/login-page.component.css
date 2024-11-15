@@ -1,0 +1,42 @@
+.header {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 2rem;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  display:flex;
+  flex-direction: column;
+  gap: 9px;
+  background: #fff;
+  padding: 24px 18px;
+  border-radius: 6px;
+  border: 1px solid #6a6a6a;
+  text-align: right;
+  width: 455px;
+}
+
+mat-form-field {
+  padding: 0;
+  height: 30px;
+  width: 100%;
+}
+
+h1 {
+  margin-bottom: 8px;
+}
+
+button {
+  margin-top: 10px;
+  margin-right: auto;
+}
+

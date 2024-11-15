@@ -1,9 +1,8 @@
 export const firebaseConfig = {
-  apiKey: 'AIzaSyAuA1lJ8vxl_MdZYZolzCW2jf74nrUU_28',
-  authDomain: 'solar-monitoring-system-34bbc.firebaseapp.com',
-  projectId: 'solar-monitoring-system-34bbc',
-  storageBucket: 'solar-monitoring-system-34bbc.firebasestorage.app',
-  messagingSenderId: '799995010358',
-  appId: '1:799995010358:web:553b1bbcb069133565a797',
-  measurementId: 'G-BCP0VX6TB5',
+  apiKey: "AIzaSyDqefD_NgH8BHJ_6RW9gs2gqmcIdsPCboA",
+  authDomain: "golan-test-e76f9.firebaseapp.com",
+  projectId: "golan-test-e76f9",
+  storageBucket: "golan-test-e76f9.firebasestorage.app",
+  messagingSenderId: "145503475109",
+  appId: "1:145503475109:web:9d501c5639d1e74c3e844c"
 };
