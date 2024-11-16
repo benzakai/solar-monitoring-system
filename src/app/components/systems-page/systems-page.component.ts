@@ -33,7 +33,7 @@ import {map, Observable, startWith} from 'rxjs';
 export class SystemsPageComponent {
   dataService = inject(DataService);
 
-  data: Observable<any[]> = this.dataService.getData().pipe(
+  data: Observable<any[]> = this.dataService.getSystemsData().pipe(
     map((data) => data || []),
     startWith([])
   );
@@ -53,8 +53,8 @@ export class SystemsPageComponent {
     'yesterday',
     'communication',
     'portal',
-    'kWp',
-    'systemName',
+    'KWP',
+    'name',
     'tested',
   ];
 

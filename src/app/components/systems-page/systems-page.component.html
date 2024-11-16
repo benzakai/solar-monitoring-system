@@ -1,6 +1,5 @@
 <app-header></app-header>
 <app-filters></app-filters>
-
 <div class="container">
   <div class="headline-1">
     Total KV: <span>16,471</span> | Systems that appear in the table: <span>95</span> | Of which were checked today: <span>12</span> | Of which you should check today: <span>0</span> | Time to read data from the server: <span>12:47:29</span>
@@ -19,8 +18,8 @@
     <ng-container matColumnDef="notes">
       <th mat-header-cell *matHeaderCellDef>Notes</th>
       <td mat-cell *matCellDef="let element">
-        <mat-icon [style.color]="element.notes ? '#1287DE' : '#141415'"
-        >{{element.notes ? 'error' : 'error_outline'}}</mat-icon
+        <mat-icon [style.color]="element.comments ? '#1287DE' : '#141415'"
+        >{{element.comments ? 'error' : 'error_outline'}}</mat-icon
         >
       </td>
     </ng-container>
@@ -48,73 +47,73 @@
       <th mat-header-cell *matHeaderCellDef>
         Cleared Alerts
       </th>
-      <td mat-cell *matCellDef="let element">{{ element.clearedAlerts }}</td>
+      <td mat-cell *matCellDef="let element">{{ element.clearedAlerts }} x {{element.system?.location?.relatedSystems?.length}}</td>
     </ng-container>
 
     <ng-container matColumnDef="startOfYear">
       <th mat-header-cell *matHeaderCellDef>Start of Year</th>
-      <td mat-cell *matCellDef="let element">{{ element.startOfYear }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.startOfYearSum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="startOfMonth">
       <th mat-header-cell *matHeaderCellDef>
         Start of Month
       </th>
-      <td mat-cell *matCellDef="let element">{{ element.startOfMonth }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.startOfMonthSum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="lastMonth">
       <th mat-header-cell *matHeaderCellDef>Last Month</th>
-      <td mat-cell *matCellDef="let element">{{ element.lastMonth | number: '1.2-2' }}</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.lastMonthSum | number: '1.2-2' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="today">
       <th mat-header-cell *matHeaderCellDef>Today</th>
-      <td mat-cell *matCellDef="let element">{{ element.today | number: '1.2-2' }}</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.todaySum | number: '1.2-2' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="monthly">
       <th mat-header-cell *matHeaderCellDef>Monthly</th>
-      <td mat-cell *matCellDef="let element">{{ element.monthly }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.monthlySum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="weekly">
       <th mat-header-cell *matHeaderCellDef>Weekly</th>
-      <td mat-cell *matCellDef="let element">{{ element.weekly }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.weeklySum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="threeDays">
       <th mat-header-cell *matHeaderCellDef>Three Days</th>
-      <td mat-cell *matCellDef="let element">{{ element.threeDays }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.threeDaysSum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="yesterday">
       <th mat-header-cell *matHeaderCellDef>Yesterday</th>
-      <td mat-cell *matCellDef="let element">{{ element.yesterday }}%</td>
+      <td mat-cell *matCellDef="let element">{{ element.aggregation.yesterdaySum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="communication">
       <th mat-header-cell *matHeaderCellDef>Communication</th>
       <td mat-cell *matCellDef="let element">
-        <mat-icon [style.color]="element.communication ? '#60B952' : '#FC5507'">
-          {{ element.communication ? 'wifi' : 'running_with_errors' }}
+        <mat-icon [style.color]="element.communication === 'ETHERNET' ? '#60B952' : '#FC5507'">
+          {{ element.communication === 'ETHERNET' ? 'wifi' : 'running_with_errors' }}
         </mat-icon>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="portal">
       <th mat-header-cell *matHeaderCellDef>Portal</th>
-      <td mat-cell *matCellDef="let element" class="link">{{ element.portal }}</td>
+      <td mat-cell *matCellDef="let element" class="link">{{ element.type }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="kWp">
+    <ng-container matColumnDef="KWP">
       <th mat-header-cell *matHeaderCellDef>kWp</th>
-      <td mat-cell *matCellDef="let element">{{ element.kWp }}</td>
+      <td mat-cell *matCellDef="let element">{{ element.KWP }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="systemName">
+    <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>System Name</th>
-      <td mat-cell *matCellDef="let element" class="link">{{ element.systemName }}</td>
+      <td mat-cell *matCellDef="let element" class="link">{{ element.name }}</td>
     </ng-container>
 
     <ng-container matColumnDef="tested">
