@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci && npm run build:prod
+      - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SOLAR_MONITORING_SYSTEM_34BBC }}
-          projectId: solar-monitoring-system-34bbc
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GOLAN_TEST_E76F9 }}
+          projectId: golan-test-e76f9

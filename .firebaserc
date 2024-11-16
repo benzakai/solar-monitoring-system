@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "solar-monitoring-system-34bbc"
-  }
+    "default": "golan-test-e76f9",
+    "staging": "golan-test-e76f9"
+  },
+  "targets": {},
+  "etags": {}
 }
