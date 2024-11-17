@@ -11,7 +11,7 @@
   </div>
   <table
     mat-table
-    [dataSource]="(data | async) || []"
+    [dataSource]="dataSource"
     matSort
     (matSortChange)="onSort($event)"
   >
@@ -52,44 +52,54 @@
 
     <ng-container matColumnDef="startOfYear">
       <th mat-header-cell *matHeaderCellDef>Start of Year</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.startOfYearSum }}</td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element?.aggregation?.startOfYearSum">{{ element?.aggregation?.startOfYearSum | number: '1.0-0' }}%</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="startOfMonth">
       <th mat-header-cell *matHeaderCellDef>
         Start of Month
       </th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.startOfMonthSum }}</td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element?.aggregation?.startOfMonthSum">{{ element?.aggregation?.startOfMonthSum | number: '1.0-0' }}%</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="lastMonth">
       <th mat-header-cell *matHeaderCellDef>Last Month</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.lastMonthSum | number: '1.2-2' }}</td>
+      <td mat-cell *matCellDef="let element">{{ element?.aggregation?.lastMonthSum | number: '1.2-2' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="today">
       <th mat-header-cell *matHeaderCellDef>Today</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.todaySum | number: '1.2-2' }}</td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element?.aggregation?.todaySum">{{ element?.aggregation?.todaySum | number: '1.0-0' }}%</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="monthly">
       <th mat-header-cell *matHeaderCellDef>Monthly</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.monthlySum }}</td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element?.aggregation?.monthlySum">{{ element?.aggregation?.monthlySum | number: '1.0-0' }}%</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="weekly">
       <th mat-header-cell *matHeaderCellDef>Weekly</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.weeklySum }}</td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="element?.aggregation?.weeklySum">{{ element?.aggregation?.weeklySum | number: '1.0-0' }}%</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="threeDays">
       <th mat-header-cell *matHeaderCellDef>Three Days</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.threeDaysSum }}</td>
+      <td mat-cell *matCellDef="let element">{{ element?.aggregation?.threeDaysSum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="yesterday">
       <th mat-header-cell *matHeaderCellDef>Yesterday</th>
-      <td mat-cell *matCellDef="let element">{{ element.aggregation.yesterdaySum }}</td>
+      <td mat-cell *matCellDef="let element">{{ element?.aggregation?.yesterdaySum }}</td>
     </ng-container>
 
     <ng-container matColumnDef="communication">
@@ -126,5 +136,11 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  <br>
+  <mat-paginator  [length]="length$ | async"
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 25, 100]"
+                 aria-label="Select page">
+  </mat-paginator>
 </div>
 

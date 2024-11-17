@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
-import {combineLatest, map, Observable, switchMap, tap} from 'rxjs';
-import {collection, collectionData, Firestore, limit, query, where} from '@angular/fire/firestore';
+import {BehaviorSubject, combineLatest, from, map, Observable, of, switchMap} from 'rxjs';
+import {
+  Firestore,
+  collection,
+  query,
+  orderBy,
+  limit,
+  startAfter, startAt,
+  collectionData, where, getCountFromServer, getDocs
+} from '@angular/fire/firestore';
 const startOfYearTime = new Date(new Date().getFullYear(), 0, 1).getTime();
 const startOfMonthTime = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
 
@@ -17,6 +25,24 @@ function getStartOfYesterday(): number {
   now.setHours(0, 0, 0, 0);
   return now.getTime();
 }
+
+function daysSinceStartOfYear(date: Date): number {
+  const startOfYear = new Date(date.getFullYear(), 0, 1);
+  const diffInTime = date.getTime() - startOfYear.getTime();
+  const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+  return diffInDays;
+}
+
+const daysSinceStartOfYearsNum = daysSinceStartOfYear(new Date()) - 1;
+
+function daysSinceStartOfMonth(date: Date): number {
+  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const diffInTime = date.getTime() - startOfMonth.getTime();
+  const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+  return diffInDays;
+}
+
+const daysSinceStartOfMonthNum = daysSinceStartOfMonth(new Date()) - 1;
 
 function getStartOfPreviousMonth(): number {
   const now = new Date();
@@ -79,12 +105,45 @@ function findTime(collection: KwhInTime[], time: number): number {
   providedIn: 'root',
 })
 export class DataService {
-  constructor(private firestore: Firestore) {}
+  public count = new BehaviorSubject(0);
 
-  getSystems(): Observable<Sys[]> {
+  public systemsLoaded = [];
+  lastVisibleDocument: any = null;
+
+  constructor(private firestore: Firestore) {}
+  //collectionData(query(dataCollection, where('isActive', '==', true), orderBy('startTime'), limit(pageSize)), { idField: 'id' }))
+  getQuery(pageSize: number = 10, pivot: any, action?: 'next' | 'prev') {
     const dataCollection = collection(this.firestore, 'systems');
-    const limitedQuery = query(dataCollection, limit(25));
-    return collectionData(limitedQuery, { idField: 'id' });
+    return of(pivot).pipe(
+      switchMap((start) => {
+        const q = query(dataCollection, where('isActive', '==', true));
+
+        if(start) {
+          const q1 = query(dataCollection, where('isActive', '==', true), orderBy('startTime'), startAfter(this.lastVisibleDocument), limit(pageSize));
+          return of(q1);
+        } else {
+          this.count.next(0);
+          return of(q).pipe(
+            switchMap((a) => {
+              return from(getCountFromServer(a)).pipe(map((c) => {
+                const count = c.data().count;
+                this.count.next(count || 0);
+                return query(dataCollection, where('isActive', '==', true), orderBy('startTime'), limit(pageSize))
+              }))
+            })
+          )
+
+        }
+      })
+    )
+  }
+
+  getSystems(pageSize: number = 10, action?: 'next' | 'prev'): Observable<Sys[]> {
+    return this.getQuery(pageSize, action).pipe(switchMap((paginatedQuery) => from(getDocs(paginatedQuery)).pipe(map((querySnapshot) => {
+      const data = querySnapshot.docs.map((doc) => ({ ...doc.data() as Sys, id: doc.id }));
+      this.lastVisibleDocument = querySnapshot.docs[querySnapshot.docs.length - 1]
+      return data || [];
+    }))));
   }
 
   getEnergyByIds(ids: string[]): Observable<Energy[]> {
@@ -93,18 +152,16 @@ export class DataService {
     const queries = idChunks.map(chunk => {
       const energyQuery = query(energyCollection,
         where('id', 'in', chunk),
-
-
       );
-      return collectionData(energyQuery, { idField: 'id' });
+      return from(getDocs(energyQuery)).pipe(map((querySnapshot) => querySnapshot.docs.map((doc) => ({ ...doc.data() as Energy, id: doc.id }))));
     });
     return combineLatest(queries).pipe(
       map(results => results.flat())
     );
   }
 
-  getSystemsData(): Observable<any[]> {
-    return this.getSystems().pipe(
+  getSystemsData(pageSize: number = 10, action?: 'next' | 'prev'): Observable<any[]> {
+    return this.getSystems(pageSize, action).pipe(
       switchMap(systems => {
         const all = systems.flatMap(system => system?.location?.relatedSystems || []);
         const relatedSystemIds = Array.from(new Set(all));
@@ -115,34 +172,36 @@ export class DataService {
               const systemDailyNominalPower = system.KWP * 1000;
               const systemWeeklyNominalPower = systemDailyNominalPower * 6;
               const systemMonthlyNominalPower = systemDailyNominalPower * 29;
+              const systemNominalPowerSinceStartOfYear = systemDailyNominalPower * daysSinceStartOfYearsNum;
+              const systemNominalPowerSinceStartOfMonth = systemDailyNominalPower * daysSinceStartOfMonthNum;
 
               const relatedSystems = system?.location?.relatedSystems ? system.location.relatedSystems.map(id => energyMap.get(id)).filter(e => e) : null;
               let aggregation = {};
               if (relatedSystems) {
                 const count = relatedSystems.length;
 
-                const today = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.daily) : 0);
+                const today = relatedSystems.map((subsystem) => subsystem?.daily ? sumTimes(subsystem.daily) : 0);
                 const todaySum = sum(today) / systemDailyNominalPower * 100 ;
 
-                const weekly = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.annual, sevenDaysAgo) : 0);
+                const weekly = relatedSystems.map((subsystem) => subsystem?.annual ? sumTimes(subsystem.annual, sevenDaysAgo) : 0);
                 const weeklySum = sum([...weekly]) / systemWeeklyNominalPower * 100 ;
 
-                const monthly = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.annual, thirtyDaysAgo) : 0);
+                const monthly = relatedSystems.map((subsystem) => subsystem?.annual  ? sumTimes(subsystem.annual, thirtyDaysAgo) : 0);
                 const monthlySum = sum([...monthly]) / systemMonthlyNominalPower * 100 ;
 
-                const startOfMonth = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.annual, startOfMonthTime) : 0);
-                const startOfMonthSum = sum([...startOfMonth]);
+                const startOfMonth = relatedSystems.map((subsystem) => subsystem?.annual  ? sumTimes(subsystem.annual, startOfMonthTime) : 0);
+                const startOfMonthSum = sum([...startOfMonth]) / systemNominalPowerSinceStartOfMonth * 100 ;
 
-                const threeDays = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.annual, threeDaysAgo) : 0);
+                const threeDays = relatedSystems.map((subsystem) => subsystem?.annual  ? sumTimes(subsystem.annual, threeDaysAgo) : 0);
                 const threeDaysSum = sum([...threeDays]);
 
-                const startOfYear = relatedSystems.map((subsystem) => subsystem ? sumTimes(subsystem.annual, startOfYearTime) : 0);
-                const startOfYearSum = sum([...startOfYear, startOfMonthSum]);
+                const startOfYear = relatedSystems.map((subsystem) => subsystem?.annual  ? sumTimes(subsystem.annual, startOfYearTime) : 0);
+                const startOfYearSum = sum([...startOfYear, sum([...startOfMonth])]) / systemNominalPowerSinceStartOfYear * 100 ;
 
-                const yesterday = relatedSystems.map((subsystem) => subsystem ? findTime(subsystem.daily, startOfYesterday) : 0);
+                const yesterday = relatedSystems.map((subsystem) => subsystem?.daily ? findTime(subsystem.daily, startOfYesterday) : 0);
                 const yesterdaySum = sum(yesterday);
 
-                const lastMonth = relatedSystems.map((subsystem) => subsystem ? findTime(subsystem.multiAnnual || [], startOfPreviousMonth) : 0);
+                const lastMonth = relatedSystems.map((subsystem) => subsystem?.multiAnnual ? findTime(subsystem.multiAnnual || [], startOfPreviousMonth) : 0);
                 const lastMonthSum = sum(lastMonth);
 
                 aggregation = {
@@ -150,7 +209,6 @@ export class DataService {
                 }
 
               }
-
 
               return {
                 ...system,

@@ -9,6 +9,7 @@ import {MatCardModule} from '@angular/material/card';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
 import {Auth} from '@angular/fire/auth';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-login-page',
@@ -24,7 +25,10 @@ import {Auth} from '@angular/fire/auth';
 export class LoginPageComponent {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private afAuth: Auth, public auth: AngularFireAuth) {
+  error: string = '';
+
+  constructor(private fb: FormBuilder, private afAuth: Auth, public auth: AngularFireAuth, private router: Router,
+              private route: ActivatedRoute) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -32,7 +36,8 @@ export class LoginPageComponent {
   }
 
   googleLogin() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    this.error = '';
+    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => this.error = 'Wrong credentials').then(() => this.router.navigate(['systems']));
   }
 
   onSubmit(): void {
