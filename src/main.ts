@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
 import {getAuth, provideAuth} from '@angular/fire/auth';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+import {ReactiveFormsModule} from '@angular/forms';
 
 const app = initializeApp(firebaseConfig);
 

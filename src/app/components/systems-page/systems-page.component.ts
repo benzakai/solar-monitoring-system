@@ -15,6 +15,7 @@ import {DataService} from '../../data.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {catchError, of} from 'rxjs';
+import {FiltersControlService} from '../../services/filters-control.service';
 
 @Component({
   selector: 'app-systems-page',
@@ -31,13 +32,13 @@ import {catchError, of} from 'rxjs';
       ]
     ],
   templateUrl: './systems-page.component.html',
-  styleUrl: './systems-page.component.css'
+  styleUrl: './systems-page.component.css',
+  providers: [FiltersControlService, DataService]
 })
 export class SystemsPageComponent {
   dataService = inject(DataService);
-
   length$ = this.dataService.count.asObservable();
-
+  isLoading = true;
   displayedColumns: string[] = [
     'notes',
     'actions',
@@ -87,12 +88,14 @@ export class SystemsPageComponent {
   pivot: any = null;
 
   loadPage() {
+    this.isLoading = true;
     this.dataSource.data = [];
     this.dataService.getSystemsData(this.pageSize, this.pageIndex > 0 ? 'next' : undefined).pipe(takeUntilDestroyed(this.destroyRef), catchError((e) => {
       this.router.navigate(['login']);
       return of([]);
     })).subscribe(data => {
       this.pivot = data[data.length - 1];
+      this.isLoading = false;
       this.dataSource.data = data || [];
     });
   }
