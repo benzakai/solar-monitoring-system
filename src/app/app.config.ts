@@ -11,7 +11,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, {
+      onSameUrlNavigation: 'reload',
+    }),
     importProvidersFrom(BrowserAnimationsModule),
   ],
 };
