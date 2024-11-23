@@ -179,6 +179,10 @@ mat-select {
   color: #333;
 }
 
+:root {
+  --mat-option-focus-state-layer-color: #f2f2f2;
+  --mat-select-panel-background-color: rgb(250, 249, 253);
+}
 mat-option {
   font-size: 14px;
   padding: 8px 16px;
@@ -186,6 +190,16 @@ mat-option {
 
 mat-select[multiple] {
   padding: 4px 0;
+}
+
+:root {
+  --mat-option-label-text-font: 'Inter', sans-serif;
+  --mat-option-label-text-size: 12px;
+  --mat-full-pseudo-checkbox-selected-icon-color: #1287DE;
+  --mat-full-pseudo-checkbox-unselected-icon-color: #bcbcbc;
+}
+.mat-mdc-option {
+  min-height: 40px;
 }
 
 .mat-select-arrow {

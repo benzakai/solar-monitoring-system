@@ -1,7 +1,7 @@
 <div class="range">
   <mat-icon [style.color]="'#1287DE'">restart_alt</mat-icon>
 
-  @if (minMaxKwp$ | async; as values) {
+  @if (minMaxKwp | async; as values) {
     <mat-slider [disableRipple]="true" [min]="values.min" [max]="values.max">
       <input value="{{values.min}}" (valueChange)="minUpdate($event)" matSliderStartThumb>
       <input value="{{values.max}}" (valueChange)="maxUpdate($event)" matSliderEndThumb>
@@ -17,8 +17,10 @@
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select multiple [(value)]="portal">
-    <mat-option *ngFor="let portal of portals" [value]="portal">{{ portal }}</mat-option>
+  <mat-select multiple [formControl]="controls.portalControl">
+    @for (portal of portals | async; track portal) {
+      <mat-option [value]="portal">{{ portal }}</mat-option>
+    }
   </mat-select>
 </mat-form-field>
 

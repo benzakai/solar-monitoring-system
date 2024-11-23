@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
 import {collection, Firestore, getDocs, limit, query, where} from '@angular/fire/firestore';
-import {from, map, Observable} from 'rxjs';
+import {from, map, Observable, shareReplay} from 'rxjs';
 
-interface MonitorItem {
+export interface MonitorItem {
   id: string;
   communication: string;
   today_average: number;
@@ -35,6 +35,16 @@ export class DirectMonitorService {
 
   private collection = collection(this.firestore, 'directMoniterLife');
 
+  public readonly monitor = this.getAll().pipe(
+    map((data) => data || []),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  portals = this.monitor.pipe(
+    map((data) => Array.from(new Set(data.map((item) => item.portal)))),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
   getAll(): Observable<MonitorItem[]> {
     const limitedQuery = query(this.collection);
     return from(getDocs(limitedQuery)).pipe(
@@ -46,4 +56,8 @@ export class DirectMonitorService {
       )
     );
   }
+
+
+
+
 }

@@ -1,8 +1,6 @@
 <app-header></app-header>
 <app-filters></app-filters>
 <div class="container">
-minmax {{minMaxKwp | async | json}} | portals
-  {{portals | async | json}}
   <div class="headline-1">
     Total KV: <span>{{totalKv | async | number: '1.2-2'}}</span> | Systems that appear in the table: <span>{{monitorFilteredCount | async}}</span> | Of which were checked today: <span>12</span> | Of which you should check today: <span>0</span> | Time to read data from the server: <span>12:47:29</span>
   </div>
@@ -20,9 +18,9 @@ minmax {{minMaxKwp | async | json}} | portals
     <ng-container matColumnDef="notes">
       <th mat-header-cell *matHeaderCellDef>Notes</th>
       <td mat-cell *matCellDef="let element">
-        <mat-icon [style.color]="element.comments ? '#1287DE' : '#141415'"
-        >{{element.comments ? 'error' : 'error_outline'}}</mat-icon
-        >
+        <mat-icon [style.color]="element.comments ? '#1287DE' : '#141415'">
+          {{element.comments ? 'error' : 'error_outline'}}
+        </mat-icon>
       </td>
     </ng-container>
 
