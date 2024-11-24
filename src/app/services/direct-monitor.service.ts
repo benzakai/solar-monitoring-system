@@ -46,7 +46,7 @@ export class DirectMonitorService {
   );
 
   getAll(): Observable<MonitorItem[]> {
-    const limitedQuery = query(this.collection, limit(100));
+    const limitedQuery = query(this.collection);
     return from(getDocs(limitedQuery)).pipe(
       map((querySnapshot) =>
         querySnapshot.docs.map((doc) => ({
