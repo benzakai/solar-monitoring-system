@@ -465,3 +465,24 @@ button.mat-flat-button {
   padding: 0.5rem 1.5rem;
   border-radius: 4px;
 }
+
+tbody {
+  display: flex;
+  overflow-y: auto;
+  flex-direction: column;
+  flex: 1 1 1px;
+
+}
+
+thead {
+  border-top: 2px #eee solid;
+  position:absolute;
+  top: -40px;
+}
+
+tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  min-height: 40px;
+}

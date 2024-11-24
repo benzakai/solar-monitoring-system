@@ -1,11 +1,15 @@
 :host {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .table-container {
-  overflow: auto;
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
 }
 
 mat-icon {
@@ -13,11 +17,15 @@ mat-icon {
 }
 
 .container {
-  margin: auto;
+  margin: 0 20px 20px 20px;
+  flex: 1 1 1px;
 }
 
-.table {
-  margin-top: 45px;
+table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+  position: relative;
 }
 
 th {
@@ -54,3 +62,13 @@ th {
 .headline-2 {
   flex-basis: 40px;
 }
+
+
+.mat-header-row, .mat-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+
