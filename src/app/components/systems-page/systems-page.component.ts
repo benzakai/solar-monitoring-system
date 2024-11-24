@@ -61,6 +61,7 @@ export class SystemsPageComponent {
     'weekly',
     'threeDays',
     'yesterday',
+    'today_comparable',
     'communication',
     'portal',
     'KWP',

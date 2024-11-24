@@ -71,6 +71,7 @@ body {
   --mat-table-header-headline-font: 'Inter', sans-serif;
   --mat-table-row-item-label-text-font: 'Inter', sans-serif;
   --mat-select-trigger-text-font:  'Inter', sans-serif;
+  --mat-table-background-color: #fff;
   --mdc-filled-text-field-label-text-font: 'Inter', sans-serif;
   --mdc-filled-text-field-label-text-size: 12px;
   --mdc-filled-text-field-label-text-tracking: 12px;
@@ -307,8 +308,8 @@ mat-form-field {
   //&-clearedAlerts { width: px; }
   //&-startOfYear { width: px; }
   //&-startOfMonth { width: px; }
-  //&-lastMonth { width: px; }
-  //&-today { width: px; }
+  &-lastMonth { min-width: 80px; }
+  &-today { min-width: 80px; }
   //&-monthly { width: px; }
   //&-weekly { width: px; }
   //&-threeDays { width: px; }

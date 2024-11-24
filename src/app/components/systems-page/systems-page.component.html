@@ -5,9 +5,6 @@
     Total KV: <span>{{totalKv | async | number: '1.2-2'}}</span> | Systems that appear in the table: <span>{{monitorFilteredCount | async}}</span> | Of which were checked today: <span>12</span> | Of which you should check today: <span>0</span> | Time to read data from the server: <span>12:47:29</span>
   </div>
   <div class="headline-2">
-    <div>Index relative to expectations</div>
-    <div>system daily average</div>
-    <div>Benchmarks that compare to the environment</div>
   </div>
   <table
     mat-table
@@ -51,7 +48,10 @@
     </ng-container>
 
     <ng-container matColumnDef="startOfYear">
-      <th mat-header-cell *matHeaderCellDef>Start of Year</th>
+      <th mat-header-cell *matHeaderCellDef>
+        Start of Year
+        <div class="description">Index relative to expectations</div>
+      </th>
       <td mat-cell *matCellDef="let element">
         <span>{{ element?.since_year_average }}</span>
       </td>
@@ -67,7 +67,10 @@
     </ng-container>
 
     <ng-container matColumnDef="lastMonth">
-      <th mat-header-cell *matHeaderCellDef>Last Month</th>
+      <th mat-header-cell *matHeaderCellDef>
+        Last Month
+        <div class="description">system daily average</div>
+      </th>
       <td mat-cell *matCellDef="let element">{{ element?.last_month_average | number: '1.2-2' }}</td>
     </ng-container>
 
@@ -79,7 +82,10 @@
     </ng-container>
 
     <ng-container matColumnDef="monthly">
-      <th mat-header-cell *matHeaderCellDef>Monthly</th>
+      <th mat-header-cell *matHeaderCellDef>
+        Monthly
+        <div class="description d-600">Benchmarks that compare to the environment</div>
+      </th>
       <td mat-cell *matCellDef="let element">
         <span>{{ element?.monthly_comparable  }}</span>
       </td>
@@ -102,8 +108,16 @@
       <td mat-cell *matCellDef="let element">{{ element?.yesterday_comparable }}</td>
     </ng-container>
 
+    <ng-container matColumnDef="today_comparable">
+      <th mat-header-cell *matHeaderCellDef>Today</th>
+      <td mat-cell *matCellDef="let element">{{ element?.today_comparable }}</td>
+    </ng-container>
+
     <ng-container matColumnDef="communication">
-      <th mat-header-cell *matHeaderCellDef>Communication</th>
+      <th mat-header-cell *matHeaderCellDef>
+        Communication
+        <div class="description"></div>
+      </th>
       <td mat-cell *matCellDef="let element">
         <mat-icon [style.color]="element.communication ? '#60B952' : '#FC5507'">
           {{ element.communication ? 'wifi' : 'running_with_errors' }}
