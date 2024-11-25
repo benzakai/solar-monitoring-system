@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import {Component, DestroyRef, inject} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
-import {combineLatest, interval, map, of, startWith} from 'rxjs';
+import {combineLatest, distinctUntilChanged, interval, map, of, startWith} from 'rxjs';
 import {AsyncPipe, NgForOf} from '@angular/common';
 import {MatFormField} from '@angular/material/form-field';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
+import {LANGUAGE} from '../../../lang';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +29,18 @@ import {MatInput} from '@angular/material/input';
 export class HeaderComponent {
   people = ['Katia Levenstein', 'Marek'];
   personControl = new FormControl(this.people[0])
+  lang = inject(LANGUAGE);
+  destroyRef = inject(DestroyRef);
+  langControl = new FormControl();
+
+  constructor() {
+    this.lang.pipe(takeUntilDestroyed(), distinctUntilChanged()).subscribe((lng) => {
+      this.langControl.setValue(lng);
+    });
+    this.langControl.valueChanges.pipe(takeUntilDestroyed()).subscribe((lang) => {
+      this.lang.next(lang);
+    } );
+  }
 
   text$ = combineLatest([
     interval(60000).pipe(startWith(0)),
@@ -56,4 +70,6 @@ export class HeaderComponent {
 
     return `${day}/${month}/${year} ${hours}:${minutes}  ${greet} ${name}`;
   }
+
+
 }

@@ -76,3 +76,7 @@ mat-form-field {
   gap: 50px;
   margin-top: 8px;
 }
+
+.lang {
+  width: 70px;
+}

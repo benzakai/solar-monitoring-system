@@ -4,6 +4,12 @@
     <div class="controls">
       <div class="control-text">{{text$ | async}}</div>
       <div class="control-form">
+        <mat-form-field appearance="outline" class="custom-select-single lang">
+          <mat-select [formControl]="langControl">
+            <mat-option value="en">EN</mat-option>
+            <mat-option value="he">HE</mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field appearance="outline" class="custom-select-single">
           <mat-select [formControl]="personControl">
             <mat-option *ngFor="let status of people" [value]="status">{{ status }}</mat-option>

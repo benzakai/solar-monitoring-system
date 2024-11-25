@@ -10,6 +10,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
 import {getAuth, provideAuth} from '@angular/fire/auth';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+import {LANGUAGE, language, LANGUAGE_DICTIONARY} from './lang';
+import {BehaviorSubject} from 'rxjs';
 
 const app = initializeApp(firebaseConfig);
 
@@ -20,6 +22,8 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()),
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
-    { provide: FIREBASE_OPTIONS, useValue: firebaseConfig }
+    { provide: FIREBASE_OPTIONS, useValue: firebaseConfig },
+    { provide: LANGUAGE_DICTIONARY, useValue: language },
+    { provide: LANGUAGE, useValue: new BehaviorSubject('he') },
   ],
 }).catch((err) => console.error(err));

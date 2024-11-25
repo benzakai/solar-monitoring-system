@@ -21,7 +21,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FiltersControlService } from '../../services/filters-control.service';
 import {DirectMonitorService, MonitorItem} from '../../services/direct-monitor.service';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
-import {map, shareReplay, combineLatest, filter} from 'rxjs';
+import {map, shareReplay, combineLatest} from 'rxjs';
+import {TranslatePipe} from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-systems-page',
@@ -41,6 +42,7 @@ import {map, shareReplay, combineLatest, filter} from 'rxjs';
       HeaderComponent,
       IssuesCountPipe,
     ],
+    TranslatePipe,
   ],
   templateUrl: './systems-page.component.html',
   styleUrl: './systems-page.component.css',
@@ -86,7 +88,7 @@ export class SystemsPageComponent {
     map(([kwp, portals, activity, systems, clients, data]) => {
       const filters: Array<(item: MonitorItem) => boolean> = [];
 
-      if (kwp?.length ) {
+      if (kwp?.length) {
         filters.push((item) => item.kwp >= kwp[0] && item.kwp <= kwp[1]);
       }
 
@@ -127,9 +129,11 @@ export class SystemsPageComponent {
     private route: ActivatedRoute,
     private destroyRef: DestroyRef
   ) {
-    this.monitorFiltered.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
-      this.dataSource.data = data;
-    });
+    this.monitorFiltered
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.dataSource.data = data;
+      });
   }
 
   onSort(sortState: Sort) {
