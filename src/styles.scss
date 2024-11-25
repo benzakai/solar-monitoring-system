@@ -486,3 +486,12 @@ tr {
   table-layout: fixed;
   min-height: 40px;
 }
+
+.filter-multi-selector {
+  max-height: unset!important;
+  overflow-y: hidden!important;
+  .filter-multi-selector-scroll {
+    overflow: auto;
+    max-height: 300px;
+  }
+}

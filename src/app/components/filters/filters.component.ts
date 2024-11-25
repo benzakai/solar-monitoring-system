@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -10,6 +10,7 @@ import { FiltersControlService } from '../../services/filters-control.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { first, map, share, shareReplay } from 'rxjs';
 import { DirectMonitorService } from '../../services/direct-monitor.service';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-filters',
@@ -22,10 +23,12 @@ import { DirectMonitorService } from '../../services/direct-monitor.service';
     MatSelectModule,
     MatSliderModule,
     MatCheckboxModule,
+    MatInputModule,
     MatIcon,
   ],
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FiltersComponent {
   filtersService = inject(FiltersService);
@@ -44,8 +47,7 @@ export class FiltersComponent {
 
   minMaxKwp$ = this.filtersService.getMinMaxKwp().pipe(share());
 
-  systemStatuses = ['Active', 'Inactive', 'Pending', 'Suspended'];
-  systemStatus = [this.systemStatuses[0]];
+  systemStatuses = ['Active', 'Inactive'];
 
   tags = ['Compensation', 'Retrofit'];
   tag = [this.tags[0], this.tags[1]];
@@ -56,8 +58,13 @@ export class FiltersComponent {
   customers = ['Alice', 'Bob', 'Charlie', 'David', 'Emma', 'Frank', 'Grace'];
   customer = [this.customers[0]];
 
-  systems = ['System 1', 'System 2', 'System 3', 'System 4', 'System 5'];
-  system = [this.systems[0]];
+  numberOfSystems = this.controls.systemsControlState.pipe(
+    map((systems) => systems?.length || 'All')
+  );
+
+  numberOfClients = this.controls.clientsControlState.pipe(
+    map((systems) => systems?.length || 'All')
+  );
 
   constructor() {
     this.minMaxKwp$

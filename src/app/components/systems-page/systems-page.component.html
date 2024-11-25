@@ -52,7 +52,7 @@
           <div class="description">Index relative to expectations</div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.since_year_average }}</span>
+          <span>{{ element?.since_year_average | number: '2.0-0' }}%</span>
         </td>
       </ng-container>
 
@@ -61,7 +61,7 @@
           Start of Month
         </th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.since_month_average }}</span>
+          <span>{{ element?.since_month_average | number: '2.0-0' }}%</span>
         </td>
       </ng-container>
 
@@ -86,30 +86,30 @@
           <div class="description d-600">Benchmarks that compare to the environment</div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.monthly_comparable  }}</span>
+          <span>{{ element?.monthly_comparable  | number: '2.0-0' }}%</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="weekly">
         <th mat-header-cell *matHeaderCellDef>Weekly</th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.weekly_comparable  }}</span>
+          <span>{{ element?.weekly_comparable  | number: '2.0-0' }}%</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="threeDays">
         <th mat-header-cell *matHeaderCellDef>Three Days</th>
-        <td mat-cell *matCellDef="let element">{{ element?.three_days_comparable }}</td>
+        <td mat-cell *matCellDef="let element">{{ element?.three_days_comparable  | number: '2.0-0'}}%</td>
       </ng-container>
 
       <ng-container matColumnDef="yesterday">
         <th mat-header-cell *matHeaderCellDef>Yesterday</th>
-        <td mat-cell *matCellDef="let element">{{ element?.yesterday_comparable }}</td>
+        <td mat-cell *matCellDef="let element">{{ element?.yesterday_comparable | number: '2.0-0' }}%</td>
       </ng-container>
 
       <ng-container matColumnDef="today_comparable">
         <th mat-header-cell *matHeaderCellDef>Today</th>
-        <td mat-cell *matCellDef="let element">{{ element?.today_comparable }}</td>
+        <td mat-cell *matCellDef="let element">{{ element?.today_comparable | number: '2.0-0' }}%</td>
       </ng-container>
 
       <ng-container matColumnDef="communication">

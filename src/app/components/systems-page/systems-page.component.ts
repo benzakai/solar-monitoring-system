@@ -21,7 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FiltersControlService } from '../../services/filters-control.service';
 import {DirectMonitorService, MonitorItem} from '../../services/direct-monitor.service';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
-import {map, shareReplay, combineLatest} from 'rxjs';
+import {map, shareReplay, combineLatest, filter} from 'rxjs';
 
 @Component({
   selector: 'app-systems-page',
@@ -78,9 +78,12 @@ export class SystemsPageComponent {
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
     this.filtersControls.portalControlState,
+    this.filtersControls.activityControlState,
+    this.filtersControls.systemsControlStateMap,
+    this.filtersControls.clientsControlStateMap,
     this.directMonitorService.monitor,
   ]).pipe(
-    map(([kwp, portals, data]) => {
+    map(([kwp, portals, activity, systems, clients, data]) => {
       const filters: Array<(item: MonitorItem) => boolean> = [];
 
       if (kwp?.length ) {
@@ -89,6 +92,18 @@ export class SystemsPageComponent {
 
       if (portals?.length) {
         filters.push((item) => portals.includes(item.portal));
+      }
+
+      if (activity?.length) {
+        filters.push((item) => activity.includes(item.system_active));
+      }
+
+      if (Object.keys(systems).length) {
+        filters.push((item) => systems[item.id]);
+      }
+
+      if (Object.keys(clients).length) {
+        filters.push((item) => clients[item.client.id]);
       }
 
       return data.filter((item) => filters.every((filter) => filter(item)));
