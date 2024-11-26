@@ -1,6 +1,13 @@
-import {inject, Injectable} from '@angular/core';
-import {collection, Firestore, getDocs, limit, query, where} from '@angular/fire/firestore';
-import {from, map, Observable, shareReplay} from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import {
+  collection,
+  Firestore,
+  getDocs,
+  limit,
+  query,
+  where,
+} from '@angular/fire/firestore';
+import { from, map, Observable, shareReplay } from 'rxjs';
 
 export interface IdName {
   id: string;
@@ -30,7 +37,7 @@ export interface MonitorItem {
   alerts_from_portal: {
     quantity: number;
     highestImpact: string;
-  }
+  };
   kwp: number;
   comments: string;
   close_issues: number;
@@ -39,7 +46,7 @@ export interface MonitorItem {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DirectMonitorService {
   private firestore = inject(Firestore);
@@ -52,12 +59,14 @@ export class DirectMonitorService {
   );
 
   public readonly fulltext = this.monitor.pipe(
-    map((data) => data.map((item) => ({
-      ...item,
-      system_name_idx: item.system_name.toLowerCase(),
-      }))),
-    shareReplay({ bufferSize: 1, refCount: true }),
-  )
+    map((data) =>
+      data.map((item) => ({
+        ...item,
+        system_name_idx: item.system_name.toLowerCase(),
+      }))
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
   public readonly clients = this.monitor.pipe(
     map((data) => {
@@ -66,19 +75,24 @@ export class DirectMonitorService {
         if (item?.client?.id && item?.client?.name) {
           clients[item.client.id] = item.client;
         }
-
       });
-      return Object.keys(clients).map((id) => ({...clients[id], fulltext: clients[id].name.toLowerCase()}));
+      return Object.keys(clients).map((id) => ({
+        ...clients[id],
+        fulltext: clients[id].name.toLowerCase(),
+      }));
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
   public readonly regions = this.monitor.pipe(
     map((data) => {
-      const regions: Record<string, {
-        name: string;
-        fulltext: string;
-      }> = {};
+      const regions: Record<
+        string,
+        {
+          name: string;
+          fulltext: string;
+        }
+      > = {};
       data.forEach((item) => {
         if (item.region?.length) {
           item.region.forEach((region) => {
@@ -100,15 +114,17 @@ export class DirectMonitorService {
   );
 
   getAll(): Observable<MonitorItem[]> {
-    const limitedQuery = query(this.collection, limit(100));
+    const limitedQuery = query(this.collection);
     return from(getDocs(limitedQuery)).pipe(
       map((querySnapshot) =>
-        querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        } as MonitorItem))
+        querySnapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as MonitorItem
+        )
       )
     );
   }
-
 }
