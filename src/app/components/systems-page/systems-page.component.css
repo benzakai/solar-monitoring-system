@@ -59,6 +59,11 @@ th {
   justify-content: center;
 }
 
+.d-420 {
+  width: 420px;
+  justify-content: center;
+}
+
 .headline-2 {
   flex-basis: 40px;
 }

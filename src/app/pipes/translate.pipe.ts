@@ -1,4 +1,4 @@
-import {Pipe, PipeTransform, OnDestroy, inject} from '@angular/core';
+import {Pipe, PipeTransform, OnDestroy, inject, ChangeDetectorRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {LANGUAGE, LANGUAGE_DICTIONARY} from '../../lang';
 
@@ -13,11 +13,13 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
 
   private lang = inject(LANGUAGE);
   private dictionary= inject(LANGUAGE_DICTIONARY);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   transform(value: string): any {
     if (!this.subscription) {
       this.subscription = this.lang.subscribe((lng) => {
         this.currentValue = this.dictionary[value][lng];
+        this.changeDetectorRef.markForCheck();
       });
     }
     return this.currentValue;

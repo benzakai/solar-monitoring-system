@@ -11,7 +11,6 @@ export interface Fulltext {
   fulltext: string;
 }
 
-
 export interface MonitorItem {
   id: string;
   communication: string;
@@ -27,6 +26,7 @@ export interface MonitorItem {
   three_days_comparable: number;
   yesterday_comparable: number;
   system_active: boolean;
+  region: string[];
   alerts_from_portal: {
     quantity: number;
     highestImpact: string;
@@ -63,9 +63,33 @@ export class DirectMonitorService {
     map((data) => {
       const clients: Record<string, IdName> = {};
       data.forEach((item) => {
-        clients[item.client.id] = item.client;
+        if (item?.client?.id && item?.client?.name) {
+          clients[item.client.id] = item.client;
+        }
+
       });
       return Object.keys(clients).map((id) => ({...clients[id], fulltext: clients[id].name.toLowerCase()}));
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  public readonly regions = this.monitor.pipe(
+    map((data) => {
+      const regions: Record<string, {
+        name: string;
+        fulltext: string;
+      }> = {};
+      data.forEach((item) => {
+        if (item.region?.length) {
+          item.region.forEach((region) => {
+            regions[region] = {
+              name: region,
+              fulltext: region.toLowerCase(),
+            };
+          });
+        }
+      });
+      return Object.keys(regions).map((id) => regions[id]);
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
@@ -76,7 +100,7 @@ export class DirectMonitorService {
   );
 
   getAll(): Observable<MonitorItem[]> {
-    const limitedQuery = query(this.collection);
+    const limitedQuery = query(this.collection, limit(100));
     return from(getDocs(limitedQuery)).pipe(
       map((querySnapshot) =>
         querySnapshot.docs.map((doc) => ({
@@ -86,8 +110,5 @@ export class DirectMonitorService {
       )
     );
   }
-
-
-
 
 }

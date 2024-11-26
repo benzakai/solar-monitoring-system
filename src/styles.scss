@@ -303,23 +303,25 @@ mat-form-field {
 
 .mat-column {
   &-notes { width: 60px; }
-  &-actions { width: 96px; }
-  //&-openAlerts { width: px; }
-  //&-clearedAlerts { width: px; }
-  //&-startOfYear { width: px; }
-  //&-startOfMonth { width: px; }
-  &-lastMonth { min-width: 80px; }
-  &-today { min-width: 80px; }
-  //&-monthly { width: px; }
-  //&-weekly { width: px; }
-  //&-threeDays { width: px; }
-  //&-yesterday { width: px; }
-  //&-communication { width: px; }
-  //&-portal { width: px; }
-  //&-kWp { width: px; }
-  //&-systemName { width: px; }
-  //&-tested { width: px; }
-
+  &-actions { width: 100px; }
+  &-openAlerts { width: 100px; }
+  &-clearedAlerts { width: 110px; }
+  &-startOfYear { width: 100px; }
+  &-startOfMonth { width: 110px; }
+  &-lastMonth { width: 100px; }
+  &-today { width: 80px; }
+  &-today_comparable { width: 80px; }
+  &-monthly { width: 80px; }
+  &-weekly { width: 80px; }
+  &-threeDays { width: 100px; }
+  &-yesterday { width: 80px; }
+  &-communication { width: 100px; }
+  &-portal { width: 80px; }
+  &-KWP { width: 60px; }
+  &-name { text-align: right!important; }
+  &-tested { width: 70px; }
+  &-l { width: 0; padding: 0!important; }
+  &-r { width: 0; padding: 0!important; }
 
 }
 
@@ -361,6 +363,13 @@ mat-form-field {
 
 .link {
   color: #1287DE;
+}
+
+a {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 body {

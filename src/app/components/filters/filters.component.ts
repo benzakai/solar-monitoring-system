@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { first, map, share, shareReplay } from 'rxjs';
 import { DirectMonitorService } from '../../services/direct-monitor.service';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-filters',
@@ -25,6 +26,7 @@ import { MatInputModule } from '@angular/material/input';
     MatCheckboxModule,
     MatInputModule,
     MatIcon,
+    TranslatePipe,
   ],
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css',
@@ -52,17 +54,15 @@ export class FiltersComponent {
   tags = ['Compensation', 'Retrofit'];
   tag = [this.tags[0], this.tags[1]];
 
-  regions = ['Germany', 'France', 'USA', 'Japan'];
-  region = [this.regions[0]];
-
-  customers = ['Alice', 'Bob', 'Charlie', 'David', 'Emma', 'Frank', 'Grace'];
-  customer = [this.customers[0]];
-
   numberOfSystems = this.controls.systemsControlState.pipe(
     map((systems) => systems?.length || 'All')
   );
 
   numberOfClients = this.controls.clientsControlState.pipe(
+    map((systems) => systems?.length || 'All')
+  );
+
+  numberOfRegions = this.controls.regionsControlState.pipe(
     map((systems) => systems?.length || 'All')
   );
 

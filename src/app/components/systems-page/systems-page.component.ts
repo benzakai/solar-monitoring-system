@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   ViewChild,
 } from '@angular/core';
@@ -19,10 +20,14 @@ import { DataService } from '../../data.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FiltersControlService } from '../../services/filters-control.service';
-import {DirectMonitorService, MonitorItem} from '../../services/direct-monitor.service';
+import {
+  DirectMonitorService,
+  MonitorItem,
+} from '../../services/direct-monitor.service';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
-import {map, shareReplay, combineLatest} from 'rxjs';
-import {TranslatePipe} from '../../pipes/translate.pipe';
+import { map, shareReplay, combineLatest } from 'rxjs';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LANGUAGE } from '../../../lang';
 
 @Component({
   selector: 'app-systems-page',
@@ -50,6 +55,8 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemsPageComponent {
+  isRTL = document.documentElement.dir === 'rtl';
+  lang = inject(LANGUAGE);
   displayedColumns: string[] = [
     'notes',
     'actions',
@@ -70,6 +77,7 @@ export class SystemsPageComponent {
     'name',
     'tested',
   ];
+  displayedHColumns: string[] = ['l', ...this.displayedColumns, 'r'];
 
   filtersControls = inject(FiltersControlService);
 
@@ -83,9 +91,10 @@ export class SystemsPageComponent {
     this.filtersControls.activityControlState,
     this.filtersControls.systemsControlStateMap,
     this.filtersControls.clientsControlStateMap,
+    this.filtersControls.regionsControlStateMap,
     this.directMonitorService.monitor,
   ]).pipe(
-    map(([kwp, portals, activity, systems, clients, data]) => {
+    map(([kwp, portals, activity, systems, clients, regions, data]) => {
       const filters: Array<(item: MonitorItem) => boolean> = [];
 
       if (kwp?.length) {
@@ -105,7 +114,15 @@ export class SystemsPageComponent {
       }
 
       if (Object.keys(clients).length) {
-        filters.push((item) => clients[item.client.id]);
+        filters.push((item) =>
+          Boolean(item.client?.id && clients[item.client.id])
+        );
+      }
+
+      if (Object.keys(regions).length) {
+        filters.push((item) =>
+          (item.region || []).some((ireg: string) => regions[ireg])
+        );
       }
 
       return data.filter((item) => filters.every((filter) => filter(item)));
@@ -122,12 +139,15 @@ export class SystemsPageComponent {
     map((data) => data.reduce((acc, item) => acc + item.kwp, 0))
   );
 
+  scrollSize = this.getScrollbarWidth();
+
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
+    private elementRef: ElementRef
   ) {
     this.monitorFiltered
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -146,5 +166,34 @@ export class SystemsPageComponent {
       queryParams: { sort: direction },
       queryParamsHandling: 'merge',
     });
+  }
+
+  getScrollbarWidth() {
+    const scrollDiv = document.createElement('div');
+    scrollDiv.style.visibility = 'hidden';
+    scrollDiv.style.overflow = 'scroll';
+    scrollDiv.style.width = '100px';
+    scrollDiv.style.height = '100px';
+
+    document.body.appendChild(scrollDiv);
+
+    const innerDiv = document.createElement('div');
+    innerDiv.style.width = '100%';
+    scrollDiv.appendChild(innerDiv);
+
+    const scrollbarWidth = scrollDiv.offsetWidth - innerDiv.offsetWidth;
+
+    document.body.removeChild(scrollDiv);
+
+    return scrollbarWidth;
+  }
+
+  hasOverflow() {
+    const element = this.elementRef?.nativeElement?.querySelector('tbody');
+    if (element) {
+      return element.scrollHeight > element.clientHeight;
+    } else {
+      return false;
+    }
   }
 }

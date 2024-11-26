@@ -18,8 +18,12 @@ export const language: Dictionary = {
     he: 'נבחרו'
   },
   'search': {
-    en: 'Search',
-    he: 'חיפוש'
+    en: 'Search...',
+    he: 'חיפוש...'
+  },
+  "all_regions": {
+    en: 'All regions',
+    he: 'כל האזורים'
   },
   'all_systems': {
     en: 'All Systems',
@@ -120,5 +124,13 @@ export const language: Dictionary = {
   'total_kv': {
     en: 'Total KV',
     he: 'סה"כ ק"ו'
-  }
+  },
+  'active': {
+    en: 'Active',
+    he: 'פעיל'
+  },
+  'inactive': {
+    en: 'Inactive',
+    he: 'לא פעיל'
+  },
 };

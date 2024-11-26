@@ -104,6 +104,44 @@ export class FiltersControlService {
       }
     ));
 
+  regionsControl = new FormControl();
+  regionsControlState = this.regionsControl.valueChanges.pipe(
+    startWith(this.regionsControl.value || []),
+  );
+  regionsSearchControl = new FormControl();
+  regions = combineLatest([
+    this.directMonitorService.regions,
+    this.regionsSearchControl.valueChanges.pipe(startWith(null)),
+    this.regionsControlState,
+  ]).pipe(
+    map(([data, search, selected]) => {
+      let result;
+      if (!search) {
+        result = data;
+      } else {
+        const lowerSearch = search.toLowerCase();
+        result = data.filter((item) => item.fulltext.includes(lowerSearch));
+      }
+
+      const selectedSet: Record<string, any> = {};
+      selected.forEach((item: {name: string}) => {
+        selectedSet[item.name] = true;
+      });
+
+      return result.filter((item) => !selectedSet[item.name]);
+
+    })
+  );
+  regionsControlStateMap = this.regionsControlState.pipe(
+    map((data) => {
+        const result: Record<string, boolean> = {};
+        data.forEach((item: any) => {
+          result[item.name] = true;
+        });
+        return result;
+      }
+    ));
+
   constructor() {
     this.directMonitorService.portals
       .pipe(first())
