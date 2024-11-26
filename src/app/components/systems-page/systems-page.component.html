@@ -117,14 +117,14 @@
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.monthly_comparable | number: '1.0-0' }}%</span>
+          <span>{{ element?.monthly_percent | number: '1.0-0' }}%</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="weekly">
         <th mat-header-cell *matHeaderCellDef>{{ 'weekly' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          <span>{{ element?.weekly_comparable | number: '1.0-0' }}%</span>
+          <span>{{ element?.weekly_percent | number: '1.0-0' }}%</span>
         </td>
       </ng-container>
 
@@ -133,21 +133,21 @@
           {{ 'three_days' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
-          {{ element?.three_days_comparable | number: '1.0-0' }}%
+          {{ element?.three_days_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 
       <ng-container matColumnDef="yesterday">
         <th mat-header-cell *matHeaderCellDef>{{ 'yesterday' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          {{ element?.yesterday_comparable | number: '1.0-0' }}%
+          {{ element?.yesterday_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 
       <ng-container matColumnDef="today_comparable">
         <th mat-header-cell *matHeaderCellDef>{{ 'today' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          {{ element?.today_comparable | number: '1.0-0' }}%
+          {{ element?.today_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 

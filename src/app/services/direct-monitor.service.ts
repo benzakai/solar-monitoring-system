@@ -43,6 +43,11 @@ export interface MonitorItem {
   close_issues: number;
   open_issues: number;
   client: IdName;
+  monthly_percent: number;
+  three_days_percent: number;
+  today_percent: number;
+  weekly_percent: number;
+  yesterday_percent: number;
 }
 
 @Injectable({
