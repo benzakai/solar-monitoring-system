@@ -1,136 +1,198 @@
-import {InjectionToken} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import { InjectionToken } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-export type Dictionary = Record<string, {
-  [key in 'en' | 'he']: string;
-}>;
+export type Dictionary = Record<
+  string,
+  {
+    [key in 'en' | 'he']: string;
+  }
+>;
 
-export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> = new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
-export const LANGUAGE: InjectionToken<BehaviorSubject<'en' | 'he'>> = new InjectionToken<BehaviorSubject<'en' | 'he'>>('LANGUAGE');
+export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
+  new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
+export const LANGUAGE: InjectionToken<BehaviorSubject<'en' | 'he'>> =
+  new InjectionToken<BehaviorSubject<'en' | 'he'>>('LANGUAGE');
 
 export const language: Dictionary = {
-  'all_clients': {
+  all_clients: {
     en: 'All clients',
-    he: 'כל הלקוחות'
+    he: 'כל הלקוחות',
   },
-  'selected': {
+  selected: {
     en: 'selected',
-    he: 'נבחרו'
+    he: 'נבחרו',
   },
-  'search': {
+  search: {
     en: 'Search...',
-    he: 'חיפוש...'
+    he: 'חיפוש...',
   },
-  "all_regions": {
+  all_regions: {
     en: 'All regions',
-    he: 'כל האזורים'
+    he: 'כל האזורים',
   },
-  'all_systems': {
+  all_systems: {
     en: 'All Systems',
-    he: 'כל המערכות'
+    he: 'כל המערכות',
   },
-  'systems_appear_in_table': {
+  systems_appear_in_table: {
     en: 'Systems that appear in the table',
-    he: 'מערכות שמופיעות בטבלה'
+    he: 'מערכות שמופיעות בטבלה',
   },
-  'were_checked_today': {
+  were_checked_today: {
     en: 'Of which were checked today',
-    he: 'מהן נבדקו היום'
+    he: 'מהן נבדקו היום',
   },
-  'should_check_today': {
+  should_check_today: {
     en: 'Of which you should check today',
-    he: 'מהן עליך לבדוק היום'
+    he: 'מהן עליך לבדוק היום',
   },
-  'read_data_from_server': {
+  read_data_from_server: {
     en: 'Time to read data from the server',
-    he: 'זמן לקריאת נתונים מהשרת'
+    he: 'זמן לקריאת נתונים מהשרת',
   },
-  'notes': {
+  notes: {
     en: 'Notes',
-    he: 'הערות'
+    he: 'הערות',
   },
-  'actions': {
+  actions: {
     en: 'Actions',
-    he: 'פעולות'
+    he: 'פעולות',
   },
-  'open_alerts': {
+  open_alerts: {
     en: 'Open Alerts',
-    he: 'תקלות פתוחות'
+    he: 'תקלות פתוחות',
   },
-  'cleared_alerts': {
+  cleared_alerts: {
     en: 'Cleared Alerts',
-    he: 'התראות מפורטל'
+    he: 'התראות מפורטל',
   },
-  'start_of_year': {
+  start_of_year: {
     en: 'Start of Year',
-    he: 'מתחילת השנה'
+    he: 'מתחילת השנה',
   },
-  'index_relative': {
+  index_relative: {
     en: 'Index relative to expectations',
-    he: 'מדד ביחס לצפי'
+    he: 'מדד ביחס לצפי',
   },
-  'start_of_month': {
+  start_of_month: {
     en: 'Start of Month',
-    he: 'מתחילת החודש'
+    he: 'מתחילת החודש',
   },
-  'last_month': {
+  last_month: {
     en: 'Last Month',
-    he: 'חודש אחרון'
+    he: 'חודש אחרון',
   },
-  'system_daily_average': {
+  system_daily_average: {
     en: 'system daily average',
-    he: 'ממוצע יומי מערכת'
+    he: 'ממוצע יומי מערכת',
   },
-  'today': {
+  today: {
     en: 'Today',
-    he: 'היום'
+    he: 'היום',
   },
-  'monthly': {
+  monthly: {
     en: 'Monthly',
-    he: 'חודשי'
+    he: 'חודשי',
   },
-  'benchmarks': {
+  benchmarks: {
     en: 'Benchmarks that compare to the environment',
-    he: 'מדדים השוואתים לסביבה'
+    he: 'מדדים השוואתים לסביבה',
   },
-  'weekly': {
+  weekly: {
     en: 'Weekly',
-    he: 'שבועי'
+    he: 'שבועי',
   },
-  'three_days': {
+  three_days: {
     en: 'Three Days',
-    he: 'תלת יומי'
+    he: 'תלת יומי',
   },
-  'yesterday': {
+  yesterday: {
     en: 'Yesterday',
-    he: 'אתמול'
+    he: 'אתמול',
   },
-  'communication': {
+  communication: {
     en: 'Communication',
-    he: 'תקשורת'
+    he: 'תקשורת',
   },
-  'portal': {
+  portal: {
     en: 'Portal',
-    he: 'פורטל'
+    he: 'פורטל',
   },
   'system Name': {
     en: 'System Name',
-    he: 'שם מערכת'
+    he: 'שם מערכת',
   },
-  'tested': {
+  tested: {
     en: 'Tested',
-    he: 'נבדק'
+    he: 'נבדק',
   },
-  'total_kv': {
+  total_kv: {
     en: 'Total KV',
-    he: 'סה"כ ק"ו'
+    he: 'סה"כ ק"ו',
   },
-  'active': {
+  active: {
     en: 'Active',
-    he: 'פעיל'
+    he: 'פעיל',
   },
-  'inactive': {
+  inactive: {
     en: 'Inactive',
-    he: 'לא פעיל'
+    he: 'לא פעיל',
+  },
+
+  region_select_all: {
+    en: 'select all',
+    he: 'בחר ',
+  },
+  region_GOLAN_NORTH: {
+    en: 'Golan Heights - North',
+    he: 'רמת הגולן- צפון',
+  },
+  region_GOLAN_SOUTH: {
+    en: 'Golan Heights - South',
+    he: 'רמת הגולן- דרום',
+  },
+  region_RAMIM_MT: {
+    en: 'Ramim Ridge',
+    he: 'רכס רמים',
+  },
+  'region_GALIL-UPPER': {
+    en: 'Upper Galilee',
+    he: 'גליל עליון',
+  },
+  region_GALIL_LOWER: {
+    en: 'Lower Galilee',
+    he: 'גליל תחתון',
+  },
+  'region_GALIL-WEST': {
+    en: 'Western Galilee',
+    he: 'גליל מערבי',
+  },
+  region_GALIL_VALLEYS: {
+    en: 'Lower Galilee - Valleys',
+    he: 'גליל תחתון - עמקים',
+  },
+  region_GALIL_WEST: {
+    en: 'Valleys',
+    he: 'עמקים',
+  },
+  region_SHARON: {
+    en: 'Sharon',
+    he: 'שרון',
+  },
+  region_CENTER: {
+    en: 'Central',
+    he: 'מרכז',
+  },
+  region_JERUSALEM: {
+    en: 'Jerusalem',
+    he: 'ירושלים',
+  },
+  region_LACHISH: {
+    en: 'Lachish',
+    he: 'לכיש',
+  },
+  region_SOUTH: {
+    en: 'South',
+    he: 'דרום',
   },
 };

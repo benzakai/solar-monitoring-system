@@ -504,3 +504,18 @@ tr {
     max-height: 300px;
   }
 }
+
+.lang-he {
+  .mat-mdc-option {
+    flex-direction: row-reverse;
+    .mat-pseudo-checkbox-full {
+      margin: 0!important;
+    }
+    .mdc-list-item__primary-text {
+      margin-right: 16px!important;
+      text-align: end;
+    }
+  }
+}
+
+
