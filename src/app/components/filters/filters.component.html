@@ -25,22 +25,22 @@
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select multiple [(value)]="tag">
-    <mat-option [value]="tag" *ngFor="let tag of tags">{{tag}}</mat-option>
+  <mat-select [placeholder]="'tag_select_all' | translate" multiple [(value)]="tag">
+    <mat-option [value]="tag" *ngFor="let tag of tags">{{'tag_' + tag | translate}}</mat-option>
   </mat-select>
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select [placeholder]="'all_regions' | translate" multiple [formControl]="controls.regionsControl" panelClass="filter-multi-selector">
+  <mat-select [placeholder]="'region_select_all' | translate" multiple [formControl]="controls.regionsControl" panelClass="filter-multi-selector">
     <mat-select-trigger>
       {{ (numberOfRegions | async) + ' ' + ('selected' | translate)  }}
     </mat-select-trigger>
     <mat-form-field class="input" appearance="outline">
       <input matInput [placeholder]="'search' | translate" [formControl]="controls.regionsSearchControl" />
     </mat-form-field>
-    <mat-option *ngFor="let clients of (controls.regionsControl.valueChanges | async)" [value]="clients">{{ clients.name || '' }}</mat-option>
+    <mat-option *ngFor="let clients of (controls.regionsControl.valueChanges | async)" [value]="clients">{{ ('region_' + (clients.name || '')) | translate }}</mat-option>
     <div class="filter-multi-selector-scroll">
-      <mat-option *ngFor="let clients of (controls.regions | async)" [value]="clients">{{ clients.name || '' }}</mat-option>
+      <mat-option *ngFor="let clients of (controls.regions | async)" [value]="clients">{{ ('region_' + (clients.name || '')) | translate }}</mat-option>
     </div>
   </mat-select>
 </mat-form-field>

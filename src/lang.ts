@@ -140,7 +140,7 @@ export const language: Dictionary = {
   },
 
   region_select_all: {
-    en: 'select all',
+    en: 'Select all',
     he: 'בחר ',
   },
   region_GOLAN_NORTH: {
@@ -194,5 +194,30 @@ export const language: Dictionary = {
   region_SOUTH: {
     en: 'South',
     he: 'דרום',
+  },
+
+  tag_select_all: {
+    en: 'Select All',
+    he: 'בחר הכל',
+  },
+  tag_no_contract: {
+    en: 'No Contract',
+    he: 'ללא חוזה',
+  },
+  tag_annual: {
+    en: 'Annual',
+    he: 'שנתי',
+  },
+  tag_execution: {
+    en: 'Execution',
+    he: 'הרצה',
+  },
+  tag_retrofit: {
+    en: 'Retrofit',
+    he: 'רטרופיט',
+  },
+  tag_compensation: {
+    en: 'Compensation',
+    he: 'פיצוי',
   },
 };

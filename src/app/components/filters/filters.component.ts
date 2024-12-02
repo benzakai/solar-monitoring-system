@@ -51,8 +51,8 @@ export class FiltersComponent {
 
   systemStatuses = ['Active', 'Inactive'];
 
-  tags = ['Compensation', 'Retrofit'];
-  tag = [this.tags[0], this.tags[1]];
+  tags = ['no_contract', 'annual', 'execution', 'retrofit', 'compensation'];
+  tag = [];
 
   numberOfSystems = this.controls.systemsControlState.pipe(
     map((systems) => systems?.length || 'All')
