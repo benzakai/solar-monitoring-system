@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import {
   collection,
   Firestore,
@@ -119,7 +119,9 @@ export class DirectMonitorService {
   );
 
   getAll(): Observable<MonitorItem[]> {
-    const limitedQuery = query(this.collection);
+    const limitedQuery = isDevMode()
+      ? query(this.collection, limit(200))
+      : query(this.collection);
     return from(getDocs(limitedQuery)).pipe(
       map((querySnapshot) =>
         querySnapshot.docs.map(
