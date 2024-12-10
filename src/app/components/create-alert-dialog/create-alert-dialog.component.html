@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>X</h2>
+<mat-dialog-content class="mat-typography">
+
+  {{ data.system_name }} : {{'create_alert_dialog.system_name' | translate}} <br>
+
+
+  <mat-form-field appearance="outline">
+    <input class="inp" matInput/>
+    <label>{{'create_alert_dialog.opening_date' | translate}}</label>
+  </mat-form-field>
+<br>
+  <mat-form-field appearance="outline">
+    <input class="inp" matInput/>
+    <label>{{'create_alert_dialog.request_number' | translate}}</label>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="outline">
+    <input class="inp" matInput/>
+    <label>{{'create_alert_dialog.issue_type' | translate}}</label>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="outline">
+    <input class="inp" matInput/>
+    <label>{{'create_alert_dialog.follow_up_date' | translate}}</label>
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="outline">
+    <input class="inp" matInput/>
+    <label>{{'create_alert_dialog.report_status' | translate}}</label>
+  </mat-form-field>
+  <br>
+
+<br><br>
+
+  {{'create_alert_dialog.statuses.faulty_optimization' | translate}} |
+  {{'create_alert_dialog.statuses.system_without' | translate}} |
+  {{'create_alert_dialog.statuses.issue_opened_solar_edge' | translate}} |
+  {{'create_alert_dialog.statuses.power_outage' | translate}} |
+  {{'create_alert_dialog.statuses.communication' | translate}} |
+  {{'create_alert_dialog.statuses.communication_production' | translate}} |
+  {{'create_alert_dialog.statuses.production' | translate}} |
+  {{'create_alert_dialog.statuses.report_for_customer' | translate}} |
+  {{'create_alert_dialog.statuses.group_report' | translate}} |
+  {{'create_alert_dialog.statuses.high_voltage_observed' | translate}} |
+  {{'create_alert_dialog.statuses.brief_morning_leakage_detected' | translate}} |
+  {{'create_alert_dialog.statuses.call_center_track_update' | translate}} |
+  {{'create_alert_dialog.statuses.found_ok_after_follow_up' | translate}} |
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>{{'create_alert_dialog.buttons.cancel' | translate}}</button>
+  <button mat-button [mat-dialog-close]="true">{{'create_alert_dialog.buttons.save' | translate}}</button>
+</mat-dialog-actions>

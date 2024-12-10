@@ -28,6 +28,8 @@ import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
 import { map, shareReplay, combineLatest } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LANGUAGE } from '../../../lang';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
 
 @Component({
   selector: 'app-systems-page',
@@ -43,6 +45,7 @@ import { LANGUAGE } from '../../../lang';
       MatPaginator,
       MatButtonModule,
       MatMenuModule,
+      MatDialogModule,
       FiltersComponent,
       HeaderComponent,
       IssuesCountPipe,
@@ -147,7 +150,8 @@ export class SystemsPageComponent {
     private router: Router,
     private route: ActivatedRoute,
     private destroyRef: DestroyRef,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private matDialog: MatDialog
   ) {
     this.monitorFiltered
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -195,5 +199,13 @@ export class SystemsPageComponent {
     } else {
       return false;
     }
+  }
+
+  openDialog(data: MonitorItem) {
+    const dialogRef = this.matDialog.open(CreateAlertDialogComponent, { data });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 }

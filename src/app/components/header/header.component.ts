@@ -5,18 +5,18 @@ import {
   distinctUntilChanged,
   interval,
   map,
-  of,
   startWith,
 } from 'rxjs';
 import { AsyncPipe, NgForOf } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { LANGUAGE } from '../../../lang';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-header',
@@ -40,6 +40,7 @@ export class HeaderComponent {
 
   people = ['Katia Levenstein', 'Marek'];
   personControl = new FormControl(this.people[0]);
+  langService = inject(LanguageService);
   lang = inject(LANGUAGE);
   destroyRef = inject(DestroyRef);
   langControl = new FormControl();
@@ -53,7 +54,7 @@ export class HeaderComponent {
     this.langControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((lang) => {
-        this.lang.next(lang);
+        this.langService.setLanguage(lang);
       });
   }
 

@@ -40,9 +40,9 @@
             class="bell-button"
             mat-button
             mat-flat-button
-            [matMenuTriggerFor]="menu"
+            (click)="openDialog(element)"
           >
-            <mat-icon class="arrow">arrow_drop_down</mat-icon>
+            <mat-icon class="arrow" (click)="$event.stopPropagation()" [matMenuTriggerFor]="menu">arrow_drop_down</mat-icon>
             <mat-icon class="bell">notification_add</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
