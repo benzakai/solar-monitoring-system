@@ -13,6 +13,7 @@ import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { LANGUAGE, language, LANGUAGE_DICTIONARY } from './lang';
 import { BehaviorSubject } from 'rxjs';
 import { LanguageService } from './app/services/language.service';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 const app = initializeApp(firebaseConfig);
 
@@ -23,6 +24,7 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()),
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
+    { provide: MAT_DATE_LOCALE, useValue: 'he' },
     { provide: FIREBASE_OPTIONS, useValue: firebaseConfig },
     { provide: LANGUAGE_DICTIONARY, useValue: language },
     {

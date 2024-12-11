@@ -158,6 +158,39 @@ export class SystemsPageComponent {
       .subscribe((data) => {
         this.dataSource.data = data;
       });
+
+    this.openDialog({
+      id: '01rINLX6TWaOgZcuXnIb',
+      three_days_percent: 84.31904139418859,
+      open_issues: 0,
+      monthly_percent: 97.23471143540011,
+      client: {
+        name: 'מועצה אזורית זבולון ',
+        id: 'UoDNc30FpUoDiokhRPex',
+      },
+      system_active: true,
+      kwp: 46.41,
+      last_month_average: 2.605528262587087,
+      yesterday_comparable: 3.164642262390403,
+      yesterday_percent: 83.91170498459006,
+      today_comparable: 1.9058563220496958,
+      weekly_percent: 83.41287322576808,
+      today_average: 2.046369316957552,
+      close_issues: 12,
+      portal: 'SE',
+      today_percent: 107.37269610947054,
+      weekly_comparable: 22.06207085915352,
+      yesterday_average: 2.655505279034691,
+      three_days_average: 8.330683042447749,
+      weeky_average: 18.402607196724848,
+      comments: 'תקשורת מעוכבת להסתכל יום אחרי',
+      since_month_percent: 41.888615959204195,
+      monthly_comparable: 80.38883102928084,
+      since_month_sum: 31.416461969403148,
+      three_days_comparable: 9.87995463978545,
+      region: ['GALIL_VALLEYS'],
+      system_name: 'Zvulun - Carmel B',
+    } as any);
   }
 
   onSort(sortState: Sort) {

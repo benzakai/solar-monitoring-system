@@ -119,6 +119,7 @@ mat-icon {
 
 :root {
   --mdc-filled-button-container-height: 25px;
+  --mdc-outlined-button-container-height: 25px;
 }
 button[mat-button][mat-flat-button] {
   color: #ffffff;
@@ -198,6 +199,9 @@ mat-select[multiple] {
   --mat-option-label-text-size: 12px;
   --mat-full-pseudo-checkbox-selected-icon-color: #1287DE;
   --mat-full-pseudo-checkbox-unselected-icon-color: #bcbcbc;
+
+
+
 }
 .mat-mdc-option {
   min-height: 40px;
@@ -271,7 +275,79 @@ mat-form-field {
     height: 20px;
   }
 
+}
 
+mat-dialog-content {
+  text-align: right;
+}
+
+.form-line {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0;
+  mat-form-field {
+    margin: 0;
+    height: 30px;
+    justify-content: right;
+    .mdc-notched-outline {
+      background: #FFF9C4;
+      z-index: -1;
+    }
+    input, textarea {
+      z-index: 1;
+      text-align: right;
+    }
+
+    .mat-mdc-button-persistent-ripple {
+      display: none;
+    }
+
+    .mdc-notched-outline__leading {
+      border-color: #F1EEA8 !important;
+    }
+    .mdc-notched-outline__notch {
+      border-color: #F1EEA8 !important;
+    }
+    .mdc-notched-outline__trailing {
+      border-color: #F1EEA8 !important;
+    }
+  }
+
+  .mat-mdc-icon-button {
+    color: #74725C;
+    width: 28px;
+    height: 28px;
+    padding: 2px 12px ;
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  span {
+    height: 30px;
+    display: flex;
+    padding: 0 16px;
+    align-items: center;
+  }
+  label {
+    flex: 0 0 90px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 4px 0;
+  }
+  &.area {
+    mat-form-field {
+      height: 160px;
+      width: 400px;
+    }
+    textarea {
+      margin-top: 10px;
+      height: 120px!important;
+    }
+  }
 }
 
 .mdc-text-field--outlined .mat-mdc-form-field-infix, .mdc-text-field--no-label .mat-mdc-form-field-infix {
@@ -457,6 +533,11 @@ input {
 
 :root {
   --mdc-filled-button-container-color: #2196F3;
+  --mdc-outlined-button-outline-color: #2196F3;
+  --mdc-outlined-button-label-text-color: #2196F3;
+  --mdc-outlined-button-container-shape: 2px;
+  --mdc-outlined-button-label-text-weight: 500;
+  --mdc-outlined-button-label-text-size: 12px;
   --mat-app-primary: #2196F3;
 }
 
@@ -475,26 +556,30 @@ button.mat-flat-button {
   border-radius: 4px;
 }
 
-tbody {
-  display: flex;
-  overflow-y: auto;
-  flex-direction: column;
-  flex: 1 1 1px;
+.page-table {
+  tbody {
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    flex: 1 1 1px;
 
+  }
+
+  thead {
+    border-top: 2px #eee solid;
+    position:absolute;
+    top: -40px;
+  }
+
+  tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    min-height: 40px;
+  }
 }
 
-thead {
-  border-top: 2px #eee solid;
-  position:absolute;
-  top: -40px;
-}
 
-tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  min-height: 40px;
-}
 
 .filter-multi-selector {
   max-height: unset!important;
