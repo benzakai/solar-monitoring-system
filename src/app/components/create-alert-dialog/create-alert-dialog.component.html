@@ -58,18 +58,24 @@
   <div class="buttons">
     @for(s of statusKeys; track s) {
       @if('create_alert_dialog.statuses.'+s | translate; as tag) {
-        <button mat-flat-button (click)="addToTextarea(tag)">{{tag}}</button>
+        <button mat-flat-button [disabled]="alertForm.disabled" (click)="addToTextarea(tag)">{{tag}}</button>
       }
     }
   </div>
 
 
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-stroked-button mat-dialog-close>
+<mat-dialog-actions align="end" >
+  <button mat-stroked-button mat-dialog-close [disabled]="alertForm.disabled">
     {{ 'create_alert_dialog.buttons.cancel' | translate }}
   </button>
-  <button mat-flat-button [mat-dialog-close]="true">
+  <button mat-flat-button (click)="save()">
     {{ 'create_alert_dialog.buttons.save' | translate }}
+    @if(alertForm.disabled) {
+      <mat-progress-spinner
+        diameter="15"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    }
   </button>
 </mat-dialog-actions>

@@ -603,4 +603,34 @@ button.mat-flat-button {
   }
 }
 
+// mat-menu
 
+:root {
+  @include mat.menu-overrides((
+    container-color: white,
+    item-hover-state-layer-color: white,
+    item-label-text-font: ('Inter', sans-serif),
+    item-label-text-size: 12px,
+    item-label-text-weight: 500,
+  ));
+}
+
+.mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+
+  mat-progress-spinner {
+    margin-left: 12px;
+  }
+
+  .mat-mdc-progress-spinner .mdc-circular-progress__indeterminate-circle-graphic {
+    stroke: #fff;
+  }
+}

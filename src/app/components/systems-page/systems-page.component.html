@@ -46,9 +46,12 @@
             <mat-icon class="bell">notification_add</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item>Action 1</button>
-            <button mat-menu-item>Action 2</button>
-            <button mat-menu-item>Action 3</button>
+            <button (click)="openDialog(element)" mat-menu-item>{{ 'open_issue' | translate }}
+              <img src="opt_plus.png" class="icon-right"/>
+            </button>
+            <button mat-menu-item>{{ 'log_event' | translate }}
+              <img src="opt_edit.png" class="icon-right"/>
+            </button>
           </mat-menu>
         </td>
       </ng-container>

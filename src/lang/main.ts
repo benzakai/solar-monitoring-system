@@ -207,4 +207,12 @@ export const mainLang: Dictionary = {
     en: 'Compensation',
     he: 'פיצוי',
   },
+  open_issue: {
+    he: 'פתיחת תקלה',
+    en: 'Open an issue',
+  },
+  log_event: {
+    he: 'רישום אירוע',
+    en: 'Log an event',
+  },
 };

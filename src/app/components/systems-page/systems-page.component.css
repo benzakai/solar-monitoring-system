@@ -27,7 +27,11 @@ table {
   flex: 1 1 1px;
   position: relative;
 }
+.icon-right {
 
+  gap: 5px;
+  width: 18px; /* Adjust the size as needed */
+}
 th {
   position: relative;
   overflow: visible;

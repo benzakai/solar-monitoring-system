@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  Inject,
+} from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MonitorItem } from '../../services/direct-monitor.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -7,7 +16,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import {
-  MAT_DATE_FORMATS,
   MatDateFormats,
   MatOption,
   provideNativeDateAdapter,
@@ -16,6 +24,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { NgForOf } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MalfunctionsService } from '../../services/malfunctions.service';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {
@@ -45,6 +55,7 @@ export const DATE_FORMATS: MatDateFormats = {
     MatOption,
     MatSelect,
     NgForOf,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './create-alert-dialog.component.html',
   styleUrl: './create-alert-dialog.component.css',
@@ -52,6 +63,8 @@ export const DATE_FORMATS: MatDateFormats = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateAlertDialogComponent {
+  malfunctionsService = inject(MalfunctionsService);
+
   alertForm: FormGroup = new FormGroup({
     openingDate: new FormControl(new Date()),
     requestNumber: new FormControl(''),
@@ -70,7 +83,7 @@ export class CreateAlertDialogComponent {
     'מתח מהרשת',
     'סטרינג',
     'פאנל',
-    'תפקה',
+    'תפוקה',
     'תקשורת',
   ];
 
@@ -95,5 +108,27 @@ export class CreateAlertDialogComponent {
     this.alertForm.get('reportStatus')?.setValue(val + ' ' + text);
   }
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: MonitorItem) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: MonitorItem,
+    private dialogRef: MatDialogRef<CreateAlertDialogComponent>
+  ) {}
+
+  save() {
+    if (!this.alertForm.disabled) {
+      this.alertForm.disable();
+
+      const malfunction = {
+        description: this.alertForm.get('reportStatus')?.value,
+        systemId: this.data.id,
+        openTime: this.alertForm.get('openingDate')?.value,
+        tracingTime: this.alertForm.get('followUpDate')?.value,
+        type: this.alertForm.get('issueType')?.value,
+        serial: this.alertForm.get('requestNumber')?.value,
+      };
+
+      this.malfunctionsService.saveMalfunction(malfunction).subscribe(() => {
+        this.dialogRef.close();
+      });
+    }
+  }
 }
