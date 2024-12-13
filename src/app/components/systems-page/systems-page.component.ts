@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -30,6 +31,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LANGUAGE } from '../../../lang';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-systems-page',
@@ -51,6 +53,7 @@ import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-
       IssuesCountPipe,
     ],
     TranslatePipe,
+    MatProgressSpinner,
   ],
   templateUrl: './systems-page.component.html',
   styleUrl: './systems-page.component.css',
@@ -146,12 +149,15 @@ export class SystemsPageComponent {
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
+  waitingOpenedIssues: { [key: string]: any } = {};
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private destroyRef: DestroyRef,
     private elementRef: ElementRef,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.monitorFiltered
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -170,6 +176,17 @@ export class SystemsPageComponent {
       queryParams: { sort: direction },
       queryParamsHandling: 'merge',
     });
+  }
+
+  isWaiting(id: string, currentValue: any) {
+    if (this.waitingOpenedIssues[id] !== undefined) {
+      if (this.waitingOpenedIssues[id] !== currentValue) {
+        delete this.waitingOpenedIssues[id];
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 
   getScrollbarWidth() {
@@ -205,7 +222,10 @@ export class SystemsPageComponent {
     const dialogRef = this.matDialog.open(CreateAlertDialogComponent, { data });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+      if (result) {
+        this.waitingOpenedIssues[data.id] = data.open_issues;
+        this.changeDetectorRef.markForCheck();
+      }
     });
   }
 }

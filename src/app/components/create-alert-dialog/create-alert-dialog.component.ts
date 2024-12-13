@@ -124,10 +124,11 @@ export class CreateAlertDialogComponent {
         tracingTime: this.alertForm.get('followUpDate')?.value,
         type: this.alertForm.get('issueType')?.value,
         serial: this.alertForm.get('requestNumber')?.value,
+        status: 'open',
       };
 
       this.malfunctionsService.saveMalfunction(malfunction).subscribe(() => {
-        this.dialogRef.close();
+        this.dialogRef.close(true);
       });
     }
   }

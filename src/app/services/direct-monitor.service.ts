@@ -1,13 +1,13 @@
 import { inject, Injectable, isDevMode } from '@angular/core';
 import {
   collection,
+  collectionData,
   Firestore,
-  getDocs,
   limit,
+  onSnapshot,
   query,
-  where,
 } from '@angular/fire/firestore';
-import { from, map, Observable, shareReplay } from 'rxjs';
+import { map, Observable, shareReplay, startWith } from 'rxjs';
 
 export interface IdName {
   id: string;
@@ -122,16 +122,31 @@ export class DirectMonitorService {
     const limitedQuery = isDevMode()
       ? query(this.collection, limit(200))
       : query(this.collection);
-    return from(getDocs(limitedQuery)).pipe(
-      map((querySnapshot) =>
-        querySnapshot.docs.map(
-          (doc) =>
-            ({
-              id: doc.id,
-              ...doc.data(),
-            }) as MonitorItem
-        )
-      )
+    return collectionData(limitedQuery, { idField: 'id' }).pipe(
+      map((data) => data || []),
+      startWith([])
     );
+    // const limitedQuery = isDevMode()
+    //   ? query(this.collection, limit(200))
+    //   : query(this.collection);
+    //
+    // return new Observable<MonitorItem[]>((observer) => {
+    //   const unsubscribe = onSnapshot(limitedQuery, {
+    //     next: (querySnapshot) => {
+    //       const items = querySnapshot.docs.map(
+    //         (doc) =>
+    //           ({
+    //             id: doc.id,
+    //             ...doc.data(),
+    //           }) as MonitorItem
+    //       );
+    //       observer.next(items);
+    //     },
+    //     error: (error) => {
+    //       observer.error(error);
+    //     },
+    //   });
+    //   return () => unsubscribe();
+    // });
   }
 }

@@ -81,3 +81,9 @@ th {
 }
 
 
+.aligner {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+}
