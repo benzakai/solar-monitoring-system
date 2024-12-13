@@ -117,11 +117,15 @@ export class CreateAlertDialogComponent {
     if (!this.alertForm.disabled) {
       this.alertForm.disable();
 
+      const openDate = this.alertForm.get('openingDate')?.value || new Date();
+      const followUpDate =
+        this.alertForm.get('followUpDate')?.value || openDate;
+
       const malfunction = {
         description: this.alertForm.get('reportStatus')?.value,
         systemId: this.data.id,
-        openTime: this.alertForm.get('openingDate')?.value,
-        tracingTime: this.alertForm.get('followUpDate')?.value,
+        openTime: openDate.toISOString(),
+        tracingTime: followUpDate.toISOString(),
         type: this.alertForm.get('issueType')?.value,
         serial: this.alertForm.get('requestNumber')?.value,
         status: 'open',
