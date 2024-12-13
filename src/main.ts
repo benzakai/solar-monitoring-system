@@ -7,13 +7,13 @@ import { provideFirebaseApp } from '@angular/fire/app';
 import { routes } from './app/app.routes';
 import { provideRouter } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, isDevMode } from '@angular/core';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { LANGUAGE, language, LANGUAGE_DICTIONARY } from './lang';
-import { BehaviorSubject } from 'rxjs';
 import { LanguageService } from './app/services/language.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { reducers, storeProviders } from './app/state';
 
 const app = initializeApp(firebaseConfig);
 
@@ -33,5 +33,6 @@ bootstrapApplication(AppComponent, {
         languageService.language$,
       deps: [LanguageService],
     },
+    ...storeProviders,
   ],
 }).catch((err) => console.error(err));

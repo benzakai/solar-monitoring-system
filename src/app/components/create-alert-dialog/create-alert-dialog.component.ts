@@ -10,7 +10,6 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MonitorItem } from '../../services/direct-monitor.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -26,6 +25,7 @@ import { MatSelect } from '@angular/material/select';
 import { NgForOf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MalfunctionsService } from '../../services/malfunctions.service';
+import { MonitorItem } from '../../domain/monitor-item';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {

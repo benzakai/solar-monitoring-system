@@ -21,10 +21,7 @@ import { DataService } from '../../data.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FiltersControlService } from '../../services/filters-control.service';
-import {
-  DirectMonitorService,
-  MonitorItem,
-} from '../../services/direct-monitor.service';
+import { DirectMonitorService } from '../../services/direct-monitor.service';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
 import { map, shareReplay, combineLatest } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -32,6 +29,9 @@ import { LANGUAGE } from '../../../lang';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MonitorItem } from '../../domain/monitor-item';
+import { Store } from '@ngrx/store';
+import { selectMonitorItems } from '../../state/monitor/monitor.selectors';
 
 @Component({
   selector: 'app-systems-page',
@@ -84,7 +84,7 @@ export class SystemsPageComponent {
     'tested',
   ];
   displayedHColumns: string[] = ['l', ...this.displayedColumns, 'r'];
-
+  store = inject(Store);
   filtersControls = inject(FiltersControlService);
 
   dataSource = new MatTableDataSource<any>();
@@ -98,7 +98,7 @@ export class SystemsPageComponent {
     this.filtersControls.systemsControlStateMap,
     this.filtersControls.clientsControlStateMap,
     this.filtersControls.regionsControlStateMap,
-    this.directMonitorService.monitor,
+    this.store.select(selectMonitorItems),
   ]).pipe(
     map(([kwp, portals, activity, systems, clients, regions, data]) => {
       const filters: Array<(item: MonitorItem) => boolean> = [];

@@ -8,10 +8,13 @@ import { MatIcon } from '@angular/material/icon';
 import { FiltersService } from '../../services/filters.service';
 import { FiltersControlService } from '../../services/filters-control.service';
 import { ReactiveFormsModule } from '@angular/forms';
-import { first, map, share, shareReplay } from 'rxjs';
+import { first, map, share } from 'rxjs';
 import { DirectMonitorService } from '../../services/direct-monitor.service';
 import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { Store } from '@ngrx/store';
+import { selectMinMaxKwp } from '../../state/monitor/monitor.selectors';
+import { MonitorFacade } from '../../state/monitor/monitor.facade';
 
 @Component({
   selector: 'app-filters',
@@ -35,17 +38,12 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class FiltersComponent {
   filtersService = inject(FiltersService);
   controls = inject(FiltersControlService);
-  directMonitorService = inject(DirectMonitorService);
+  monitorFacade = inject(MonitorFacade);
+  store = inject(Store);
 
-  minMaxKwp = this.directMonitorService.monitor.pipe(
-    map((data) => {
-      const kwp = data.map((item) => item.kwp);
-      return { min: Math.min(...kwp), max: Math.max(...kwp) };
-    }),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
+  minMaxKwp = this.store.select(selectMinMaxKwp);
 
-  portals = this.directMonitorService.portals;
+  portals = this.monitorFacade.portals;
 
   minMaxKwp$ = this.filtersService.getMinMaxKwp().pipe(share());
 
