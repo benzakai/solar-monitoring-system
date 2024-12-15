@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { merge, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   loadMonitorItemsSuccess,
@@ -14,7 +14,10 @@ export class MonitorEffects {
   constructor(private actions$: Actions) {}
 
   loadMonitorItems$ = createEffect(() =>
-    this.monitorItemService.getAllSnapshot().pipe(
+    merge(
+      this.monitorItemService.getAllSnapshot(),
+      this.monitorItemService.getAllChanged()
+    ).pipe(
       map((monitorItems) => loadMonitorItemsSuccess({ monitorItems })),
       catchError((error) =>
         of(loadMonitorItemsFailure({ error: error.message }))

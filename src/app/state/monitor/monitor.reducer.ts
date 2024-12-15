@@ -13,6 +13,7 @@ export const initialState: MonitorState = {
 export const monitorReducer = createReducer(
   initialState,
   on(loadMonitorItemsSuccess, (state, { monitorItems }) => {
+    console.log('S', monitorItems?.length);
     const updatedState = [...state.monitorItems];
 
     monitorItems.forEach((updatedItem) => {

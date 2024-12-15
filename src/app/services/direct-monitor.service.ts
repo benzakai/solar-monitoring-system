@@ -9,6 +9,7 @@ import {
 } from '@angular/fire/firestore';
 import { map, Observable, startWith } from 'rxjs';
 import { MonitorItem } from '../domain/monitor-item';
+import { getDocs } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -24,9 +25,9 @@ export class DirectMonitorService {
       : query(this.collection);
 
     return new Observable<MonitorItem[]>((observer) => {
-      return onSnapshot(
-        limitedQuery,
-        (snapshot) => {
+      (async () => {
+        try {
+          const snapshot = await getDocs(limitedQuery);
           const monitorItems = snapshot.docs.map((doc) => {
             const data = doc.data();
             return {
@@ -34,6 +35,37 @@ export class DirectMonitorService {
               ...data,
             } as MonitorItem;
           });
+          console.log('F', monitorItems?.length);
+          observer.next(monitorItems);
+          observer.complete();
+        } catch (error) {
+          observer.error(error);
+        }
+      })();
+    });
+  }
+
+  getAllChanged(): Observable<MonitorItem[]> {
+    const limitedQuery = isDevMode()
+      ? query(this.collection, limit(200))
+      : query(this.collection);
+
+    return new Observable<MonitorItem[]>((observer) => {
+      return onSnapshot(
+        limitedQuery,
+        (snapshot) => {
+          const monitorItems = snapshot
+            .docChanges()
+            .filter((d) => d.type === 'modified')
+            .map((doc) => {
+              const data = doc.doc.data();
+
+              return {
+                id: doc.doc.id,
+                ...data,
+              } as MonitorItem;
+            });
+          console.log('U', monitorItems?.length);
           observer.next(monitorItems);
         },
         (error) => observer.error(error)
