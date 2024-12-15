@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Store } from '@ngrx/store';
 import { selectMinMaxKwp } from '../../state/monitor/monitor.selectors';
+import { MatListItem } from '@angular/material/list';
 
 @Component({
   selector: 'app-filters',
@@ -28,6 +29,7 @@ import { selectMinMaxKwp } from '../../state/monitor/monitor.selectors';
     MatInputModule,
     MatIcon,
     TranslatePipe,
+    MatListItem,
   ],
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css',

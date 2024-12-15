@@ -174,17 +174,33 @@ export class FiltersControlService {
         const prevSelector = prev.includes('all_contracts');
         const nextSelector = next.includes('all_contracts');
 
+        console.log(
+          '===================================',
+          prevAllSelected,
+          nextAllSelected,
+          prevSelector,
+          nextSelector
+        );
+
         if (!prevAllSelected && nextAllSelected && !nextSelector) {
+          console.log('a');
           this.contractsControl.setValue([...next, 'all_contracts']);
         }
 
         if (prevAllSelected && !nextAllSelected && nextSelector) {
+          console.log('b');
           this.contractsControl.setValue(
             next.filter((c) => c !== 'all_contracts')
           );
         }
 
-        if (!prevSelector && nextSelector) {
+        if (
+          !prevSelector &&
+          nextSelector &&
+          !nextAllSelected &&
+          !prevAllSelected
+        ) {
+          console.log('c');
           this.contractsControl.setValue([
             ...new Set([...next, ...this.contracts]),
           ]);
