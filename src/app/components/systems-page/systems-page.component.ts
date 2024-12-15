@@ -100,9 +100,8 @@ export class SystemsPageComponent {
     this.filtersControls.clientsControlStateMap,
     this.filtersControls.regionsControlStateMap,
     this.filtersControls.contractsControlState,
-    this.store.select(selectMonitorItems),
+    this.store.select(selectMonitorItems).pipe(debounceTime(500)),
   ]).pipe(
-    debounceTime(500),
     map(
       ([
         kwp,
@@ -158,6 +157,7 @@ export class SystemsPageComponent {
           );
         }
 
+        console.log('FILTER', ...(contracts || []));
         const contractsMap: { [key: string]: boolean } = (
           contracts || []
         ).reduce(
