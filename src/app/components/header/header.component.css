@@ -10,7 +10,7 @@
     display: flex;
 
     img {
-      margin: 0 57px 0 180px;
+      margin: 0 57px 0 30px;
 
     }
   }
@@ -79,4 +79,13 @@ mat-form-field {
 
 .lang {
   width: 70px;
+}
+
+.refresh {
+  display: flex;
+  align-items: center;
+
+  button {
+    white-space: nowrap;
+  }
 }

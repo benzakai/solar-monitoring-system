@@ -25,7 +25,12 @@
       (matSortChange)="onSort($event)"
     >
       <ng-container matColumnDef="notes">
-        <th mat-header-cell *matHeaderCellDef>{{ 'notes' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'notes' | translate }}
+          <div class="description empty">
+            <button mat-icon-button (click)="toXlsx()"><img src="download.png"></button>
+          </div>
+        </th>
         <td mat-cell *matCellDef="let element">
           <mat-icon [style.color]="element.comments ? '#1287DE' : '#141415'">
             {{ element.comments ? 'error' : 'error_outline' }}
@@ -86,7 +91,7 @@
       <ng-container matColumnDef="startOfYear">
         <th mat-header-cell *matHeaderCellDef>
           {{ 'start_of_year' | translate }}
-          <div class="description">{{ 'index_relative' | translate }}</div>
+
         </th>
         <td mat-cell *matCellDef="let element">
           @if(element?.since_month_percent > 0) {
@@ -98,6 +103,7 @@
       <ng-container matColumnDef="startOfMonth">
         <th mat-header-cell *matHeaderCellDef>
           {{ 'start_of_month' | translate }}
+          <div class="description d-170">{{ 'index_relative' | translate }}</div>
         </th>
         <td mat-cell *matCellDef="let element">
           @if(element?.since_month_percent > 0) {
@@ -109,7 +115,7 @@
       <ng-container matColumnDef="lastMonth">
         <th mat-header-cell *matHeaderCellDef>
           {{ 'last_month' | translate }}
-          <div class="description">
+          <div class="description d-140">
             {{ 'system_daily_average' | translate }}
           </div>
         </th>
@@ -128,7 +134,7 @@
       <ng-container matColumnDef="monthly">
         <th mat-header-cell *matHeaderCellDef>
           {{ 'monthly' | translate }}
-          <div class="description d-420">
+          <div class="description d-380">
             {{ 'benchmarks' | translate }}
           </div>
         </th>

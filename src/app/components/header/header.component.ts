@@ -17,6 +17,8 @@ import { LANGUAGE } from '../../../lang';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { LanguageService } from '../../services/language.service';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-header',
@@ -30,6 +32,8 @@ import { LanguageService } from '../../services/language.service';
     NgForOf,
     ReactiveFormsModule,
     MatInput,
+    MatButton,
+    TranslatePipe,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -42,7 +46,6 @@ export class HeaderComponent {
   personControl = new FormControl(this.people[0]);
   langService = inject(LanguageService);
   lang = inject(LANGUAGE);
-  destroyRef = inject(DestroyRef);
   langControl = new FormControl();
 
   constructor() {
@@ -85,5 +88,9 @@ export class HeaderComponent {
     }
 
     return `${day}/${month}/${year} ${hours}:${minutes}  ${greet} ${name}`;
+  }
+
+  reloadPage() {
+    window.location.reload();
   }
 }

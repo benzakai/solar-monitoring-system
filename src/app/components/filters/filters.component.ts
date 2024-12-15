@@ -8,13 +8,11 @@ import { MatIcon } from '@angular/material/icon';
 import { FiltersService } from '../../services/filters.service';
 import { FiltersControlService } from '../../services/filters-control.service';
 import { ReactiveFormsModule } from '@angular/forms';
-import { first, map, share } from 'rxjs';
-import { DirectMonitorService } from '../../services/direct-monitor.service';
+import { filter, first, map, share } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Store } from '@ngrx/store';
 import { selectMinMaxKwp } from '../../state/monitor/monitor.selectors';
-import { MonitorFacade } from '../../state/monitor/monitor.facade';
 
 @Component({
   selector: 'app-filters',
@@ -38,19 +36,44 @@ import { MonitorFacade } from '../../state/monitor/monitor.facade';
 export class FiltersComponent {
   filtersService = inject(FiltersService);
   controls = inject(FiltersControlService);
-  monitorFacade = inject(MonitorFacade);
   store = inject(Store);
 
   minMaxKwp = this.store.select(selectMinMaxKwp);
 
-  portals = this.monitorFacade.portals;
-
   minMaxKwp$ = this.filtersService.getMinMaxKwp().pipe(share());
 
-  systemStatuses = ['Active', 'Inactive'];
+  systemStatuses = [
+    'status_active_with_issues',
+    'status_active_without_issues',
+    'status_inactive',
+  ];
 
-  tags = ['no_contract', 'annual', 'execution', 'retrofit', 'compensation'];
+  allContractsSelected = this.controls.contractsControlState.pipe(
+    filter(Boolean),
+    map((contracts) =>
+      this.controls.contracts.every((c) => contracts.includes(c))
+    )
+  );
+
+  tags = this.controls.contractsOptions;
   tag = [];
+
+  portalNames: { [k: string]: string } = {
+    SE: 'Solar Edge',
+    SMA: 'SMA',
+    ENX: 'Ennex',
+    HWI: 'Huawei',
+    MTC: 'Meteo Control',
+    UNKNOWN_CODE_REFU: 'Refu',
+    UNKNOWN_CODE_TIGO: 'Tigo',
+    SGR: 'Sun Grow',
+    GW: 'Growatt',
+    UNKNOWN_CODE_NETECO: 'Neteco',
+    UNKNOWN_CODE_SOLAX: 'Solax',
+    UNKNOWN_CODE_GOODWE: 'Goodwe',
+    FSN: 'Fusion',
+  };
+  portalsList: string[] = Object.keys(this.portalNames);
 
   numberOfSystems = this.controls.systemsControlState.pipe(
     map((systems) => systems?.length || 'All')

@@ -7,6 +7,9 @@ import {
   map,
   startWith,
   combineLatest,
+  Observable,
+  filter,
+  pairwise,
 } from 'rxjs';
 import { MonitorFacade } from '../state/monitor/monitor.facade';
 
@@ -26,11 +29,19 @@ export class FiltersControlService {
     startWith(this.portalControl.value)
   );
 
-  activityControl = new FormControl(['Active', 'Inactive']);
-  activityControlState = this.activityControl.valueChanges.pipe(
-    startWith(['Active', 'Inactive']),
-    map((value) => (value || []).map((item: string) => item === 'Active'))
+  contracts = ['year', 'month', 'retrofit', 'manual'];
+  contractsOptions = ['all_contracts', 'no_contract', ...this.contracts];
+  contractsControl = new FormControl(this.contracts);
+  contractsControlState = this.contractsControl.valueChanges.pipe(
+    startWith(this.contractsControl.value)
   );
+
+  activityControl: FormControl<string[] | null> = new FormControl([]);
+  activityControlState: Observable<string[]> =
+    this.activityControl.valueChanges.pipe(
+      startWith([]),
+      filter((data): data is string[] => Boolean(data))
+    );
 
   systemsControl = new FormControl();
   systemsControlState = this.systemsControl.valueChanges.pipe(
@@ -147,8 +158,37 @@ export class FiltersControlService {
   );
 
   constructor() {
-    this.monitorFacade.portals.pipe(first()).subscribe((portals) => {
-      this.portalControl.setValue(portals);
-    });
+    this.contractsControlState
+      .pipe(startWith([]), pairwise())
+      .subscribe(([p, n]) => {
+        const prev = p || [];
+        const next = n || [];
+
+        const prevAllSelected = this.contracts.every((contract) =>
+          prev.includes(contract)
+        );
+        const nextAllSelected = this.contracts.every((contract) =>
+          next.includes(contract)
+        );
+
+        const prevSelector = prev.includes('all_contracts');
+        const nextSelector = next.includes('all_contracts');
+
+        if (!prevAllSelected && nextAllSelected && !nextSelector) {
+          this.contractsControl.setValue([...next, 'all_contracts']);
+        }
+
+        if (prevAllSelected && !nextAllSelected && nextSelector) {
+          this.contractsControl.setValue(
+            next.filter((c) => c !== 'all_contracts')
+          );
+        }
+
+        if (!prevSelector && nextSelector) {
+          this.contractsControl.setValue([
+            ...new Set([...next, ...this.contracts]),
+          ]);
+        }
+      });
   }
 }

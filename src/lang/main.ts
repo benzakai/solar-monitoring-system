@@ -21,6 +21,26 @@ export const mainLang: Dictionary = {
     en: 'All Systems',
     he: 'כל המערכות',
   },
+  statuses_placeholder: {
+    en: 'Active Systems',
+    he: 'מערכות פעילות',
+  },
+  status_active_with_issues: {
+    en: 'Systems with issues',
+    he: 'מערכות עם תקלות',
+  },
+  status_active_without_issues: {
+    en: 'Systems without issues',
+    he: 'מערכות ללא תקלות',
+  },
+  status_inactive: {
+    en: 'Inactive systems',
+    he: 'מערכות לא פעילות',
+  },
+  all_portals: {
+    en: 'All Portals',
+    he: 'כל הפורטלים',
+  },
   systems_appear_in_table: {
     en: 'Systems that appear in the table',
     he: 'מערכות שמופיעות בטבלה',
@@ -67,11 +87,11 @@ export const mainLang: Dictionary = {
   },
   last_month: {
     en: 'Last Month',
-    he: 'חודש אחרון',
+    he: 'ממוצע לחודש',
   },
   system_daily_average: {
     en: 'system daily average',
-    he: 'ממוצע יומי מערכת',
+    he: 'נירמול',
   },
   today: {
     en: 'Today',
@@ -187,23 +207,27 @@ export const mainLang: Dictionary = {
     en: 'Select All',
     he: 'בחר הכל',
   },
+  tag_all_contracts: {
+    en: 'All contracts',
+    he: 'כל החוזים',
+  },
   tag_no_contract: {
     en: 'No Contract',
     he: 'ללא חוזה',
   },
-  tag_annual: {
+  tag_year: {
     en: 'Annual',
     he: 'שנתי',
   },
-  tag_execution: {
-    en: 'Execution',
+  tag_month: {
+    en: 'Pilot',
     he: 'הרצה',
   },
   tag_retrofit: {
     en: 'Retrofit',
     he: 'רטרופיט',
   },
-  tag_compensation: {
+  tag_manual: {
     en: 'Compensation',
     he: 'פיצוי',
   },
@@ -214,5 +238,9 @@ export const mainLang: Dictionary = {
   log_event: {
     he: 'רישום אירוע',
     en: 'Log an event',
+  },
+  data_refresh: {
+    he: 'רענון נתונים',
+    en: 'Data refresh',
   },
 };

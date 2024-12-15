@@ -44,7 +44,7 @@ th {
     align-items: center;
     height: 40px;
 
-    &:before {
+    &:not(.empty):before {
       content: " ";
       position: absolute;
       display: block;
@@ -63,8 +63,18 @@ th {
   justify-content: center;
 }
 
-.d-420 {
-  width: 420px;
+.d-380 {
+  width: 380px;
+  justify-content: center;
+}
+
+.d-170 {
+  width: 170px;
+  justify-content: center;
+}
+
+.d-140 {
+  width: 140px;
   justify-content: center;
 }
 

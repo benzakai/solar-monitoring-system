@@ -35,7 +35,7 @@ export class DirectMonitorService {
               ...data,
             } as MonitorItem;
           });
-          console.log('F', monitorItems?.length);
+
           observer.next(monitorItems);
           observer.complete();
         } catch (error) {
@@ -65,7 +65,6 @@ export class DirectMonitorService {
                 ...data,
               } as MonitorItem;
             });
-          console.log('U', monitorItems?.length);
           observer.next(monitorItems);
         },
         (error) => observer.error(error)

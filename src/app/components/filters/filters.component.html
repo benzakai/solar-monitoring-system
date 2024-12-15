@@ -11,21 +11,21 @@
   <span>KWP</span>
 </div>
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select multiple [formControl]="controls.activityControl">
-    <mat-option *ngFor="let status of systemStatuses" [value]="status">{{ status | lowercase | translate }}</mat-option>
+  <mat-select [placeholder]="'statuses_placeholder' | translate" multiple [formControl]="controls.activityControl">
+    <mat-option *ngFor="let status of systemStatuses" [value]="status">{{ status | translate }}</mat-option>
   </mat-select>
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select multiple [formControl]="controls.portalControl">
-    @for (portal of portals | async; track portal) {
-      <mat-option [value]="portal">{{ portal }}</mat-option>
+  <mat-select [placeholder]="'all_portals' | translate" multiple [formControl]="controls.portalControl">
+    @for (portal of portalsList; track portal) {
+      <mat-option [value]="portal">{{ portalNames[portal] }}</mat-option>
     }
   </mat-select>
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="custom-select">
-  <mat-select [placeholder]="'tag_select_all' | translate" multiple [(value)]="tag">
+  <mat-select [placeholder]="'tag_select_all' | translate" multiple [formControl]="controls.contractsControl">
     <mat-option [value]="tag" *ngFor="let tag of tags">{{'tag_' + tag | translate}}</mat-option>
   </mat-select>
 </mat-form-field>

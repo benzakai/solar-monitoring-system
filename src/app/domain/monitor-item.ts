@@ -4,6 +4,7 @@ export interface MonitorItem {
   id: string;
   communication: string;
   today_average: number;
+  contract: string;
   since_year_average: number;
   since_month_average: number;
   weekly_comparable: number;
