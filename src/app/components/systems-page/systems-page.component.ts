@@ -157,7 +157,6 @@ export class SystemsPageComponent {
           );
         }
 
-        console.log('FILTER', ...(contracts || []));
         const contractsMap: { [key: string]: boolean } = (
           contracts || []
         ).reduce(

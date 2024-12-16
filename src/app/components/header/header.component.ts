@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import {
   combineLatest,
@@ -41,9 +41,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 export class HeaderComponent {
   auth = inject(AngularFireAuth);
   authState = this.auth.authState.pipe(startWith(undefined));
+  translatePipe = new TranslatePipe();
 
-  people = ['Katia Levenstein', 'Marek'];
-  personControl = new FormControl(this.people[0]);
+  personControl = new FormControl();
   langService = inject(LanguageService);
   lang = inject(LANGUAGE);
   langControl = new FormControl();
@@ -59,6 +59,9 @@ export class HeaderComponent {
       .subscribe((lang) => {
         this.langService.setLanguage(lang);
       });
+    this.authState.pipe(takeUntilDestroyed()).subscribe((a) => {
+      this.personControl.setValue(a?.email);
+    });
   }
 
   text$ = combineLatest([
@@ -71,21 +74,31 @@ export class HeaderComponent {
 
   generateGreeting(name: string): string {
     const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    const hours = today.getHours();
-    const minutes = String(today.getMinutes()).padStart(2, '0');
+    const israelTime = new Date(
+      today.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })
+    );
 
-    let greet;
+    const day = String(israelTime.getDate()).padStart(2, '0');
+    const month = String(israelTime.getMonth() + 1).padStart(2, '0');
+    const year = israelTime.getFullYear();
+    const hours = israelTime.getHours();
+    const minutes = String(israelTime.getMinutes()).padStart(2, '0');
+
+    let greetKey: string;
 
     if (hours < 12) {
-      greet = 'Good morning';
+      greetKey = 'good_morning';
     } else if (hours < 18) {
-      greet = 'Good afternoon';
+      greetKey = 'good_afternoon';
+    } else if (hours < 21) {
+      greetKey = 'good_late_afternoon';
+    } else if (hours < 24) {
+      greetKey = 'good_evening';
     } else {
-      greet = 'Good evening';
+      greetKey = 'good_night';
     }
+
+    const greet = this.translatePipe.transform(`header.${greetKey}`);
 
     return `${day}/${month}/${year} ${hours}:${minutes}  ${greet} ${name}`;
   }

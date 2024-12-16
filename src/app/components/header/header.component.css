@@ -65,7 +65,9 @@ mat-form-field {
 .control-text {
   display: flex;
   align-items: center;
+  justify-content: right;
   margin-top: 18px;
+  margin-right: 233px;
 
 }
 

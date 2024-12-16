@@ -19,12 +19,15 @@
         </mat-form-field>
         <mat-form-field appearance="outline" class="custom-select-single">
           <mat-select [formControl]="personControl">
-            <mat-option *ngFor="let status of people" [value]="status">{{ status }}</mat-option>
+            @if (authState | async; as auth) {
+              <mat-option [value]="auth.email">{{ auth.displayName }}</mat-option>
+            }
+
           </mat-select>
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-icon class="pref" >search</mat-icon>
-          <input class="inp" matInput placeholder="System/client search" />
+          <mat-icon class="pref">search</mat-icon>
+          <input class="inp" matInput [placeholder]="'header.search_placeholder' | translate" />
         </mat-form-field>
       </div>
     </div>

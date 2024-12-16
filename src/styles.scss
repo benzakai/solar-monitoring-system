@@ -531,6 +531,11 @@ input {
   background: url('./../public/background.jpg') no-repeat center center / cover;
 }
 
+app-systems-page {
+  background: linear-gradient(rgba(219, 226, 235, 0.8), rgba(219, 226, 235, 0.8)),
+  url('./../public/background.jpg') no-repeat center center / cover;
+}
+
 :root {
   --mdc-filled-button-container-color: #2196F3;
   --mdc-outlined-button-outline-color: #2196F3;
@@ -600,6 +605,10 @@ button.mat-flat-button {
       margin-right: 16px!important;
       text-align: end;
     }
+  }
+
+  input {
+    text-align: right;
   }
 }
 
