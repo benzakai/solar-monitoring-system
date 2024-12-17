@@ -55,7 +55,7 @@ export const mainLang: Dictionary = {
   },
   read_data_from_server: {
     en: 'Time to read data from the server',
-    he: 'זמן לקריאת נתונים מהשרת',
+    he: 'עדכון אחרון מהשרת',
   },
   notes: {
     en: 'Notes',

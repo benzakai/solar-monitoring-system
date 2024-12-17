@@ -2,12 +2,18 @@ import { Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import {
   combineLatest,
+  debounceTime,
   distinctUntilChanged,
   interval,
   map,
+  Observable,
+  of,
   startWith,
+  switchMap,
+  tap,
+  withLatestFrom,
 } from 'rxjs';
-import { AsyncPipe, NgForOf } from '@angular/common';
+import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
@@ -19,6 +25,9 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { LanguageService } from '../../services/language.service';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MonitorFacade } from '../../state/monitor/monitor.facade';
+import { MonitorItem } from '../../domain/monitor-item';
 
 @Component({
   selector: 'app-header',
@@ -34,6 +43,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     MatInput,
     MatButton,
     TranslatePipe,
+    MatAutocompleteModule,
+    JsonPipe,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -44,9 +55,24 @@ export class HeaderComponent {
   translatePipe = new TranslatePipe();
 
   personControl = new FormControl();
+  searchControl = new FormControl();
   langService = inject(LanguageService);
   lang = inject(LANGUAGE);
   langControl = new FormControl();
+
+  facade = inject(MonitorFacade);
+
+  foundSystems: Observable<Partial<MonitorItem>[]> =
+    this.searchControl.valueChanges.pipe(
+      debounceTime(200),
+      map((search) => (search?.length ? search.toLowerCase() : '')),
+      withLatestFrom(
+        combineLatest([this.facade.fulltext, this.facade.clients])
+      ),
+      map(([phrase, [systems, clients]]) =>
+        phrase ? this.searchForSystems(phrase, systems, clients) : []
+      )
+    );
 
   constructor() {
     this.lang
@@ -62,6 +88,38 @@ export class HeaderComponent {
     this.authState.pipe(takeUntilDestroyed()).subscribe((a) => {
       this.personControl.setValue(a?.email);
     });
+  }
+
+  private searchForSystems(
+    phrase: string,
+    systems: (MonitorItem & { system_name_idx: string })[],
+    clients: any[]
+  ): Partial<MonitorItem>[] {
+    if (!(phrase && systems.length && clients.length)) {
+      return [];
+    }
+
+    const systemsFoundByName = systems.filter((client) =>
+      client.system_name_idx.includes(phrase)
+    );
+    const clientsFound = clients.filter((client) =>
+      client.fulltext.includes(phrase)
+    );
+    const clientsMap = clientsFound.reduce(
+      (acc, client) => Object.assign(acc, { [client.id]: true }),
+      {}
+    );
+    const systemsFoundByClient = systems.filter(
+      (system) => system.client?.id && clientsMap[system.client.id]
+    );
+
+    return [...systemsFoundByName, ...systemsFoundByClient];
+  }
+
+  goToSystemDetails(id?: string) {
+    if (id) {
+      window.location.href = `https://solar-golan.web.app/solar-system/${id}`;
+    }
   }
 
   text$ = combineLatest([

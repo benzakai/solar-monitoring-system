@@ -8,4 +8,5 @@ export const header = {
     en: 'System/client search',
     he: 'חיפוש לפי שם מערכת/שם לקוח',
   },
+  monitoring_table: { en: 'Monitoring table', he: 'טבלת ניטור' },
 };

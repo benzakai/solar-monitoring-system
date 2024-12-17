@@ -27,12 +27,21 @@
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-icon class="pref">search</mat-icon>
-          <input class="inp" matInput [placeholder]="'header.search_placeholder' | translate" />
+          <input class="inp" matInput [formControl]="searchControl" [placeholder]="'header.search_placeholder' | translate" [matAutocomplete]="cps" />
+          <mat-autocomplete #cps="matAutocomplete">
+            @if (foundSystems | async; as sys) {
+              @for(s of sys; track s.id) {
+                <mat-option (click)="goToSystemDetails(s?.id)">
+                  {{ s?.system_name }}
+                </mat-option>
+              }
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
     </div>
     <div class="nav">
-      <span>Monitoring Table</span>
+      <span>{{ 'header.monitoring_table' | translate }}</span>
       <mat-icon>east</mat-icon>
     </div>
   </div>

@@ -2,8 +2,9 @@
 <app-filters></app-filters>
 <div class="container">
   <div class="headline-1">
-    {{ 'total_kv' | translate }}:
-    <span>{{ totalKv | async | number: '1.2-2' }}</span> |
+
+    {{ 'total_kv' | translate }}:<span>{{ totalKv | async | number: '1.2-2' }}</span>
+     |
     @if ((lang | async) === 'en') {
       {{ 'systems_appear_in_table' | translate }}:
       <span>{{ monitorFilteredCount | async }}</span> |
