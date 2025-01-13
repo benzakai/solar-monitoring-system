@@ -85,9 +85,17 @@ mat-form-field {
 
 .refresh {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  align-items: stretch;
 
   button {
     white-space: nowrap;
   }
+}
+
+.go-to-old-button {
+  background: #2278BD!important;
+
 }

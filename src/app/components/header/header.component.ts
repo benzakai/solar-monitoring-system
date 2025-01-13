@@ -7,10 +7,7 @@ import {
   interval,
   map,
   Observable,
-  of,
   startWith,
-  switchMap,
-  tap,
   withLatestFrom,
 } from 'rxjs';
 import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
@@ -159,6 +156,10 @@ export class HeaderComponent {
     const greet = this.translatePipe.transform(`header.${greetKey}`);
 
     return `${day}/${month}/${year} ${hours}:${minutes}  ${greet} ${name}`;
+  }
+
+  goToOld() {
+    window.location.href = 'https://solar-golan.web.app';
   }
 
   reloadPage() {

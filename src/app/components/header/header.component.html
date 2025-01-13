@@ -1,6 +1,9 @@
 <div class="inner">
   <div class="header-container">
     <div class="refresh">
+      <button mat-flat-button class="go-to-old-button" (click)="goToOld()" >
+        {{'header.go_to_old' | translate}}
+      </button>
       <button mat-flat-button class="refresh-button" (click)="reloadPage()" >
         <mat-icon>browser_updated</mat-icon>
         {{'data_refresh' | translate}}
