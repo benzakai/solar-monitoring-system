@@ -10,10 +10,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom, isDevMode } from '@angular/core';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { LANGUAGE, language, LANGUAGE_DICTIONARY } from './lang';
-import { LanguageService } from './app/services/language.service';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { reducers, storeProviders } from './app/state';
+import { storeProviders } from './app/state';
+import { LanguageService } from './app/core/lang/language.service';
+import { LANGUAGE, language, LANGUAGE_DICTIONARY } from './app/core/lang';
 
 const app = initializeApp(firebaseConfig);
 

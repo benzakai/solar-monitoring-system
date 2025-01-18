@@ -10,7 +10,6 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
@@ -24,8 +23,9 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { NgForOf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MalfunctionsService } from '../../services/malfunctions.service';
-import { MonitorItem } from '../../domain/monitor-item';
+import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
+import { MonitorItem } from '../../../../domain/monitor-item';
+import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {

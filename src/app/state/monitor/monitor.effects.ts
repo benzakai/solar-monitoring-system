@@ -1,14 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
-import { filter, merge, of, startWith, switchMap } from 'rxjs';
+import { merge, of, startWith, switchMap } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   loadMonitorItemsSuccess,
   loadMonitorItemsFailure,
 } from './monitor.actions';
-import { DirectMonitorService } from '../../services/direct-monitor.service';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { DirectMonitorService } from '../../endpoint/direct-monitor.service';
 
 @Injectable()
 export class MonitorEffects {

@@ -3,15 +3,13 @@ import { FormControl } from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
-  first,
   map,
   startWith,
   combineLatest,
   Observable,
   filter,
-  pairwise,
 } from 'rxjs';
-import { MonitorFacade } from '../state/monitor/monitor.facade';
+import { MonitorFacade } from '../../../state/monitor/monitor.facade';
 
 @Injectable()
 export class FiltersControlService {
@@ -156,41 +154,4 @@ export class FiltersControlService {
       return result;
     })
   );
-
-  constructor() {
-    // this.contractsControl.valueChanges
-    //   .pipe(startWith([]), pairwise())
-    //   .subscribe(([p, n]) => {
-    //     const prev = p || [];
-    //     const next = n || [];
-    //
-    //     const prevAllSelected = this.contracts.every((contract) =>
-    //       prev.includes(contract)
-    //     );
-    //     const nextAllSelected = this.contracts.every((contract) =>
-    //       next.includes(contract)
-    //     );
-    //
-    //     const prevSelector = prev.includes('all_contracts');
-    //     const nextSelector = next.includes('all_contracts');
-    //
-    //     if (!prevAllSelected && nextAllSelected && !nextSelector) {
-    //       this.contractsControl.setValue([...next, 'all_contracts']);
-    //       return;
-    //     }
-    //
-    //     if (prevAllSelected && !nextAllSelected && nextSelector) {
-    //       this.contractsControl.setValue(
-    //         next.filter((c) => c !== 'all_contracts')
-    //       );
-    //       return;
-    //     }
-    //
-    //     if (!prevSelector && nextSelector) {
-    //       const dest = [...new Set([...prev, ...this.contracts])];
-    //       this.contractsControl.setValue(dest);
-    //       return;
-    //     }
-    //   });
-  }
 }

@@ -8,8 +8,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FiltersComponent } from '../filters/filters.component';
-import { HeaderComponent } from '../header/header.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,25 +15,33 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { MatCard } from '@angular/material/card';
-import { DataService } from '../../data.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FiltersControlService } from '../../services/filters-control.service';
-import { DirectMonitorService } from '../../services/direct-monitor.service';
-import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
-import { map, shareReplay, combineLatest, first, debounceTime } from 'rxjs';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { LANGUAGE } from '../../../lang';
+import {
+  map,
+  shareReplay,
+  combineLatest,
+  first,
+  debounceTime,
+  take,
+} from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MonitorItem } from '../../domain/monitor-item';
 import { Store } from '@ngrx/store';
-import { selectMonitorItems } from '../../state/monitor/monitor.selectors';
 import * as XLSX from 'xlsx';
+import { HeaderComponent } from '../../../../core/header/header.component';
+import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
+import { FiltersControlService } from '../../services/filters-control.service';
+import { selectMonitorItems } from '../../../../state/monitor/monitor.selectors';
+import { MonitorItem } from '../../../../domain/monitor-item';
+import { MonitoringFiltersComponent } from '../monitoring-filters/monitoring-filters.component';
+import { TranslatePipe } from '../../../../core/lang/translate.pipe';
+import { LANGUAGE } from '../../../../core/lang';
+import { SystemApiService } from '../../../systems/system-api.service';
 
 @Component({
-  selector: 'app-systems-page',
+  selector: 'app-monitoring-table',
   standalone: true,
   imports: [
     [
@@ -49,19 +55,19 @@ import * as XLSX from 'xlsx';
       MatButtonModule,
       MatMenuModule,
       MatDialogModule,
-      FiltersComponent,
+      MonitoringFiltersComponent,
       HeaderComponent,
       IssuesCountPipe,
     ],
     TranslatePipe,
     MatProgressSpinner,
   ],
-  templateUrl: './systems-page.component.html',
-  styleUrl: './systems-page.component.css',
-  providers: [FiltersControlService, DataService],
+  templateUrl: './monitoring-table.component.html',
+  styleUrl: './monitoring-table.component.css',
+  providers: [FiltersControlService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SystemsPageComponent {
+export class MonitoringTableComponent {
   isRTL = document.documentElement.dir === 'rtl';
   lang = inject(LANGUAGE);
   displayedColumns: string[] = [
@@ -89,8 +95,6 @@ export class SystemsPageComponent {
   filtersControls = inject(FiltersControlService);
 
   dataSource = new MatTableDataSource<any>();
-
-  directMonitorService = inject(DirectMonitorService);
 
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
@@ -196,7 +200,8 @@ export class SystemsPageComponent {
     private destroyRef: DestroyRef,
     private elementRef: ElementRef,
     private matDialog: MatDialog,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private systemApiService: SystemApiService
   ) {
     this.monitorFiltered
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -287,5 +292,12 @@ export class SystemsPageComponent {
 
       document.body.removeChild(link);
     });
+  }
+
+  navigateToSystemApi(systemId: string) {
+    this.systemApiService
+      .redirectToSystemApi(systemId)
+      .pipe(take(1))
+      .subscribe();
   }
 }

@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import {SystemsPageComponent} from './components/systems-page/systems-page.component';
-import {LoginPageComponent} from './components/login-page/login-page.component';
+import { MonitoringTableComponent } from './features/monitoring/components/monitoring-table/monitoring-table.component';
+import { LoginPageComponent } from './core/login-page/login-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
-  { path: 'systems', component: SystemsPageComponent },
+  { path: 'systems', component: MonitoringTableComponent },
   { path: 'login', component: LoginPageComponent },
-  { path: '**', redirectTo: 'systems' }
+  { path: '**', redirectTo: 'systems' },
 ];

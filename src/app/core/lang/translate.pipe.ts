@@ -6,8 +6,8 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LANGUAGE, LANGUAGE_DICTIONARY } from '../../lang';
-import { Dictionary, DictionaryRecord } from '../../lang/types/dictionary';
+import { Dictionary, DictionaryRecord } from './types/dictionary';
+import { LANGUAGE, LANGUAGE_DICTIONARY } from './index';
 
 function getNestedValue(
   obj: Dictionary | DictionaryRecord,

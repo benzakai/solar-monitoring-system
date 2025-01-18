@@ -190,7 +190,7 @@
       <ng-container matColumnDef="portal">
         <th mat-header-cell *matHeaderCellDef>{{ 'portal' | translate }}</th>
         <td mat-cell *matCellDef="let element" class="link">
-          {{ element.portal }}
+          <a class="link" (click)="navigateToSystemApi(element.id)" href="javascript:void()">{{ element.portal }}</a>
         </td>
       </ng-container>
 

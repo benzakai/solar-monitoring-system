@@ -13,8 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { Auth } from '@angular/fire/auth';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { startWith } from 'rxjs';
 import { state } from '@angular/animations';
 
@@ -44,9 +43,7 @@ export class LoginPageComponent {
 
   constructor(
     private fb: FormBuilder,
-    private afAuth: Auth,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -73,7 +70,6 @@ export class LoginPageComponent {
     } else {
       this.error = 'Form is invalid';
     }
-
   }
 
   logout() {

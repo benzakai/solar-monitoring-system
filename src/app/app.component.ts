@@ -2,7 +2,7 @@ import { Component, inject, Renderer2 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-import { LANGUAGE } from '../lang';
+import { LANGUAGE } from './core/lang';
 @Component({
   selector: 'app-root',
   standalone: true,

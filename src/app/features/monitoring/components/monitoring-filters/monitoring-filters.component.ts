@@ -5,15 +5,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { FiltersService } from '../../services/filters.service';
-import { FiltersControlService } from '../../services/filters-control.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { filter, first, map, share } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
-import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Store } from '@ngrx/store';
-import { selectMinMaxKwp } from '../../state/monitor/monitor.selectors';
 import { MatListItem } from '@angular/material/list';
+import { FiltersService } from '../../services/filters.service';
+import { FiltersControlService } from '../../services/filters-control.service';
+import { selectMinMaxKwp } from '../../../../state/monitor/monitor.selectors';
+import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 
 @Component({
   selector: 'app-filters',
@@ -31,11 +31,11 @@ import { MatListItem } from '@angular/material/list';
     TranslatePipe,
     MatListItem,
   ],
-  templateUrl: './filters.component.html',
-  styleUrl: './filters.component.css',
+  templateUrl: './monitoring-filters.component.html',
+  styleUrl: './monitoring-filters.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FiltersComponent {
+export class MonitoringFiltersComponent {
   filtersService = inject(FiltersService);
   controls = inject(FiltersControlService);
   store = inject(Store);

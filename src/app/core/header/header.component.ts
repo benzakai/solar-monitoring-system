@@ -16,15 +16,15 @@ import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
-import { LANGUAGE } from '../../../lang';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { LanguageService } from '../../services/language.service';
 import { MatButton } from '@angular/material/button';
-import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { MonitorItem } from '../../domain/monitor-item';
+import { TranslatePipe } from '../lang/translate.pipe';
+import { LanguageService } from '../lang/language.service';
+import { LANGUAGE } from '../lang';
 
 @Component({
   selector: 'app-header',

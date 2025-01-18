@@ -1,4 +1,4 @@
-import { Dictionary } from './types/dictionary';
+import { Dictionary } from '../types/dictionary';
 
 export const mainLang: Dictionary = {
   all_clients: {

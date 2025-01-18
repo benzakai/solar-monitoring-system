@@ -20,6 +20,7 @@ mat-icon {
 .container {
   margin: 0 20px 20px 20px;
   flex: 1 1 1px;
+  overflow: hidden;
 }
 
 table {

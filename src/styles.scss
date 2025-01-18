@@ -101,6 +101,23 @@ body {
   //--mat-form-field-container-text-size: 40px;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .mat-mdc-row:nth-child(odd) {
   background-color: #f2f2f2;
 }
