@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { addDoc, collection, Firestore } from '@angular/fire/firestore';
+import { collection, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 
 @Injectable({
@@ -10,6 +10,10 @@ export class MalfunctionsService {
   private collection = collection(this.firestore, 'malfunctions');
 
   saveMalfunction(malfunction: any): Observable<any> {
-    return from(addDoc(this.collection, malfunction));
+    const docRef = doc(this.collection);
+    return from(setDoc(docRef, {
+      ...malfunction,
+      id: docRef.id,
+    }));
   }
 }
