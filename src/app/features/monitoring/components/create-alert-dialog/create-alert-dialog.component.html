@@ -28,7 +28,7 @@
     <div class="form-line">
       <mat-form-field appearance="outline" class="custom-select-single">
         <mat-select formControlName="issueType">
-          <mat-option *ngFor="let type of issueTypes" [value]="type">{{ type }}</mat-option>
+          <mat-option *ngFor="let type of issueTypes" [value]="type">{{ malfunctionTypesMap[type] }}</mat-option>
         </mat-select>
       </mat-form-field>
       <label>{{ 'create_alert_dialog.issue_type' | translate }}</label>

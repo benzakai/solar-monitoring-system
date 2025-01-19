@@ -90,7 +90,7 @@
       </ng-container>
 
       <ng-container matColumnDef="startOfYear">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'start_of_year' | translate }}
           <div class="description d-170">{{ 'index_relative' | translate }}</div>
         </th>
@@ -102,7 +102,7 @@
       </ng-container>
 
       <ng-container matColumnDef="startOfMonth">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'start_of_month' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -113,7 +113,7 @@
       </ng-container>
 
       <ng-container matColumnDef="lastMonth">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'last_month' | translate }}
           <div class="description d-140">
             {{ 'system_daily_average' | translate }}
@@ -125,14 +125,14 @@
       </ng-container>
 
       <ng-container matColumnDef="today">
-        <th mat-header-cell *matHeaderCellDef>{{ 'today' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'today' | translate }}</th>
         <td mat-cell *matCellDef="let element">
           <span>{{ element?.today_average | number: '1.2-2' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="monthly">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'monthly' | translate }}
           <div class="description d-380">
             {{ 'benchmarks' | translate }}
@@ -144,14 +144,14 @@
       </ng-container>
 
       <ng-container matColumnDef="weekly">
-        <th mat-header-cell *matHeaderCellDef>{{ 'weekly' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'weekly' | translate }}</th>
         <td mat-cell *matCellDef="let element">
           <span>{{ element?.weekly_percent | number: '1.0-0' }}%</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="threeDays">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'three_days' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -160,21 +160,21 @@
       </ng-container>
 
       <ng-container matColumnDef="yesterday">
-        <th mat-header-cell *matHeaderCellDef>{{ 'yesterday' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'yesterday' | translate }}</th>
         <td mat-cell *matCellDef="let element">
           {{ element?.yesterday_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 
       <ng-container matColumnDef="today_comparable">
-        <th mat-header-cell *matHeaderCellDef>{{ 'today' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'today' | translate }}</th>
         <td mat-cell *matCellDef="let element">
           {{ element?.today_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 
       <ng-container matColumnDef="communication">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'communication' | translate }}
           <div class="description"></div>
         </th>
@@ -187,15 +187,15 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="portal">
-        <th mat-header-cell *matHeaderCellDef>{{ 'portal' | translate }}</th>
+      <ng-container matColumnDef="portal" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'portal' | translate }}</th>
         <td mat-cell *matCellDef="let element" class="link">
-          <a class="link" (click)="navigateToSystemApi(element.id)" href="javascript:void()">{{ element.portal }}</a>
+          <a class="link" (click)="navigateToSystemApi(element.id)" href="javascript:void(0)">{{ element.portal }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="KWP">
-        <th mat-header-cell *matHeaderCellDef>kWp</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>kWp</th>
         <td mat-cell *matCellDef="let element">{{ element.kwp | number : '1.0-2' }}</td>
       </ng-container>
 
