@@ -24,6 +24,7 @@ import {
   first,
   debounceTime,
   take,
+  startWith,
 } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
@@ -95,6 +96,7 @@ export class MonitoringTableComponent {
   filtersControls = inject(FiltersControlService);
 
   dataSource = new MatTableDataSource<any>();
+  route = inject(ActivatedRoute);
 
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
@@ -105,6 +107,17 @@ export class MonitoringTableComponent {
     this.filtersControls.regionsControlStateMap,
     this.filtersControls.contractsControlState,
     this.store.select(selectMonitorItems).pipe(debounceTime(500)),
+    this.route.queryParams.pipe(
+      map((params) => {
+        const sort = params['sort'];
+        return sort ? sort.split(',') : [];
+      }),
+      map(([sortField, sortDirection]) => ({
+        sortField,
+        sortDirection: sortDirection === 'asc' ? 1 : -1,
+      })),
+      startWith({ sortField: null, sortDirection: 1 })
+    ),
   ]).pipe(
     map(
       ([
@@ -116,6 +129,7 @@ export class MonitoringTableComponent {
         regions,
         contracts,
         data,
+        sortConfig,
       ]) => {
         const filters: Array<(item: MonitorItem) => boolean> = [];
 
@@ -128,19 +142,19 @@ export class MonitoringTableComponent {
         }
 
         if (activity?.length) {
-          const accpets: Array<(item: MonitorItem) => boolean> = [];
+          const accepts: Array<(item: MonitorItem) => boolean> = [];
           if (activity.includes('status_active_with_issues')) {
-            accpets.push((item) => item.system_active && item.open_issues > 0);
+            accepts.push((item) => item.system_active && item.open_issues > 0);
           }
           if (activity.includes('status_active_without_issues')) {
-            accpets.push(
+            accepts.push(
               (item) => item.system_active && item.open_issues === 0
             );
           }
           if (activity.includes('status_inactive')) {
-            accpets.push((item) => !item.system_active);
+            accepts.push((item) => !item.system_active);
           }
-          filters.push((item) => accpets.some((filter) => filter(item)));
+          filters.push((item) => accepts.some((filter) => filter(item)));
         } else {
           filters.push((item) => item.system_active);
         }
@@ -173,7 +187,23 @@ export class MonitoringTableComponent {
           filters.push((item) => contractsMap[item.contract]);
         }
 
-        return data.filter((item) => filters.every((filter) => filter(item)));
+        let filteredData = data.filter((item) =>
+          filters.every((filter) => filter(item))
+        );
+
+        if (sortConfig.sortField) {
+          filteredData = filteredData.sort((a, b) => {
+            // @ts-ignore
+            const aValue = a[sortConfig.sortField];
+            // @ts-ignore
+            const bValue = b[sortConfig.sortField];
+            if (aValue < bValue) return -1 * sortConfig.sortDirection;
+            if (aValue > bValue) return 1 * sortConfig.sortDirection;
+            return 0;
+          });
+        }
+
+        return filteredData;
       }
     ),
     shareReplay({ bufferSize: 1, refCount: true })
@@ -196,7 +226,6 @@ export class MonitoringTableComponent {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
     private destroyRef: DestroyRef,
     private elementRef: ElementRef,
     private matDialog: MatDialog,
