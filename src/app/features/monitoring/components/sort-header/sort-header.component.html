@@ -1,0 +1,11 @@
+@if (fit | async) {
+  @if ((direction | async) === 'desc') {
+    <i class="pi pi-sort-amount-down" ></i>
+  } @else {
+    <i class="pi pi-sort-amount-up-alt"></i>
+  }
+} @else {
+  <i class="pi pi-sort-amount-down hovering"></i>
+}
+
+<div class="indicator"></div>

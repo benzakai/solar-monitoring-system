@@ -1,0 +1,35 @@
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+:host-context(th:hover) {
+  .hovering {
+    opacity: 0.5;
+  }
+}
+
+.hovering {
+  opacity: 0;
+}
+
+i {
+  color: var(--color-primary);
+  background-color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.indicator {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  right: 1px;
+}

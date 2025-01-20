@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -40,6 +41,7 @@ import { MonitoringFiltersComponent } from '../monitoring-filters/monitoring-fil
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { LANGUAGE } from '../../../../core/lang';
 import { SystemApiService } from '../../../systems/system-api.service';
+import { SortHeaderComponent } from '../sort-header/sort-header.component';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -59,6 +61,7 @@ import { SystemApiService } from '../../../systems/system-api.service';
       MonitoringFiltersComponent,
       HeaderComponent,
       IssuesCountPipe,
+      SortHeaderComponent,
     ],
     TranslatePipe,
     MatProgressSpinner,
@@ -98,6 +101,18 @@ export class MonitoringTableComponent {
   dataSource = new MatTableDataSource<any>();
   route = inject(ActivatedRoute);
 
+  sortParams = this.route.queryParams.pipe(
+    startWith({ sort: 'tested,desc' }),
+    map((params) => {
+      const sort = params['sort'];
+      return sort?.split(',') || ['tested', 'desc'];
+    }),
+    map(([sortField, sortDirection]) => ({
+      sortField,
+      sortDirection: sortDirection === 'asc' ? 1 : -1,
+    }))
+  );
+
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
     this.filtersControls.portalControlState,
@@ -107,17 +122,6 @@ export class MonitoringTableComponent {
     this.filtersControls.regionsControlStateMap,
     this.filtersControls.contractsControlState,
     this.store.select(selectMonitorItems).pipe(debounceTime(500)),
-    this.route.queryParams.pipe(
-      map((params) => {
-        const sort = params['sort'];
-        return sort ? sort.split(',') : [];
-      }),
-      map(([sortField, sortDirection]) => ({
-        sortField,
-        sortDirection: sortDirection === 'asc' ? 1 : -1,
-      })),
-      startWith({ sortField: null, sortDirection: 1 })
-    ),
   ]).pipe(
     map(
       ([
@@ -129,7 +133,6 @@ export class MonitoringTableComponent {
         regions,
         contracts,
         data,
-        sortConfig,
       ]) => {
         const filters: Array<(item: MonitorItem) => boolean> = [];
 
@@ -187,25 +190,27 @@ export class MonitoringTableComponent {
           filters.push((item) => contractsMap[item.contract]);
         }
 
-        let filteredData = data.filter((item) =>
-          filters.every((filter) => filter(item))
-        );
-
-        if (sortConfig.sortField) {
-          filteredData = filteredData.sort((a, b) => {
-            // @ts-ignore
-            const aValue = a[sortConfig.sortField];
-            // @ts-ignore
-            const bValue = b[sortConfig.sortField];
-            if (aValue < bValue) return -1 * sortConfig.sortDirection;
-            if (aValue > bValue) return 1 * sortConfig.sortDirection;
-            return 0;
-          });
-        }
-
-        return filteredData;
+        return data.filter((item) => filters.every((filter) => filter(item)));
       }
     ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  monitorSorted = combineLatest([this.monitorFiltered, this.sortParams]).pipe(
+    map(([filteredData, sortConfig]) => {
+      if (sortConfig.sortField) {
+        return filteredData.sort((a, b) => {
+          // @ts-ignore
+          const aValue = a[sortConfig.sortField];
+          // @ts-ignore
+          const bValue = b[sortConfig.sortField];
+          if (aValue < bValue) return -1 * sortConfig.sortDirection;
+          if (aValue > bValue) return 1 * sortConfig.sortDirection;
+          return 0;
+        });
+      }
+      return filteredData;
+    }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
@@ -232,7 +237,7 @@ export class MonitoringTableComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private systemApiService: SystemApiService
   ) {
-    this.monitorFiltered
+    this.monitorSorted
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.dataSource.data = data;

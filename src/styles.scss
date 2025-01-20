@@ -457,8 +457,12 @@ mat-dialog-content {
   }
 }
 
+:root {
+  --color-primary: #1287DE;
+}
+
 .link {
-  color: #1287DE;
+  color: var(--color-primary);
 }
 
 a {
