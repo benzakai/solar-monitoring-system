@@ -1,63 +1,6 @@
-@use '@angular/material' as mat;
-@use './app/theme/palette' as palette;
-
-@include mat.core();
-
-$theme: mat.define-theme((
-  color: (
-    primary: palette.$custom-primary-palette,
-  ),
-  typography: (
-    brand-family: 'Inter',
-    regular-weight:400,
-    bold-weight: 600,
-    medium-weight: 600
-
-  ),
-  density: (
-    scale: -1
-  )
-));
-
-html {
-  @include mat.core-theme($theme);
-  @include mat.card-theme($theme);
-  @include mat.progress-bar-theme($theme);
-  @include mat.tooltip-theme($theme);
-  @include mat.form-field-theme($theme);
-  @include mat.input-theme($theme);
-  @include mat.select-theme($theme);
-  @include mat.autocomplete-theme($theme);
-  @include mat.dialog-theme($theme);
-  @include mat.chips-theme($theme);
-  @include mat.slide-toggle-theme($theme);
-  @include mat.radio-theme($theme);
-  @include mat.slider-theme($theme);
-  @include mat.menu-theme($theme);
-  @include mat.list-theme($theme);
-  @include mat.paginator-theme($theme);
-  @include mat.tabs-theme($theme);
-  @include mat.checkbox-theme($theme);
-  @include mat.button-theme($theme);
-  @include mat.icon-button-theme($theme);
-  @include mat.fab-theme($theme);
-  @include mat.snack-bar-theme($theme);
-  @include mat.table-theme($theme);
-  @include mat.progress-spinner-theme($theme);
-  @include mat.badge-theme($theme);
-  @include mat.bottom-sheet-theme($theme);
-  @include mat.button-toggle-theme($theme);
-  @include mat.datepicker-theme($theme);
-  @include mat.divider-theme($theme);
-  @include mat.expansion-theme($theme);
-  @include mat.grid-list-theme($theme);
-  @include mat.icon-theme($theme);
-  @include mat.sidenav-theme($theme);
-  @include mat.stepper-theme($theme);
-  @include mat.sort-theme($theme);
-  @include mat.toolbar-theme($theme);
-  @include mat.tree-theme($theme);
-}
+@import './app/theme/materials';
+@import './app/theme/mat-menu';
+@import "./app/theme/scroll";
 
 body {
   background-color: rgb(219 226 235);
@@ -101,22 +44,7 @@ body {
   //--mat-form-field-container-text-size: 40px;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-}
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
 
 .mat-mdc-row:nth-child(odd) {
   background-color: #f2f2f2;
@@ -371,52 +299,7 @@ mat-dialog-content {
   padding: 0!important;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #c3c3c3;
-  background-color: #fff;
-  border-radius: 4px;
-
-  margin:8px 17px;
-
-  & > * {
-    margin: 4px;
-  }
-}
-
-.mdc-data-table__cell, .mdc-data-table__header-cell {
-  padding: 0 10px!important;
-  text-align: center!important;
-}
-
-.mat-cell, .mat-header-cell, .mat-mdc-cell, .mat-mdc-header-cell {
-  border: none !important;
-}
-
-.mat-column {
-  &-notes { width: 60px; }
-  &-actions { width: 100px; }
-  &-openAlerts { width: 100px; }
-  &-clearedAlerts { width: 110px; }
-  &-startOfYear { width: 110px; }
-  &-startOfMonth { width: 110px; }
-  &-lastMonth { width: 100px; }
-  &-today { width: 80px; }
-  &-today_comparable { width: 80px; }
-  &-monthly { width: 80px; }
-  &-weekly { width: 80px; }
-  &-threeDays { width: 100px; }
-  &-yesterday { width: 80px; }
-  &-communication { width: 100px; }
-  &-portal { width: 80px; }
-  &-KWP { width: 60px; }
-  &-name { text-align: right!important; }
-  &-tested { width: 70px; }
-  &-l { width: 0; padding: 0!important; }
-  &-r { width: 0; padding: 0!important; }
-
-}
+@import './app/theme/table';
 
 .mat-typography, .mat-form-field, .mat-button, .mat-card, body, mat-table {
   font-family: 'Inter', sans-serif !important;
@@ -636,24 +519,7 @@ button.mat-flat-button {
   }
 }
 
-// mat-menu
 
-:root {
-  @include mat.menu-overrides((
-    container-color: white,
-    item-hover-state-layer-color: white,
-    item-label-text-font: ('Inter', sans-serif),
-    item-label-text-size: 12px,
-    item-label-text-weight: 500,
-  ));
-}
-
-.mat-mdc-menu-item-text {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
 
 .mdc-button__label {
   display: inline-flex;

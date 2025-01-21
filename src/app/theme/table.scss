@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #c3c3c3;
+  background-color: #fff;
+  border-radius: 4px;
+
+  margin:8px 17px;
+
+  & > * {
+    margin: 4px;
+  }
+}
+
+.mdc-data-table__cell, .mdc-data-table__header-cell {
+  padding: 0 10px!important;
+  text-align: center!important;
+}
+
+.mat-cell, .mat-header-cell, .mat-mdc-cell, .mat-mdc-header-cell {
+  border: none !important;
+}
+
+.mat-column {
+  &-notes { width: 60px; }
+  &-actions { width: 100px; }
+  &-openAlerts { width: 100px; }
+  &-clearedAlerts { width: 110px; }
+  &-startOfYear { width: 110px; }
+  &-startOfMonth { width: 110px; }
+  &-lastMonth { width: 100px; }
+  &-today { width: 80px; }
+  &-today_comparable { width: 80px; }
+  &-monthly { width: 80px; }
+  &-weekly { width: 80px; }
+  &-threeDays { width: 100px; }
+  &-yesterday { width: 80px; }
+  &-communication { width: 100px; }
+  &-portal { width: 80px; }
+  &-KWP { width: 60px; }
+  &-name { text-align: right!important; }
+  &-tested { width: 70px; }
+  &-l { width: 0; padding: 0!important; }
+  &-r { width: 0; padding: 0!important; }
+
+}

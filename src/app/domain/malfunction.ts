@@ -1,6 +1,6 @@
 export interface Malfunction {
   id: string;
-  serial: number;
+  serial?: number;
   systemId: string;
   kwhKwpSnapshot: number | null;
   type?: [string, string];
@@ -17,6 +17,7 @@ export interface Malfunction {
   status: MalfunctionStatus;
   customerPrice: number | null;
   golanSolarPrice: number | null;
+  requestNumber?: string;
   '#modified': number;
 }
 
@@ -33,8 +34,7 @@ export enum MalfunctionActionType {
   ADD_COMMENT = 'comment',
   SEND_MSG_TO_CLIENT = 'msgToClient',
   SEND_MSG_TO_GROUP = 'msgToGroup',
-  REOPEN = 'reopen'
-
+  REOPEN = 'reopen',
 }
 
 export enum MalfunctionStatus {

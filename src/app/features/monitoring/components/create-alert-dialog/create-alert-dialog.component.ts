@@ -26,8 +26,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
 import { MonitorItem } from '../../../../domain/monitor-item';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
-import {AngularFireAuth} from '@angular/fire/compat/auth';
-import {Malfunction, MalfunctionStatus} from '../../../../domain/malfunction';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Malfunction, MalfunctionStatus } from '../../../../domain/malfunction';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {
@@ -67,7 +67,6 @@ export const DATE_FORMATS: MatDateFormats = {
 export class CreateAlertDialogComponent {
   malfunctionsService = inject(MalfunctionsService);
 
-
   alertForm: FormGroup = new FormGroup({
     openingDate: new FormControl(new Date()),
     requestNumber: new FormControl(''),
@@ -76,21 +75,19 @@ export class CreateAlertDialogComponent {
     reportStatus: new FormControl(''),
   });
 
-
-
-  malfunctionTypesMap: { [key: string]: string} = {
-    "optimizer": "אופטימייזר",
-    "other": "אחר",
-    "insulation": "זליגה",
-    "Production": "ייצור",
-    "equipment": "מאוורר",
-    "inverter": "ממיר",
-    "voltage": "מתח מהרשת",
-    "string": "סטרינג",
-    "panel": "פאנל",
-    "production": "תפוקה",
-    "connection": "תקשורת"
-  }
+  malfunctionTypesMap: { [key: string]: string } = {
+    optimizer: 'אופטימייזר',
+    other: 'אחר',
+    insulation: 'זליגה',
+    Production: 'ייצור',
+    equipment: 'מאוורר',
+    inverter: 'ממיר',
+    voltage: 'מתח מהרשת',
+    string: 'סטרינג',
+    panel: 'פאנל',
+    production: 'תפוקה',
+    connection: 'תקשורת',
+  };
 
   issueTypes: string[] = Object.keys(this.malfunctionTypesMap);
 
@@ -125,8 +122,7 @@ export class CreateAlertDialogComponent {
       this.alertForm.disable();
 
       const openDate = this.alertForm.get('openingDate')?.value || new Date();
-      const followUpDate =
-        this.alertForm.get('followUpDate')?.value;
+      const followUpDate = this.alertForm.get('followUpDate')?.value;
       const malfunction = {
         code: null,
         customerPrice: null,
@@ -139,11 +135,15 @@ export class CreateAlertDialogComponent {
         reportText: '',
         severity: 2,
         status: MalfunctionStatus.OPEN,
-        tracingTime: followUpDate?.toISOString ? followUpDate.toISOString() : null,
+        tracingTime: followUpDate?.toISOString
+          ? followUpDate.toISOString()
+          : null,
         systemId: this.data.id,
-        type: [String(this.alertForm.get('issueType')?.value), ''] as [string, string],
-        serial: this.alertForm.get('requestNumber')?.value || '',
-
+        type: [String(this.alertForm.get('issueType')?.value), ''] as [
+          string,
+          string,
+        ],
+        requestNumber: this.alertForm.get('requestNumber')?.value || '',
       };
 
       this.malfunctionsService.createMalfunction(malfunction).subscribe(() => {

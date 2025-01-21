@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+
+:root {
+  @include mat.menu-overrides((
+    container-color: white,
+    item-hover-state-layer-color: white,
+    item-label-text-font: ('Inter', sans-serif),
+    item-label-text-size: 12px,
+    item-label-text-weight: 500,
+  ));
+}
+
+.mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
