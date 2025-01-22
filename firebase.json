@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "target": "default",
+      "target": "golan-test-e76f9",
       "public": "dist/solar-monitoring-system/browser",
       "ignore": [
         "firebase.json",
