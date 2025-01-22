@@ -16,7 +16,6 @@
       ]
     },
     {
-      "target": "new-solar-golan",
       "site": "new-solar-golan",
       "public": "dist/solar-monitoring-system/browser",
       "ignore": [
