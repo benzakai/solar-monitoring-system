@@ -51,6 +51,27 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "alpha": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/app/firebase.ts",
+                  "with": "src/app/firebase.alpha.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
