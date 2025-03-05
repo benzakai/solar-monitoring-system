@@ -1,0 +1,13 @@
+.details {
+  display: flex;
+
+}
+
+.system {
+  flex: 0 0 300px;
+
+}
+
+.issues {
+  flex: 1 1 1px;
+}

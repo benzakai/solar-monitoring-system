@@ -1,5 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import {
+  collection,
+  doc,
+  Firestore,
+  query,
+  setDoc,
+  where,
+  getDocs,
+} from '@angular/fire/firestore';
 import { filter, from, map, Observable, switchMap } from 'rxjs';
 import { Malfunction, MalfunctionActionType } from '../domain/malfunction';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
@@ -26,6 +34,24 @@ export class MalfunctionsService {
             ...logEntry,
           })
         );
+      })
+    );
+  }
+
+  getForSystem(
+    systemId: string,
+    status: 'open' | 'closed' = 'open'
+  ): Observable<Malfunction[]> {
+    const q = status
+      ? query(
+          this.collection,
+          where('systemId', '==', systemId),
+          where('status', '==', status)
+        )
+      : query(this.collection, where('systemId', '==', systemId));
+    return from(getDocs(q)).pipe(
+      map((querySnapshot) => {
+        return querySnapshot.docs.map((doc) => doc.data() as Malfunction);
       })
     );
   }

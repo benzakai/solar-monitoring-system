@@ -14,7 +14,11 @@ export class SystemApiService {
     return this.systemsService.getById(systemId).pipe(
       map((system) => {
         if (system) {
-          window.location.href = this.getSystemApiUrl(system);
+          window.open(
+            this.getSystemApiUrl(system),
+            '_blank',
+            'noopener,noreferrer'
+          );
         }
       })
     );

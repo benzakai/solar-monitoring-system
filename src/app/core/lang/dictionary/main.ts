@@ -243,4 +243,8 @@ export const mainLang: Dictionary = {
     he: 'רענון נתונים',
     en: 'Data refresh',
   },
+  start_time: {
+    he: 'תאריך חיבור',
+    en: 'Start time',
+  },
 };

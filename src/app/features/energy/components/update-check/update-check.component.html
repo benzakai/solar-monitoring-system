@@ -1,0 +1,20 @@
+Systems updated more than 2h ago {{ updatesCount1 | async }}<br>
+Errorrs: {{errorsCount | async}}<br>
+
+<section>
+  <div>
+    @for (update of updates | async; track update.id) {
+      <div class="update">
+        <div class="update-header">
+          <div class="update-title">{{ update.date }}: <a class="link" href="https://solar-golan.web.app/solar-system/{{ update.id }}">{{ update.id }}</a></div>
+        </div>
+      </div>
+    }
+
+  </div>
+  <div>
+    <pre>
+      {{errors | async | json}}
+    </pre>
+  </div>
+</section>

@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
-    "build:alpha": "ng build --configuration alpha",
+    "build:new-site": "ng build --configuration alpha",
+    "deploy:new-site": "firebase deploy --only hosting:new-solar-golan",
+    "deploy:new-site:alpha": "firebase deploy --only hosting:alpha-new-solar-golan",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,css,scss}\""
@@ -27,6 +29,7 @@
     "@ngrx/effects": "^18.1.1",
     "@ngrx/store": "^18.1.1",
     "@ngrx/store-devtools": "^18.1.1",
+    "apexcharts": "^4.5.0",
     "firebase": "^10.14.1",
     "moment": "^2.30.1",
     "rxjs": "~7.8.0",

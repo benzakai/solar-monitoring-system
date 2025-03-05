@@ -1,0 +1,64 @@
+<app-header></app-header>
+
+<div class="container">
+  <div #chart style="height: 300px"></div>
+</div>
+
+<div class="details">
+  <div class="system container">
+    @if(systemDetails | async; as data) {
+      <h1>{{ 'system_details.details_header' | translate }}</h1>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline">
+          <input class="inp" matInput [value]="data.system?.AC" disabled />
+        </mat-form-field>
+        <label>AC</label>
+      </div>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline">
+          <input class="inp" matInput [value]="data.system?.KWP" disabled />
+        </mat-form-field>
+        <label>kWp</label>
+      </div>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline">
+          <input class="inp" matInput [value]="data.system?.KWP" disabled />
+        </mat-form-field>
+        <label>{{ 'system_details.capacity_factor' | translate }}</label>
+      </div>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline">
+          <input class="inp" matInput [value]="data.system?.type" disabled />
+        </mat-form-field>
+        <label>{{ 'system_details.capacity_factor' | translate }}</label>
+      </div>
+    }
+  </div>
+  <div class="issues container">
+
+    <mat-icon class="bell">notification_add</mat-icon>
+    <h1>{{ 'system_details.latest_malfunctions' | translate }}</h1>
+
+    @if(malfunctions | async; as malfs) {
+
+
+      @for(malf of malfs; track malf.id) {
+        {{malf.status}}, {{malf.tracingTime}}, {{malf.closeTime}}, {{malf.openTime}}, {{malf.reportText}}
+
+        <br>
+        <br>
+      }
+
+    } @else {
+      <mat-progress-spinner
+        diameter="30"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    }
+
+  </div>
+</div>

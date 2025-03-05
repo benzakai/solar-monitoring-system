@@ -1,0 +1,86 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.filters {
+  margin: 10px;
+}
+
+.heatmap {
+  display: flex;
+  width: fit-content;
+  margin: 10px;
+}
+
+.system {
+  display: flex;
+  width: 4px;
+  position: relative;
+
+  &.label {
+    width: 20px;
+  }
+
+  .hour {
+    position: absolute;
+    padding-top: 3px;
+  }
+}
+
+.selected {
+  transform: scaleX(2) scaleY(1.2);
+}
+
+.screen {
+
+  position: fixed;
+  padding: 20px;
+  bottom: 0;
+  height: 200px;
+  left: 0;
+  right: 0;
+  display: flex;
+
+  flex-wrap: wrap;
+  gap: 10px;
+
+  font-weight: bold;
+
+  mat-card {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 300px;
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    padding-right: 10px;
+    font-weight: normal;
+  }
+
+}
+
+app-sample-energy {
+  position: absolute;
+  width: 2px;
+  left: 1px;
+  height: 23px;
+  background-color: #60b952;
+
+  &:hover {
+    transform: scaleX(2) scaleY(1.2);
+  }
+  &.clicked {
+    outline: 1px solid #f00;
+  }
+
+
+}
+
+

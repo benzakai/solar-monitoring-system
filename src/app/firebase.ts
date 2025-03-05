@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyDqefD_NgH8BHJ_6RW9gs2gqmcIdsPCboA",
-  authDomain: "golan-test-e76f9.firebaseapp.com",
-  projectId: "golan-test-e76f9",
-  storageBucket: "golan-test-e76f9.firebasestorage.app",
-  messagingSenderId: "145503475109",
-  appId: "1:145503475109:web:9d501c5639d1e74c3e844c"
+  apiKey: 'AIzaSyBtfJcT23phGL9Xk-PXuPT5Vc1emJbbc44',
+  authDomain: 'solar-golan.firebaseapp.com',
+  projectId: 'solar-golan',
+  storageBucket: 'solar-golan.appspot.com',
+  messagingSenderId: '870051366241',
+  appId: '1:870051366241:web:d838a50ea33ac17d86f120',
 };

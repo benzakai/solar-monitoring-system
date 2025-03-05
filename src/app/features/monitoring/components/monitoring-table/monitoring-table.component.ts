@@ -14,7 +14,12 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule, Sort } from '@angular/material/sort';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterModule,
+  RouterOutlet,
+} from '@angular/router';
 import { MatCard } from '@angular/material/card';
 import { MatPaginator } from '@angular/material/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -62,6 +67,7 @@ import { SortHeaderComponent } from '../sort-header/sort-header.component';
       HeaderComponent,
       IssuesCountPipe,
       SortHeaderComponent,
+      RouterModule,
     ],
     TranslatePipe,
     MatProgressSpinner,

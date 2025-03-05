@@ -224,7 +224,7 @@
           {{ 'system Name' | translate }}
         </th>
         <td mat-cell *matCellDef="let element" class="link">
-          <a class="link" href="https://solar-golan.web.app/solar-system/{{ element.id }}">{{
+          <a class="link" [routerLink]="['/system', element.id]">{{
             element.system_name
           }}</a>
         </td>

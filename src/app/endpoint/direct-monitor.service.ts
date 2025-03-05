@@ -17,7 +17,7 @@ import { getDocs } from 'firebase/firestore';
 export class DirectMonitorService {
   private firestore = inject(Firestore);
 
-  private collection = collection(this.firestore, 'directMoniterLife');
+  private collection = collection(this.firestore, 'directMonitorLife');
 
   getAllSnapshot(): Observable<MonitorItem[]> {
     const limitedQuery = isDevMode()
