@@ -7,9 +7,14 @@ import {
   setDoc,
   where,
   getDocs,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { filter, from, map, Observable, switchMap } from 'rxjs';
-import { Malfunction, MalfunctionActionType } from '../domain/malfunction';
+import {
+  Malfunction,
+  MalfunctionAction,
+  MalfunctionActionType,
+} from '../domain/malfunction';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Injectable({
@@ -40,7 +45,7 @@ export class MalfunctionsService {
 
   getForSystem(
     systemId: string,
-    status: 'open' | 'closed' = 'open'
+    status?: 'open' | 'closed'
   ): Observable<Malfunction[]> {
     const q = status
       ? query(
@@ -51,12 +56,14 @@ export class MalfunctionsService {
       : query(this.collection, where('systemId', '==', systemId));
     return from(getDocs(q)).pipe(
       map((querySnapshot) => {
-        return querySnapshot.docs.map((doc) => doc.data() as Malfunction);
+        return querySnapshot.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id }) as Malfunction
+        );
       })
     );
   }
 
-  private generateLogEntry(
+  public generateLogEntry(
     malfunction: Partial<Malfunction>,
     action?: MalfunctionActionType
   ): Observable<Pick<Malfunction, '#modified' | 'log'>> {
@@ -76,5 +83,10 @@ export class MalfunctionsService {
         '#modified': now.getTime(),
       }))
     );
+  }
+
+  deleteMalfunction(id: string): Observable<void> {
+    const docRef = doc(this.collection, id);
+    return from(deleteDoc(docRef));
   }
 }

@@ -1,51 +1,66 @@
 <div class="inner">
   <div class="header-container">
-    <div class="refresh">
-      <button mat-flat-button class="go-to-old-button" (click)="goToOld()" >
-        {{'header.go_to_old' | translate}}
-      </button>
-      <button mat-flat-button class="refresh-button" (click)="reloadPage()" >
-        <mat-icon>browser_updated</mat-icon>
-        {{'data_refresh' | translate}}
-      </button>
-    </div>
+    @if (authState | async; as state) {
+      <div class="refresh">
+        <button mat-flat-button class="go-to-old-button" (click)="goToOld()" >
+          {{'header.go_to_old' | translate}}
+        </button>
+        <button mat-flat-button class="refresh-button" (click)="reloadPage()" >
+          <mat-icon>browser_updated</mat-icon>
+          {{'data_refresh' | translate}}
+        </button>
+      </div>
+    }
+
 
     <img src="logo.png"/>
-    <div class="controls">
-      <div class="control-text">{{text$ | async}}</div>
-      <div class="control-form">
-        <mat-form-field appearance="outline" class="custom-select-single lang">
-          <mat-select [formControl]="langControl">
-            <mat-option value="en">EN</mat-option>
-            <mat-option value="he">HE</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="custom-select-single">
-          <mat-select [formControl]="personControl">
-            @if (authState | async; as auth) {
-              <mat-option [value]="auth.email">{{ auth.displayName }}</mat-option>
-            }
 
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-icon class="pref">search</mat-icon>
-          <input class="inp" matInput [formControl]="searchControl" [placeholder]="'header.search_placeholder' | translate" [matAutocomplete]="cps" />
-          <mat-autocomplete #cps="matAutocomplete">
-            @if (foundSystems | async; as sys) {
-              @for(s of sys; track s.id) {
-                <mat-option (click)="goToSystemDetails(s?.id)">
-                  {{ s?.system_name }}
-                </mat-option>
+    @if (authState | async; as state) {
+      <div class="controls">
+        <div class="control-text">{{text$ | async}}</div>
+        <div class="control-form">
+          <mat-form-field appearance="outline" class="custom-select-single lang">
+            <mat-select [formControl]="langControl">
+              <mat-option value="en">EN</mat-option>
+              <mat-option value="he">HE</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="custom-select-single">
+            <mat-select [formControl]="personControl">
+              @if (authState | async; as auth) {
+                <mat-option [value]="auth.email">{{ auth.displayName }}</mat-option>
               }
-            }
-          </mat-autocomplete>
-        </mat-form-field>
+
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-icon class="pref">search</mat-icon>
+            <input class="inp" matInput [formControl]="searchControl" [placeholder]="'header.search_placeholder' | translate" [matAutocomplete]="cps" />
+            <mat-autocomplete #cps="matAutocomplete">
+              @if (foundSystems | async; as sys) {
+                @for(s of sys; track s.id) {
+                  <mat-option (click)="goToSystemDetails(s?.id)">
+                    {{ s?.system_name }}
+                  </mat-option>
+                }
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div class="nav">
-      <span>{{ 'header.monitoring_table' | translate }}</span>
-      <mat-icon>east</mat-icon>
-    </div>
+      <div class="nav">
+        @if (headerTitle) {
+          <span>{{ headerTitle }}</span>
+        } @else {
+          <span>{{ 'header.monitoring_table' | translate }}</span>
+        }
+
+        <button mat-icon-button color="primary" (click)="menu.next(null)">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+      </div>
+    }
+
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { EnergyService } from '../../../../endpoint/energy.service';
 import { map, shareReplay, take } from 'rxjs';
 import { AsyncPipe, JsonPipe } from '@angular/common';
@@ -11,6 +11,7 @@ import { EnergyErrorsService } from '../../../../endpoint/energy-error.service';
   imports: [AsyncPipe, JsonPipe],
   templateUrl: './update-check.component.html',
   styleUrl: './update-check.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateCheckComponent {
   public energyService = inject(EnergyService);

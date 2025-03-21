@@ -8,6 +8,7 @@ import {
 import { Subscription } from 'rxjs';
 import { Dictionary, DictionaryRecord } from './types/dictionary';
 import { LANGUAGE, LANGUAGE_DICTIONARY } from './index';
+import { LanguageService } from './language.service';
 
 function getNestedValue(
   obj: Dictionary | DictionaryRecord,
@@ -37,17 +38,25 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   private subscription: Subscription | null = null;
 
   private lang = inject(LANGUAGE);
+  private languageService = inject(LanguageService);
   private dictionary = inject(LANGUAGE_DICTIONARY);
-  private changeDetectorRef = inject(ChangeDetectorRef);
+  private changeDetectorRef = inject(ChangeDetectorRef, { optional: true });
 
   transform(value: string): any {
-    if (!this.subscription) {
-      this.subscription = this.lang.subscribe((lng) => {
-        const pointedDict = getNestedValue(this.dictionary, value);
-        this.currentValue = pointedDict ? pointedDict[lng] : value;
-        this.changeDetectorRef.markForCheck();
-      });
+    if (this.changeDetectorRef) {
+      if (!this.subscription) {
+        this.subscription = this.lang.subscribe((lng) => {
+          const pointedDict = getNestedValue(this.dictionary, value);
+          this.currentValue = pointedDict ? pointedDict[lng] : value;
+          this.changeDetectorRef?.markForCheck();
+        });
+      }
+    } else {
+      const langSnapshot = this.languageService.getCurrentLang();
+      const pointedDict = getNestedValue(this.dictionary, value);
+      this.currentValue = pointedDict ? pointedDict[langSnapshot] : value;
     }
+
     return this.currentValue;
   }
 

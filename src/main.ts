@@ -10,10 +10,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom, isDevMode } from '@angular/core';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { storeProviders } from './app/state';
 import { LanguageService } from './app/core/lang/language.service';
 import { LANGUAGE, language, LANGUAGE_DICTIONARY } from './app/core/lang';
+
+import localeHe from '@angular/common/locales/he';
+import { registerLocaleData } from '@angular/common';
+import { TranslatePipe } from './app/core/lang/translate.pipe';
+
+registerLocaleData(localeHe);
 
 const app = initializeApp(firebaseConfig);
 
@@ -33,6 +39,8 @@ bootstrapApplication(AppComponent, {
         languageService.language$,
       deps: [LanguageService],
     },
+    TranslatePipe,
+    MatNativeDateModule,
     ...storeProviders,
   ],
 }).catch((err) => console.error(err));

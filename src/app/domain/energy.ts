@@ -1,6 +1,7 @@
 export type EnergySample = {
   time: number;
   valueKwh: number;
+  apiValue?: number;
   h?: number;
 };
 

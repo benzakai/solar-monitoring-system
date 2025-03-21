@@ -1,0 +1,265 @@
+<app-header [headerTitle]="'malfunction.header' | translate"></app-header>
+<br>
+<form [formGroup]="form">
+  <div class="level">
+    <div class="side">
+      <div class="container">
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput type="number" formControlName="customerPrice" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+          <label>{{ 'malfunction.customerPrice' | translate }}</label>
+        </div>
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput type="number" formControlName="golanSolarPrice" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+          <label>{{ 'malfunction.golanSolarPrice' | translate }}</label>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput type="text" formControlName="code" />
+          </mat-form-field>
+          <label>{{ 'malfunction.code' | translate }}</label>
+        </div>
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput [matDatepicker]="tracingPicker" formControlName="tracingTime" />
+            <mat-datepicker-toggle matSuffix [for]="tracingPicker"></mat-datepicker-toggle>
+            <mat-datepicker #tracingPicker></mat-datepicker>
+          </mat-form-field>
+          <label>{{ 'malfunction.tracingTime' | translate }}</label>
+        </div>
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <mat-select formControlName="handler">
+              @for (h of handlers; track h) {
+                <mat-option [value]="h">
+                  {{ 'malfunction.handler_names.' + h | translate }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+
+          <label>{{ 'malfunction.handler' | translate }}</label>
+        </div>
+
+        <div class="form-line area">
+          <mat-form-field appearance="outline" class="txt">
+            <textarea matInput formControlName="reportText"></textarea>
+          </mat-form-field>
+          <label>{{ 'malfunction.reportText' | translate }}</label>
+        </div>
+        <div class="buttons">
+          @for(s of statusKeys; track s) {
+            @if('create_alert_dialog.statuses.'+s | translate; as tag) {
+              <button mat-flat-button (click)="addToTextarea(tag, 'reportText')">{{tag}}</button>
+            }
+          }
+        </div>
+        <div class="form-line">
+          <mat-checkbox formControlName="notToReport"></mat-checkbox>
+          <label>{{ 'malfunction.notToReport' | translate }}</label>
+        </div>
+
+
+      </div>
+      <div class="button-container">
+        @if (isClosed | async) {
+          <button mat-flat-button color="primary"
+                  (click)="save({reopen: true})">{{ 'malfunction.newEntry' | translate }}</button>
+        }
+        <button mat-flat-button color="warn" (click)="deleteMalfunction()">{{ 'malfunction.delete' | translate }}</button>
+        <button mat-flat-button color="basic" (click)="cancel()">{{ 'malfunction.cancel' | translate }}</button>
+        <button mat-flat-button color="success" [disabled]="isClosed | async" (click)="closeMalfunction()">{{ 'malfunction.resolved' | translate }}</button>
+        <button mat-flat-button color="primary" (click)="save()">{{ 'malfunction.save' | translate }}</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="container">
+
+        @if (system | async; as s) {
+          <div class="form-line">
+            <button mat-button (click)="goToSystem(s.id)">{{ s.name }}</button>
+            <label>
+              {{ 'system Name' | translate }}
+            </label>
+          </div>
+
+          <div class="form-line">
+            <button mat-button (click)="navigateToSystemApi(s.id)">{{ s.type }}</button>
+            <label>{{ 'portal' | translate }}</label>
+          </div>
+        }
+        @if (malfunction | async; as m) {
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+            <input matInput [value]="m.kwhKwpSnapshot ? (m.kwhKwpSnapshot | number : '1.2-2') : ''" disabled/>
+            </mat-form-field>
+            <label>
+              פורטל
+            </label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput [value]="(lastDay | async | number : '1.0-0') + '%'" disabled/>
+            </mat-form-field>
+            <label>
+              {{ 'yesterday' | translate }}
+            </label>
+          </div>
+        }
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput [matDatepicker]="openPicker" formControlName="openTime" />
+            <mat-datepicker-toggle matSuffix [for]="openPicker"></mat-datepicker-toggle>
+            <mat-datepicker #openPicker></mat-datepicker>
+          </mat-form-field>
+          <label>{{ 'malfunction.openTime' | translate }}</label>
+        </div>
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <input matInput [matDatepicker]="closePicker" formControlName="closeTime" />
+            <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
+            <mat-datepicker #closePicker></mat-datepicker>
+          </mat-form-field>
+          <label>{{ 'malfunction.closeTime' | translate }}</label>
+        </div>
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <mat-select formControlName="type">
+              @for (type of issueTypes; track type) {
+                <mat-option [value]="type">{{ 'malfunction.types.' + type | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <label>
+            {{ 'malfunction.type' | translate }}</label>
+        </div>
+
+
+        <div class="form-line">
+          <mat-form-field class="inline-form" appearance="outline">
+            <mat-select formControlName="severity">
+              <mat-select-trigger>
+                @if (form.get('severity')?.value; as s) {
+                  @switch (s) {
+                    @case (3) {
+                      {{ 'malfunction.severityType.3' | translate }}
+                      <svg>
+                        <image id="Layer_30_copy_3" data-name="Layer 30 copy 3" width="18" height="18" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAlCAYAAAA5iwvJAAAEmElEQVRYhb2YX2gcVRTGf3f9S2O0ohGUSiKYPIQtRWJDsTQQpQFLU5DE1O2LlmjIiyZ9EdTiP9CC+JAGoSUapCKV1vgSpUgKFVqCoUFEHPahfdm+FBFRUCKC0JEL312Ow2x3ZnbbD4bZuXPPOd8959xzz477mZawAxgAtgJ95Th+Mk1Z5Nw54BLgzf0ArBU1emsBmTKwBxgBPEGXQWZYl0cM+AWsAGf8em4U4X6gAuwHes34mrx2vWBNKwoDispTul4ETgFfANUsJLKmxJSUb9dzJO+syFvea5TjOFU4cvUgOEVlRFEqa3wd+ARYaJVwDzALvCJjVXnDe+VycnIGwha9ilZF0fPC88AcUCtC+DHgNeBZPS/IC+tmTgewCxgE3m1C+E3gInAB2DCvtyt6U3r+EjgC/JiHsCf7DjCq1c5p9YGR9/wYsA8YCrqaEA4vzwPLwFfGk05RnJXur4G30kinbboeeXZUAke06oBJ4CCwU88b8lozfKtoDOl6BvgUWNRijgJXje1/gFeT6ZFGeFZpUEuQ7da7GXmkJi8ty2vN8LSI7lN0/IKf0MbzEbxibH0gDldls45kSvg8Oi5Cs1o12hRvAAf0vCjvrFrhHJtup6I0qeeTwHumtM1oEbFKYr16lIySfiW/04R549lA1nvhEPBSkmxOrErHIek8IBvdUjMvDk6c+tMIV7Rjq6oGwV2zhuzrZuWbgAngWA6uxySzSTrmpDOQDuGPxaEqTpUk4bJqIqqzoXRNKjxI+Un93g2cUD2ezkF4WjInpAPpnNPvGZMm6+KCuJUt4T0q5JEUompxUGFZNPlckYFx4G/gdA7CpyUzLh3Bc0dlw8lmj8ZPiVOvONYJj+h+xpxgYSfXtMFieeWwcuos8LyJTBbsl8xZ6TgsnbFs1GRzTLoui1OdY0nNSGgLV3TvUPlBpWtVeTdlyPp8WzIkH4iceztybj1y7vfIud8i576PnPN1dbOZtyTZQHpKuldlC9nuSHDyHHeU1EE5dV3n9DIU+A3VWY+9Jg0WEt3VuPpdfzo9DtwL3CdnvK93u838qnSE9Nir8WXZHBIHxGlNHAdKavtQixgqw6DuF8yhEPrZbxKenVCu3XOdlOiS3LAZW9KY1X3enJqBQyxuHls94T492DNkm+4XzVhQ8J0Ze1Dlx5bHRrgd+By4y7wPugbNWLC5zYwFbn0lU6wvmQlhET+ZsZA6x83Yy0BnBrIBD+nACAin6oAZCzb7zFjg1l1SuFDxDtiSsog0jOYgGzDW5H2wucWMBW5dvpe4plXeDfyV07jvqO7IKfNnk3xPQ6fkYhc3aFjSkNLEZBf+P+qKGjVMjZBlszRCkX/cAbcUFWyFcFeGOY1wf1HBVgiXM8xphP5iYq0RHs4wpxFSvxBlQVHCJdujFsBzGb8YpRouggnTAhbBo/oTelMId+pPYqv40HRkN5Twx8DDbSD8CPBRXqG8hG8zrWA7sCuvjryE/wVeAH5tA9lf9LUnF1o9mlvGzTya07Cg/iJc1/SBpG1oN+Fkb+xDcmc7DbTSwKTBf1P4Qx9FvIc/08e99gD4D6rmIYdC4jfJAAAAAElFTkSuQmCC"></image>
+                      </svg>
+                    }
+                    @case (2) {
+                      {{ 'malfunction.severityType.2' | translate }}
+                      <svg>
+                        <image id="Layer_30_copy_5" data-name="Layer 30 copy 5" width="18" height="18" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAhCAYAAABX5MJvAAAC/ElEQVRYhb2XT0gVQRzHP2t/USqiDApDozKQwkMhUSkYCFkhhKLppUQSiUyvmRQFdYgOioFRSRgRJE+CiAo8BE/s4C2KDnbRW3SpQ3oJ3Jj6jkyL7zlv39IXlrcz7/fnM7Ozv5kNwkv4qgioBqoYCm9mtOoOrgHTwCQw7xN4tYdNGdAINAA16ssMATf0mwZeAuPAbD4QHUA7cFTteY0wm95qxmp0nQEeAyO5QpQCvUAPEGgk4xpZegWIeiVv0AyaARwB9gMDwJwPRAVwFWhTe0QjmVohuau0rheayQ4NahtwC/icDaLUAZgT+SAQ5gDgyoC/Bz4Jwg6sz52RgohTrwPQJwgDUAg0A8OeyYdlXyj/ASdxm/IsyYXo0BpATs90XweMAs+BLk+ILtmPyh/FG9B9j/L9MxNlenaB1sCg+lvl2AQsAGOeEGOyb5J/q/oHFT9QvjIXwq7iWS3CUCPo10KdAM4BLZ4QLbKfkH+/4oWKP6t8jRbCVMIGOY9rMZln2ekAmGeY8gSwSsnPgnQq7pTyoNe4yJTtE8AbFaKTerWa9UwXNCIXwLxmF4FTwG5gEfiiGmIW5I8ITJPWRqFmaEx15LUmoL7gz17wV5NOIarV76sIgAk4A1wHDgGbgS3AYeC2/quLQKQUx42bdipvlYGoVGPacbRg75w+OzubsjyCYiWsjfTbOFVOn81XaYpVuRofHIODkSDbgUfL1JXltBZ4CuwDfur/+7pc2XzlJmiJGjNZAncDGzwArHYAF1awsflKgjBcpiJ3B9Gej9qAcpF5C44t2Q9lrvw+02u0N0cAowO+hr4Q62JAbEwSwuf0lUmrkoIozgNia1IQuS5IVxVJQUQLTy46ngREgbMNx9FZbdt5QTTbPT+m9ui0HRvCVMg7eQBY3dVuGQviIbAzAYhdwL04EGuA0wkAWFXHgfgFnAe+JQDwFbiczSBbNUzFONLFku/eEdUDHVrttagvq/8KET1bmFqwPi5E3M3JfLh819eUmYknwJVYkYDfREibxcbkVw0AAAAASUVORK5CYII="></image>
+                      </svg>
+                    }
+                    @default {
+                      {{ 'malfunction.severityType.1' | translate }}
+                      <svg>
+                        <image id="Layer_29_copy" data-name="Layer 29 copy" width="18" height="18" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAaCAYAAACtv5zzAAABzElEQVRIia2WTSuEURTHf8Zr43WBohQ1q8nazmKUHQuR8bKgRFmQrZqFjY0sLJTChkQ0S7tZzFLxFXwAIQpJKY8O59Z153m4Y+Zf08x9Of/fuc9z77lT8XyMqzgwBKSAxYLRcO0AeeAceLVnuIBBYAEYM+OegEC/s8AukDMDMWvSJLCl5pLFmac5OvdVY7fU6wdAMs8ASaXPAOkiAGmNyalHRj2/AHF9LMZ8RZdq1A6sAVfAA3APXACrQIs1L6uxBiKecXkH48CpLnHGMZcl7wPNEZnfAdP2M9eYA008HdPdgu4A29yAo8xFbRqXsvqy2idKCaBPG3lrUodmbm+CKNUAR0CDNW68+sQgoY1La8IS0OhhbtQJzFtt45WwM7y2fg8XYW40GuZVEQQBLycF5+kNqC0S8GS/r4bJ77MX9YyLNRc1hXWGAar+YW5U6QNoKwHQ6gPoLQGQ9AGkQvp8NfAXIGZXwn9owi3xLkDKQ3cJADm0I1EAObkbJZgbbQL1YYA9oKsMgB5g2wVU6z1cLvW7gHdgFrgtA+AGWDYN+9RmnfugLPKp9yL5pyDVy3w+gHWfQF+AezfIXq/zCfQtbHPAIzClKzjUS/93AZ/KslHformNVAAAAABJRU5ErkJggg=="></image>
+                      </svg>
+                    }
+                  }
+                }
+              </mat-select-trigger>
+              @for (severity of severityLevels; track severity) {
+                <mat-option [value]="severity">
+                  {{ 'malfunction.severityType.' + severity | translate }}
+                  @switch (severity) {
+                    @case (3) {
+                      <svg>
+                        <image id="Layer_30_copy_3" data-name="Layer 30 copy 3" width="18" height="18" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAlCAYAAAA5iwvJAAAEmElEQVRYhb2YX2gcVRTGf3f9S2O0ohGUSiKYPIQtRWJDsTQQpQFLU5DE1O2LlmjIiyZ9EdTiP9CC+JAGoSUapCKV1vgSpUgKFVqCoUFEHPahfdm+FBFRUCKC0JEL312Ow2x3ZnbbD4bZuXPPOd8959xzz477mZawAxgAtgJ95Th+Mk1Z5Nw54BLgzf0ArBU1emsBmTKwBxgBPEGXQWZYl0cM+AWsAGf8em4U4X6gAuwHes34mrx2vWBNKwoDispTul4ETgFfANUsJLKmxJSUb9dzJO+syFvea5TjOFU4cvUgOEVlRFEqa3wd+ARYaJVwDzALvCJjVXnDe+VycnIGwha9ilZF0fPC88AcUCtC+DHgNeBZPS/IC+tmTgewCxgE3m1C+E3gInAB2DCvtyt6U3r+EjgC/JiHsCf7DjCq1c5p9YGR9/wYsA8YCrqaEA4vzwPLwFfGk05RnJXur4G30kinbboeeXZUAke06oBJ4CCwU88b8lozfKtoDOl6BvgUWNRijgJXje1/gFeT6ZFGeFZpUEuQ7da7GXmkJi8ty2vN8LSI7lN0/IKf0MbzEbxibH0gDldls45kSvg8Oi5Cs1o12hRvAAf0vCjvrFrhHJtup6I0qeeTwHumtM1oEbFKYr16lIySfiW/04R549lA1nvhEPBSkmxOrErHIek8IBvdUjMvDk6c+tMIV7Rjq6oGwV2zhuzrZuWbgAngWA6uxySzSTrmpDOQDuGPxaEqTpUk4bJqIqqzoXRNKjxI+Un93g2cUD2ezkF4WjInpAPpnNPvGZMm6+KCuJUt4T0q5JEUompxUGFZNPlckYFx4G/gdA7CpyUzLh3Bc0dlw8lmj8ZPiVOvONYJj+h+xpxgYSfXtMFieeWwcuos8LyJTBbsl8xZ6TgsnbFs1GRzTLoui1OdY0nNSGgLV3TvUPlBpWtVeTdlyPp8WzIkH4iceztybj1y7vfIud8i576PnPN1dbOZtyTZQHpKuldlC9nuSHDyHHeU1EE5dV3n9DIU+A3VWY+9Jg0WEt3VuPpdfzo9DtwL3CdnvK93u838qnSE9Nir8WXZHBIHxGlNHAdKavtQixgqw6DuF8yhEPrZbxKenVCu3XOdlOiS3LAZW9KY1X3enJqBQyxuHls94T492DNkm+4XzVhQ8J0Ze1Dlx5bHRrgd+By4y7wPugbNWLC5zYwFbn0lU6wvmQlhET+ZsZA6x83Yy0BnBrIBD+nACAin6oAZCzb7zFjg1l1SuFDxDtiSsog0jOYgGzDW5H2wucWMBW5dvpe4plXeDfyV07jvqO7IKfNnk3xPQ6fkYhc3aFjSkNLEZBf+P+qKGjVMjZBlszRCkX/cAbcUFWyFcFeGOY1wf1HBVgiXM8xphP5iYq0RHs4wpxFSvxBlQVHCJdujFsBzGb8YpRouggnTAhbBo/oTelMId+pPYqv40HRkN5Twx8DDbSD8CPBRXqG8hG8zrWA7sCuvjryE/wVeAH5tA9lf9LUnF1o9mlvGzTya07Cg/iJc1/SBpG1oN+Fkb+xDcmc7DbTSwKTBf1P4Qx9FvIc/08e99gD4D6rmIYdC4jfJAAAAAElFTkSuQmCC"></image>
+                      </svg>
+                    }
+                    @case (2) {
+                      <svg>
+                        <image id="Layer_30_copy_5" data-name="Layer 30 copy 5" width="18" height="18" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAhCAYAAABX5MJvAAAC/ElEQVRYhb2XT0gVQRzHP2t/USqiDApDozKQwkMhUSkYCFkhhKLppUQSiUyvmRQFdYgOioFRSRgRJE+CiAo8BE/s4C2KDnbRW3SpQ3oJ3Jj6jkyL7zlv39IXlrcz7/fnM7Ozv5kNwkv4qgioBqoYCm9mtOoOrgHTwCQw7xN4tYdNGdAINAA16ssMATf0mwZeAuPAbD4QHUA7cFTteY0wm95qxmp0nQEeAyO5QpQCvUAPEGgk4xpZegWIeiVv0AyaARwB9gMDwJwPRAVwFWhTe0QjmVohuau0rheayQ4NahtwC/icDaLUAZgT+SAQ5gDgyoC/Bz4Jwg6sz52RgohTrwPQJwgDUAg0A8OeyYdlXyj/ASdxm/IsyYXo0BpATs90XweMAs+BLk+ILtmPyh/FG9B9j/L9MxNlenaB1sCg+lvl2AQsAGOeEGOyb5J/q/oHFT9QvjIXwq7iWS3CUCPo10KdAM4BLZ4QLbKfkH+/4oWKP6t8jRbCVMIGOY9rMZln2ekAmGeY8gSwSsnPgnQq7pTyoNe4yJTtE8AbFaKTerWa9UwXNCIXwLxmF4FTwG5gEfiiGmIW5I8ITJPWRqFmaEx15LUmoL7gz17wV5NOIarV76sIgAk4A1wHDgGbgS3AYeC2/quLQKQUx42bdipvlYGoVGPacbRg75w+OzubsjyCYiWsjfTbOFVOn81XaYpVuRofHIODkSDbgUfL1JXltBZ4CuwDfur/+7pc2XzlJmiJGjNZAncDGzwArHYAF1awsflKgjBcpiJ3B9Gej9qAcpF5C44t2Q9lrvw+02u0N0cAowO+hr4Q62JAbEwSwuf0lUmrkoIozgNia1IQuS5IVxVJQUQLTy46ngREgbMNx9FZbdt5QTTbPT+m9ui0HRvCVMg7eQBY3dVuGQviIbAzAYhdwL04EGuA0wkAWFXHgfgFnAe+JQDwFbiczSBbNUzFONLFku/eEdUDHVrttagvq/8KET1bmFqwPi5E3M3JfLh819eUmYknwJVYkYDfREibxcbkVw0AAAAASUVORK5CYII="></image>
+                      </svg>
+                    }
+                    @default {
+                      <svg>
+                        <image id="Layer_29_copy" data-name="Layer 29 copy" width="18" height="18" x-link:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAaCAYAAACtv5zzAAABzElEQVRIia2WTSuEURTHf8Zr43WBohQ1q8nazmKUHQuR8bKgRFmQrZqFjY0sLJTChkQ0S7tZzFLxFXwAIQpJKY8O59Z153m4Y+Zf08x9Of/fuc9z77lT8XyMqzgwBKSAxYLRcO0AeeAceLVnuIBBYAEYM+OegEC/s8AukDMDMWvSJLCl5pLFmac5OvdVY7fU6wdAMs8ASaXPAOkiAGmNyalHRj2/AHF9LMZ8RZdq1A6sAVfAA3APXACrQIs1L6uxBiKecXkH48CpLnHGMZcl7wPNEZnfAdP2M9eYA008HdPdgu4A29yAo8xFbRqXsvqy2idKCaBPG3lrUodmbm+CKNUAR0CDNW68+sQgoY1La8IS0OhhbtQJzFtt45WwM7y2fg8XYW40GuZVEQQBLycF5+kNqC0S8GS/r4bJ77MX9YyLNRc1hXWGAar+YW5U6QNoKwHQ6gPoLQGQ9AGkQvp8NfAXIGZXwn9owi3xLkDKQ3cJADm0I1EAObkbJZgbbQL1YYA9oKsMgB5g2wVU6z1cLvW7gHdgFrgtA+AGWDYN+9RmnfugLPKp9yL5pyDVy3w+gHWfQF+AezfIXq/zCfQtbHPAIzClKzjUS/93AZ/KslHformNVAAAAABJRU5ErkJggg=="></image>
+                      </svg>
+                    }
+                  }
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <label>{{ 'malfunction.severity' | translate }}</label>
+        </div>
+
+
+
+        <div class="form-line area">
+          <mat-form-field class="txt" appearance="outline">
+            <textarea matInput formControlName="description"></textarea>
+          </mat-form-field>
+          <label>{{ 'malfunction.description' | translate }}</label>
+        </div>
+
+        <div class="buttons">
+          @for(s of statusKeys; track s) {
+            @if('create_alert_dialog.statuses.'+s | translate; as tag) {
+              <button mat-flat-button (click)="addToTextarea(tag, 'description')">{{tag}}</button>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="container logs">
+    <h1>{{ 'malfunction.logs.header' | translate }}</h1>
+
+    @if (malfunction | async; as malf) {
+      @if (users | async; as u) {
+        <table mat-table [dataSource]="malf.log">
+
+          <ng-container matColumnDef="text">
+            <th mat-header-cell *matHeaderCellDef> {{ 'malfunction.logs.text' | translate }} </th>
+            <td mat-cell *matCellDef="let log"> {{ log.text }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="handler">
+            <th mat-header-cell *matHeaderCellDef> {{ 'malfunction.logs.handler' | translate }} </th>
+            <td mat-cell *matCellDef="let log"> {{ u[log.by] || '' }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef> {{ 'malfunction.logs.action' | translate }} </th>
+            <td mat-cell *matCellDef="let log"> {{ 'malfunction.logs.actionTypes.' + log.action | translate }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> {{ 'malfunction.logs.date' | translate }} </th>
+            <td mat-cell *matCellDef="let log"> {{ log.time | date: 'short' }} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      }
+    }
+
+  </div>
+
+</form>

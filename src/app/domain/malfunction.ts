@@ -59,3 +59,17 @@ export enum MalfunctionHandler {
   OUT_TECH = '#out-tech',
   IN_TECH = '#in-tech',
 }
+
+export const malfunctionTypesMap: { [key: string]: string } = {
+  optimizer: 'אופטימייזר',
+  other: 'אחר',
+  insulation: 'זליגה',
+  Production: 'ייצור',
+  equipment: 'מאוורר',
+  inverter: 'ממיר',
+  voltage: 'מתח מהרשת',
+  string: 'סטרינג',
+  panel: 'פאנל',
+  production: 'תפוקה',
+  connection: 'תקשורת',
+};

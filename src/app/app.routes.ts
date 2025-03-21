@@ -4,6 +4,7 @@ import { LoginPageComponent } from './core/login-page/login-page.component';
 import { UpdateCheckComponent } from './features/energy/components/update-check/update-check.component';
 import { UpdatePartitionComponent } from './features/energy/components/update-partition/update-partition.component';
 import { SystemDetailsComponent } from './features/monitoring/components/system-details/system-details.component';
+import { MalfuncitonEditComponent } from './features/malfunctions/malfunciton-edit/malfunciton-edit.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'energy-update-check', component: UpdateCheckComponent },
   { path: 'energy-update-partition', component: UpdatePartitionComponent },
+  { path: 'malfunction-edit/:id', component: MalfuncitonEditComponent },
   { path: '**', redirectTo: 'systems' },
 ];

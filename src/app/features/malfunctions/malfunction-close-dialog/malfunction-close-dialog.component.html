@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{'malfunction.issueClose.header' | translate}}</h2>
+<mat-dialog-content>
+  <div class="form-line">
+    <mat-form-field class="inline-form" appearance="outline">
+      <input matInput [matDatepicker]="closePicker" [formControl]="ctrl" />
+      <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
+      <mat-datepicker #closePicker></mat-datepicker>
+    </mat-form-field>
+    <label>{{'malfunction.issueClose.closingDate' | translate}}</label>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onCancel()">{{ 'malfunction.dialogDelete.cancel' | translate }}</button>
+  <button mat-button color="primary" (click)="onConfirm()">{{  'malfunction.issueClose.confirmClose' | translate  }}</button>
+</mat-dialog-actions>

@@ -3,11 +3,134 @@
 
 }
 
+h1{
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px!important;
+}
+
 .system {
   flex: 0 0 300px;
+  & > * {
+    margin: 4px 10px;
+  }
 
+}
+
+.bell {
+  margin-right: auto;
 }
 
 .issues {
   flex: 1 1 1px;
+}
+
+.settings {
+  display: flex;
+  align-items: center;
+
+  margin: 10px;
+  gap: 10px;
+
+  mat-form-field {
+    margin: 0;
+    height: 36px;
+    padding: 0;
+  }
+
+  button {
+    box-shadow: none;
+  }
+}
+
+.sums {
+  display: flex;
+  gap: 10px;
+  margin-left: auto !important;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.mat-column-reportStatus {
+  text-align: right!important;
+}
+
+svg {
+  width: 24px;
+  height: 24px;
+  margin-top: 5px;
+}
+
+.opened-status {
+  color: #f00;
+}
+
+.add-malfunction-button {
+  margin-right: auto;
+
+  mat-icon {
+    background-repeat: no-repeat;
+    display: inline-block;
+    color: #f44336;
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.mat-mdc-icon-button{
+  padding: 0!important;
+}
+
+.edit-button {
+  color: #2196F3;
+}
+
+.title {
+  justify-content: flex-end;
+}
+
+.green {
+  color: #70c265 !important;
+}
+
+.yellow {
+  color: #f3a600 !important;
+}
+
+mat-progress-spinner {
+  margin: 30px auto;
+  ::ng-deep .mdc-circular-progress__indeterminate-circle-graphic {
+    stroke: #2196F3;
+  }
+}
+
+th {
+  position: relative;
+  overflow: visible;
+  .description {
+    position: absolute;
+    top: -40px;
+    display: flex;
+    white-space: nowrap;
+    padding: 0 10px;
+    align-items: center;
+    height: 40px;
+
+    &:not(.empty):before {
+      content: " ";
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 10px;
+      background-color: #fff;
+      left: -20px;
+      bottom: -5px;
+
+    }
+  }
 }

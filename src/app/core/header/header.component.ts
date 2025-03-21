@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
+import { Component, inject, Input } from '@angular/core';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import {
   combineLatest,
   debounceTime,
@@ -18,13 +18,18 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { MatButton } from '@angular/material/button';
+import {
+  MatButton,
+  MatButtonModule,
+  MatIconButton,
+} from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { MonitorItem } from '../../domain/monitor-item';
 import { TranslatePipe } from '../lang/translate.pipe';
 import { LanguageService } from '../lang/language.service';
 import { LANGUAGE } from '../lang';
+import { MENU_TOOGLE } from './menu';
 
 @Component({
   selector: 'app-header',
@@ -42,6 +47,8 @@ import { LANGUAGE } from '../lang';
     TranslatePipe,
     MatAutocompleteModule,
     JsonPipe,
+    MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -56,6 +63,9 @@ export class HeaderComponent {
   langService = inject(LanguageService);
   lang = inject(LANGUAGE);
   langControl = new FormControl();
+  menu = inject(MENU_TOOGLE);
+
+  @Input() public headerTitle: string | undefined;
 
   facade = inject(MonitorFacade);
 

@@ -5,12 +5,13 @@ import {
   Firestore,
   getDoc,
   query,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { forkJoin, from, map, Observable } from 'rxjs';
 import { System } from '../domain/system';
-import { Energy } from '../domain/energy';
 import { getDocs } from 'firebase/firestore';
+import { chunkArray } from './chunk-array.function';
 
 @Injectable({
   providedIn: 'root',
@@ -32,23 +33,12 @@ export class SystemsService {
     );
   }
 
-  private chunkArray<T>(array: T[]): T[][] {
-    return array.reduce((resultArray: T[][], item, index) => {
-      const chunkIndex = Math.floor(index / 10);
-      if (!resultArray[chunkIndex]) {
-        resultArray[chunkIndex] = [];
-      }
-      resultArray[chunkIndex].push(item);
-      return resultArray;
-    }, []);
-  }
-
   getSystemsByIds(systemIds: string[]): Observable<System[]> {
     if (systemIds.length === 0) {
       return from([[]]);
     }
 
-    const chunks = this.chunkArray(systemIds);
+    const chunks = chunkArray(systemIds);
     const queries = chunks.map((chunk) => {
       const q = query(this.collection, where('__name__', 'in', chunk));
       const p = from(getDocs(q)).pipe(
@@ -60,5 +50,10 @@ export class SystemsService {
     });
 
     return forkJoin(queries).pipe(map((results) => results.flat()));
+  }
+
+  updateComment(id: string, value: string | null) {
+    const docRef = doc(this.collection, id);
+    return from(updateDoc(docRef, { comments: value }));
   }
 }

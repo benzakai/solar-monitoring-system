@@ -35,10 +35,9 @@ import { state } from '@angular/animations';
 })
 export class LoginPageComponent {
   auth = inject(AngularFireAuth);
-
+  authState = this.auth.authState.pipe(startWith(undefined));
   loginForm: FormGroup;
 
-  authState = this.auth.authState.pipe(startWith(undefined));
   error: string = '';
 
   constructor(

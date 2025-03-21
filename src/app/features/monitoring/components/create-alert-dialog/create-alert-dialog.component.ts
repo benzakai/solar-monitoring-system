@@ -26,8 +26,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
 import { MonitorItem } from '../../../../domain/monitor-item';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Malfunction, MalfunctionStatus } from '../../../../domain/malfunction';
+import {
+  MalfunctionStatus,
+  malfunctionTypesMap,
+} from '../../../../domain/malfunction';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {
@@ -75,21 +77,8 @@ export class CreateAlertDialogComponent {
     reportStatus: new FormControl(''),
   });
 
-  malfunctionTypesMap: { [key: string]: string } = {
-    optimizer: 'אופטימייזר',
-    other: 'אחר',
-    insulation: 'זליגה',
-    Production: 'ייצור',
-    equipment: 'מאוורר',
-    inverter: 'ממיר',
-    voltage: 'מתח מהרשת',
-    string: 'סטרינג',
-    panel: 'פאנל',
-    production: 'תפוקה',
-    connection: 'תקשורת',
-  };
-
-  issueTypes: string[] = Object.keys(this.malfunctionTypesMap);
+  malfunctionTypesMap = malfunctionTypesMap;
+  issueTypes: string[] = Object.keys(malfunctionTypesMap);
 
   statusKeys: string[] = [
     'faulty_optimization',
@@ -113,7 +102,8 @@ export class CreateAlertDialogComponent {
   }
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: MonitorItem,
+    @Inject(MAT_DIALOG_DATA)
+    public data: Pick<MonitorItem, 'id' | 'system_name'>,
     private dialogRef: MatDialogRef<CreateAlertDialogComponent>
   ) {}
 
@@ -135,6 +125,7 @@ export class CreateAlertDialogComponent {
         reportText: '',
         severity: 2,
         status: MalfunctionStatus.OPEN,
+        serial: 0,
         tracingTime: followUpDate?.toISOString
           ? followUpDate.toISOString()
           : null,

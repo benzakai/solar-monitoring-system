@@ -1,1 +1,32 @@
-<router-outlet></router-outlet>
+<mat-sidenav-container class="main-container" autosize [hasBackdrop]="true">
+  <router-outlet></router-outlet>
+
+  <mat-drawer #drawer mode="over" position="end" class="black-sidenav">
+    <div class="sidenav-col">
+      <div class="sidenav-header">
+        <button mat-icon-button (click)="toggle.next(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+        <img src="logo-o.png" />
+      </div>
+      <div class="sidenav-content">
+        <button mat-button color="white" (click)="redirect('systems')">
+          {{ 'sidenav.system_monitoring' | translate }}
+          <mat-icon color="yellow">stacked_line_chart</mat-icon>
+        </button>
+
+        @if (feature.energyPartitionDaily) {
+          <button mat-button color="white" (click)="redirect('energy-update-partition')">
+            Partition Daily
+            <mat-icon color="yellow">cloud</mat-icon>
+          </button>
+        }
+
+        <button mat-button color="white" (click)="logout()">
+          {{ 'sidenav.go_out' | translate }}
+          <mat-icon color="red">follow_the_signs</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-drawer>
+</mat-sidenav-container>

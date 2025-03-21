@@ -1,0 +1,317 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+} from '@angular/core';
+import {
+  Malfunction,
+  MalfunctionActionType,
+  MalfunctionHandler,
+  MalfunctionStatus,
+  malfunctionTypesMap,
+} from '../../../domain/malfunction';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { ActivatedRoute } from '@angular/router';
+import {
+  filter,
+  map,
+  Observable,
+  shareReplay,
+  switchMap,
+  take,
+  combineLatest,
+  distinctUntilChanged,
+} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '../../../core/lang/translate.pipe';
+import { HeaderComponent } from '../../../core/header/header.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MalfunctionActionsService } from '../services/malfunction-actions.service';
+import { SystemsService } from '../../../endpoint/systems.service';
+import { RoutingService } from '../../../core/routing/routing.service';
+import { AsyncPipe, DatePipe, DecimalPipe, NgForOf } from '@angular/common';
+import { MatTableModule } from '@angular/material/table';
+import { UsersService } from '../../../endpoint/users.service';
+import { MalfunctionsService } from '../../../endpoint/malfunctions.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { EnergyService } from '../../../endpoint/energy.service';
+import { EnergyCalc } from '../../../core/energy/energy-calculator';
+
+@Component({
+  selector: 'app-malfunciton-edit',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    FormsModule,
+    TranslatePipe,
+    HeaderComponent,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatIconModule,
+    AsyncPipe,
+    MatTableModule,
+    DatePipe,
+    DecimalPipe,
+    NgForOf,
+  ],
+  templateUrl: './malfunciton-edit.component.html',
+  styleUrl: './malfunciton-edit.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class MalfuncitonEditComponent {
+  fb = inject(FormBuilder);
+  routingService = inject(RoutingService);
+  activatedRoute = inject(ActivatedRoute);
+  usersService = inject(UsersService);
+  destroyRef = inject(DestroyRef);
+  malfunctionActionsService = inject(MalfunctionActionsService);
+  systemService = inject(SystemsService);
+  energyService = inject(EnergyService);
+  malfunctionsService = inject(MalfunctionsService);
+  auth = inject(AngularFireAuth);
+  malfunctionId = this.activatedRoute.params.pipe(
+    map((params) => params['id']),
+    filter(Boolean)
+  );
+
+  displayedColumns: string[] = ['text', 'handler', 'action', 'date'];
+
+  malfunction: Observable<Malfunction> = this.malfunctionId.pipe(
+    takeUntilDestroyed(this.destroyRef),
+    switchMap((id) => this.malfunctionActionsService.getMalfunction(id)),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  isClosed = this.malfunction.pipe(
+    map((malfunction) => malfunction.status === MalfunctionStatus.CLOSED)
+  );
+
+  users: Observable<Record<string, string>> = this.malfunction.pipe(
+    switchMap((malfunction) =>
+      this.usersService
+        .getUsersByUids(malfunction.log.map((log) => log.by))
+        .pipe(
+          map((users) =>
+            users.reduce(
+              (acc, user) => ({ ...acc, [user.uid]: user.displayName }),
+              {}
+            )
+          )
+        )
+    )
+  );
+
+  system = this.malfunction.pipe(
+    filter((malfunction): malfunction is Malfunction => !!malfunction),
+    switchMap((malfunction) =>
+      this.systemService.getById(malfunction.systemId)
+    ),
+    filter(Boolean),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  lastDay = this.malfunction.pipe(
+    distinctUntilChanged(
+      (previous, current) => previous?.systemId === current?.systemId
+    ),
+    switchMap((malfunction) =>
+      combineLatest([
+        this.energyService.getEnergy(malfunction.systemId),
+        this.system,
+      ]).pipe(
+        map(([energy, system]) => {
+          const lastDay = energy
+            ? EnergyCalc.daysBackEnergy(energy, 1, system.KWP)
+            : 0;
+          return (lastDay / (malfunction?.kwhKwpSnapshot || 1)) * 100;
+        })
+      )
+    )
+  );
+
+  form: FormGroup = this.fb.group({
+    customerPrice: [null],
+    golanSolarPrice: [null],
+    code: [''],
+    tracingTime: [''],
+    handler: [''],
+    reportText: [''],
+    notToReport: [false],
+    openTime: [''],
+    closeTime: [''],
+    type: [''],
+    severity: [''],
+    description: [''],
+  });
+
+  severityLevels = [1, 2, 3];
+
+  malfunctionTypes = ['Electrical', 'Mechanical', 'Software'];
+  malfunctionSubTypes = ['Voltage issue', 'Sensor failure', 'Firmware bug'];
+
+  malfunctionTypesMap = malfunctionTypesMap;
+  issueTypes: string[] = Object.keys(malfunctionTypesMap);
+
+  statusKeys: string[] = [
+    'faulty_optimization',
+    'system_without',
+    'issue_opened_solar_edge',
+    'power_outage',
+    'communication',
+    'communication_production',
+    'production',
+    'report_for_customer',
+    'group_report',
+    'high_voltage_observed',
+    'brief_morning_leakage_detected',
+    'call_center_track_update',
+    'found_ok_after_follow_up',
+  ];
+
+  constructor(private afs: AngularFirestore) {
+    this.malfunction.subscribe((data) => {
+      if (data) {
+        const type = data?.type ? data?.type[0] : '';
+        this.form.patchValue({
+          ...data,
+          type,
+        });
+      }
+    });
+  }
+
+  handlers = Object.values(MalfunctionHandler);
+
+  addToTextarea(text: string, field: string) {
+    const val = this.form.get(field)?.value;
+    this.form.get(field)?.setValue(val + ' ' + text);
+  }
+
+  save(options?: { reopen?: boolean; close?: Date }) {
+    this.form?.markAllAsTouched();
+    if (this.form?.valid) {
+      this.malfunction
+        .pipe(
+          take(1),
+          takeUntilDestroyed(this.destroyRef),
+          switchMap((malfunction) =>
+            combineLatest([
+              this.malfunctionsService.generateLogEntry(
+                malfunction,
+                MalfunctionActionType.REOPEN
+              ),
+              this.malfunctionsService.generateLogEntry(
+                malfunction,
+                MalfunctionActionType.CLOSE
+              ),
+            ]).pipe(
+              map(([reopenEntry, closedEntry]) => ({
+                malfunction,
+                reopenEntry,
+                closedEntry,
+              }))
+            )
+          )
+        )
+        .subscribe(({ malfunction, reopenEntry, closedEntry }) => {
+          const type = malfunction.type || ['', ''];
+          type[0] = this.form.value.type;
+
+          let result: Malfunction = {
+            ...malfunction,
+            ...this.form.value,
+            type,
+          };
+
+          if (options?.reopen) {
+            result = {
+              ...result,
+              status: MalfunctionStatus.OPEN,
+              log: reopenEntry.log,
+            };
+          }
+
+          if (options?.close) {
+            result = {
+              ...result,
+              status: MalfunctionStatus.CLOSED,
+              closeTime: options.close.toString(),
+              log: closedEntry.log,
+            };
+          }
+
+          console.log('SAVE', result);
+
+          this.afs
+            .collection('malfunctions')
+            .doc(this.activatedRoute.snapshot.params['id'])
+            .update(result);
+        });
+    }
+  }
+
+  deleteMalfunction() {
+    this.malfunction
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap((malfunction) =>
+          this.malfunctionActionsService
+            .deleteMalfunction({
+              id: this.activatedRoute.snapshot.params['id'],
+            })
+            .pipe(
+              map((isSuccess) => (isSuccess ? malfunction.systemId : undefined))
+            )
+        )
+      )
+      .subscribe((id) => this.routingService.goToSystemDetails(id));
+  }
+
+  navigateToSystemApi(systemId: string) {
+    this.routingService.navigateToSystemApi(systemId);
+  }
+
+  cancel() {
+    this.malfunction.pipe(take(1)).subscribe((malfunction) => {
+      this.routingService.goToSystemDetails(malfunction.systemId);
+    });
+  }
+
+  goToSystem(id: string) {
+    this.routingService.goToSystemDetails(id);
+  }
+
+  closeMalfunction() {
+    this.malfunction
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        take(1),
+        switchMap((malfunction) =>
+          this.malfunctionActionsService.closeMalfunction(malfunction)
+        ),
+        filter(Boolean)
+      )
+      .subscribe((date) => {
+        this.save({ close: date });
+      });
+  }
+}

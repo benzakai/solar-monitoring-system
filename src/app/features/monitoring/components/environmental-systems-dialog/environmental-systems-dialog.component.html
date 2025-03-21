@@ -1,0 +1,66 @@
+<h2 mat-dialog-title mat-dialog-close>
+  <button mat-icon-button>
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+<mat-dialog-content class="mat-typography">
+  @if (means && dataSrc.data.length) {
+
+    <div class="table-container">
+    <table mat-table [dataSource]="dataSrc">
+      <ng-container matColumnDef="systemName">
+        <th mat-header-cell *matHeaderCellDef>שם מערכת</th>
+        <td mat-cell *matCellDef="let system">{{ system.system.name }}</td>
+        <td mat-footer-cell *matFooterCellDef colspan="1">ממוצע:</td>
+      </ng-container>
+
+      <ng-container matColumnDef="today">
+        <th mat-header-cell *matHeaderCellDef>היום</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 0] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 0] / means.today) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.today | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="yesterday">
+        <th mat-header-cell *matHeaderCellDef>אתמול</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 1] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 1] / means.lastDay) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.lastDay | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="threeDays">
+        <th mat-header-cell *matHeaderCellDef>תלת יומי</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 3] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 3] / means.last3Days) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.last3Days | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="weekly">
+        <th mat-header-cell *matHeaderCellDef>שבועי</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 7] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 7] / means.lastWeek) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.lastWeek | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="monthly">
+        <th mat-header-cell *matHeaderCellDef>חודשי</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 30] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 30] / means.lastMonth) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.lastMonth | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="yearly">
+        <th mat-header-cell *matHeaderCellDef>שנתי</th>
+        <td mat-cell *matCellDef="let system">{{ systemMap[system.system.id + '-' + 365] | number: '1.2-2' }} ({{ asPercent(systemMap[system.system.id + '-' + 365] / means.lastYear) }})</td>
+        <td mat-footer-cell *matFooterCellDef>{{ means.lastYear | number: '1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastUpdate">
+        <th mat-header-cell *matHeaderCellDef>זמן עדכון</th>
+        <td mat-cell *matCellDef="let system">{{ lastConnection[system.system.id] | date: 'short' }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+    </table>
+    </div>
+  }
+
+</mat-dialog-content>

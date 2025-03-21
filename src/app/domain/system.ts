@@ -1,5 +1,6 @@
 export interface System {
   id: string;
+  name: string;
   type?: string;
   KWP: number;
   AC: number;
@@ -12,4 +13,11 @@ export interface System {
   location?: {
     relatedSystems?: string[];
   };
+  client?: {
+    name: string;
+    id: string;
+  };
+  lastConnectionTime?: string;
+  comments: string | null;
+  contactsIds: string[];
 }

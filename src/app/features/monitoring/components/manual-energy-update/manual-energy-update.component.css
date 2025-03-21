@@ -1,0 +1,26 @@
+h2 {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin-left: auto;
+  }
+}
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.riw {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.remove {
+  mat-icon {
+    color: #f00;
+  }
+}

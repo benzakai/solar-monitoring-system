@@ -1,0 +1,68 @@
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 1272px;
+  margin: 25px auto;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px;
+  justify-content: flex-end;
+}
+
+.level .container {
+  padding: 20px 0;
+}
+
+.form-line {
+  margin: 2px 10px;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.level {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.txt {
+  width: 300px;
+  height: 150px;
+}
+
+.button-container {
+  display: flex;
+  margin: 20px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logs {
+  h1 {
+    margin: 20px;
+    margin-left: auto;
+  }
+}
+
+svg {
+  height: 18px;
+  width: 18px;
+}
+
+.system-desc {display:  flex;
+  flex-direction: column;
+  flex: 0 0 30%;}

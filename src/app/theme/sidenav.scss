@@ -1,0 +1,61 @@
+@mixin sidenav() {
+  .mat-drawer.black-sidenav {
+    z-index: 20;
+    background-color: #212121;
+    color: white;
+
+    button.mat-white {
+      color: white !important;
+    }
+
+
+    button.mat-white .mat-mdc-button-ripple {
+      background-color: rgba(255, 255, 255, 0) !important;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    button.mat-white:hover .mat-mdc-button-ripple {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .sidenav-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .sidenav-header {
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+
+      & > * {
+        margin: 20px;
+      }
+    }
+
+    .sidenav-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin: 20px;
+      & > * {
+        margin: 2px 0;
+      }
+
+      button {
+        flex-flow: row-reverse;
+        mat-icon {
+          margin-left: 8px;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  .mat-yellow {
+    color: #FFEB3B;
+  }
+
+  .mat-red {
+    color: #F44336;
+  }
+}

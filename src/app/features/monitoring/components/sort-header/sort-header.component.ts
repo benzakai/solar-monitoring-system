@@ -1,11 +1,12 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   HostListener,
   Input,
   Output,
 } from '@angular/core';
-import { BehaviorSubject, filter, first, map } from 'rxjs';
+import { BehaviorSubject, filter, map } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { Sort } from '@angular/material/sort';
 
@@ -21,6 +22,7 @@ interface SortState {
   imports: [AsyncPipe],
   templateUrl: './sort-header.component.html',
   styleUrl: './sort-header.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortHeaderComponent {
   private setup = new BehaviorSubject<Partial<SortState>>({});

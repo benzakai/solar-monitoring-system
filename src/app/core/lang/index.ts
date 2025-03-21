@@ -5,6 +5,8 @@ import { header } from './dictionary/header';
 import { createAlertDialogLang } from './dictionary/create-alert-dialog';
 import { Dictionary } from './types/dictionary';
 import { system_details } from './dictionary/system-details';
+import { sidenav } from './dictionary/sidenav';
+import { malfunction } from './dictionary/malfunction';
 
 export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
   new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
@@ -16,4 +18,6 @@ export const language: Dictionary = {
   header,
   create_alert_dialog: createAlertDialogLang,
   system_details,
+  sidenav,
+  malfunction,
 };

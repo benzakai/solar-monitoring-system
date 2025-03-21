@@ -1,15 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  InjectionToken,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectEnergyItems } from '../../../../state/energy/energy.selectors';
 import { AsyncPipe, DecimalPipe } from '@angular/common';
 import { SampleEnergyComponent } from '../sample-energy/sample-energy.component';
 import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
-import { BehaviorSubject, map, startWith } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MonitorItem } from '../../../../domain/monitor-item';
 import {
@@ -20,7 +15,7 @@ import {
 import { loadEnergyItems } from '../../../../state/energy/energy.actions';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatCard, MatCardModule } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-update-partition',

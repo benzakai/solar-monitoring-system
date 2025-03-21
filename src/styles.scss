@@ -1,6 +1,7 @@
 @import './app/theme/materials';
 @import './app/theme/mat-menu';
 @import "./app/theme/scroll";
+@import "./app/theme/sidenav";
 
 body {
   background-color: rgb(219 226 235);
@@ -41,10 +42,14 @@ body {
   --mdc-filled-button-container-shape: 2px;
   --mdc-filled-button-label-text-weight: 500;
   --mdc-filled-button-label-text-size: 12px;
+
+  --mat-standard-button-toggle-shape: 12px;
+  --mat-standard-button-toggle-divider-color: #c3c3c3;
   //--mat-form-field-container-text-size: 40px;
 }
 
 
+@include sidenav();
 
 .mat-mdc-row:nth-child(odd) {
   background-color: #f2f2f2;
@@ -52,6 +57,14 @@ body {
 
 mat-icon {
   vertical-align: middle;
+}
+
+.mat-mdc-icon-button {
+  padding: 0 !important;
+
+  mat-icon {
+    font-size: 20px;
+  }
 }
 
 [matColumnDef="notes"] mat-icon {
@@ -262,11 +275,15 @@ mat-dialog-content {
     color: #74725C;
     width: 28px;
     height: 28px;
-    padding: 2px 12px ;
+    padding: 0!important;
     svg {
       width: 18px;
       height: 18px;
     }
+  }
+
+  .mat-icon-button {
+    padding: 0!important;
   }
 
   span {
@@ -534,3 +551,24 @@ button.mat-flat-button {
     stroke: #fff;
   }
 }
+
+
+.mdc-button {
+  &.mat-warn {
+    background-color: #d50000!important;
+  }
+  &.mat-basic {
+    background-color: #9e9e9e!important;
+  }
+  &.mat-success {
+    background-color: #70c265 !important;
+  }
+}
+
+.main-container {
+  background-image: url('./../public/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+

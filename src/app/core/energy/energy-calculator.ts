@@ -1,4 +1,4 @@
-import { EnergyApiRecord } from '../../domain/energy';
+import { Energy, EnergyApiRecord } from '../../domain/energy';
 
 export interface SolarEdgeAlerts {
   quantity: number;
@@ -35,6 +35,20 @@ export type EnergyDoc = {
 };
 
 export class EnergyCalc {
+  static daysBackEnergy(
+    energy: Energy,
+    days = 1,
+    systemKwp: number | undefined = undefined
+  ): number {
+    const from = EnergyCalc.DaysBack(days);
+    const to: number = Infinity;
+    const sum = EnergyCalc.Sum(
+      energy.annual
+        .filter((e) => e.time >= from && e.time <= to)
+        .map((e) => e.valueKwh)
+    );
+    return systemKwp ? sum / systemKwp : sum;
+  }
   /**
    * Sum energy production.
    * If there are no values, return NaN - means there is no data.

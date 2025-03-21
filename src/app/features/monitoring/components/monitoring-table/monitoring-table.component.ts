@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -47,6 +46,9 @@ import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { LANGUAGE } from '../../../../core/lang';
 import { SystemApiService } from '../../../systems/system-api.service';
 import { SortHeaderComponent } from '../sort-header/sort-header.component';
+import { RoutingService } from '../../../../core/routing/routing.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { SystemCommentDialogComponent } from '../system-comment-dialog/system-comment-dialog.component';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -68,6 +70,7 @@ import { SortHeaderComponent } from '../sort-header/sort-header.component';
       IssuesCountPipe,
       SortHeaderComponent,
       RouterModule,
+      MatTooltipModule,
     ],
     TranslatePipe,
     MatProgressSpinner,
@@ -234,6 +237,7 @@ export class MonitoringTableComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   waitingOpenedIssues: { [key: string]: any } = {};
+  waitingComments: { [key: string]: any } = {};
 
   constructor(
     private router: Router,
@@ -241,7 +245,7 @@ export class MonitoringTableComponent {
     private elementRef: ElementRef,
     private matDialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
-    private systemApiService: SystemApiService
+    private routingService: RoutingService
   ) {
     this.monitorSorted
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -266,6 +270,17 @@ export class MonitoringTableComponent {
     if (this.waitingOpenedIssues[id] !== undefined) {
       if (this.waitingOpenedIssues[id] !== currentValue) {
         delete this.waitingOpenedIssues[id];
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isWaitingComment(id: string, currentValue: any) {
+    if (this.waitingComments[id] !== undefined) {
+      if (this.waitingComments[id] === currentValue) {
+        delete this.waitingComments[id];
       } else {
         return true;
       }
@@ -335,9 +350,22 @@ export class MonitoringTableComponent {
   }
 
   navigateToSystemApi(systemId: string) {
-    this.systemApiService
-      .redirectToSystemApi(systemId)
-      .pipe(take(1))
-      .subscribe();
+    this.routingService.navigateToSystemApi(systemId);
+  }
+
+  commentDialog(id: string) {
+    const data = { id };
+    const dialogRef = this.matDialog.open(SystemCommentDialogComponent, {
+      data,
+      width: '1200px',
+      maxWidth: '90vw',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.waitingComments[id] = result.comment;
+        this.changeDetectorRef.markForCheck();
+      }
+    });
   }
 }

@@ -1,0 +1,17 @@
+h2 {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin-left: auto;
+  }
+}
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+
+  mat-form-field {
+    width: 100%;
+  }
+}

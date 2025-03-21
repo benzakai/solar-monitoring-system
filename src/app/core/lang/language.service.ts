@@ -17,6 +17,12 @@ export class LanguageService {
     return this.languageSubject.asObservable();
   }
 
+  getCurrentLang(): 'en' | 'he' {
+    return ['en', 'he'].includes(this.languageSubject.value)
+      ? (this.languageSubject.value as 'en' | 'he')
+      : 'he';
+  }
+
   setLanguage(language: string) {
     localStorage.setItem(this.LANGUAGE_KEY, language);
     this.languageSubject.next(language);

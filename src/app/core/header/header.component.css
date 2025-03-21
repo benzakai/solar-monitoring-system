@@ -16,14 +16,18 @@
   }
 }
 
-
-
 .header-container {
   display: flex;
-  flex: 0 1 var(--max-width);
-  margin: 0 auto;
-  max-width: var(--max-width);
+  margin: 0 20px;
 }
+
+@media (min-width: 1428px) {
+  .header-container {
+    flex: 1 0 var(--max-width);
+    min-width: 1428px;
+  }
+}
+
 
 mat-form-field {
   width: 182px;
@@ -44,15 +48,15 @@ mat-form-field {
   span {
     font-size: 20px;
   }
-
-  mat-icon {
-    margin-left: 80px;
+  button {
+    margin-left: 20px;
   }
 }
 .inp {
   position: relative;
   padding-left: 20px;
   line-height: 29px!important;
+
 }
 .pref {
   position:absolute;

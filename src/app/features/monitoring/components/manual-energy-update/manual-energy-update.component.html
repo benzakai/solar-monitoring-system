@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h1>
+    {{ 'system_details.manual_edit.header' | translate }}
+  </h1>
+</h2>
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="form">
+    <div formArrayName="energyData">
+      @for(group of energyData.controls; let i = $index; track group) {
+        <div [formGroupName]="i" class="riw">
+          <button mat-icon-button type="button" (click)="removeEnergyData(i)" class="remove">
+            <mat-icon>delete</mat-icon>
+          </button>
+
+
+
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput type="number" formControlName="api" />
+              <span matPrefix>kWh</span>
+            </mat-form-field>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput type="number" formControlName="manual" />
+              <span matPrefix>kWh</span>
+            </mat-form-field>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput [matDatepicker]="tracingPicker" formControlName="date" (dateChange)="dataChanged(i, $event)" />
+              <mat-datepicker-toggle matSuffix [for]="tracingPicker"></mat-datepicker-toggle>
+              <mat-datepicker #tracingPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+
+
+        </div>
+      }
+
+    </div>
+    <button mat-button type="button" (click)="addEnergyData()">{{ 'system_details.manual_edit.add' | translate }}</button>
+  </form>
+
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="save()"
+    [disabled]="action | async"
+  >
+    {{ 'system_details.manual_edit.save' | translate }}
+    @if (action | async) {
+      <mat-progress-spinner
+        diameter="15"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    }
+  </button>
+</mat-dialog-actions>

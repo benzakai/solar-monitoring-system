@@ -7,6 +7,7 @@ import {
   limit,
   onSnapshot,
   query,
+  updateDoc,
   where,
 } from '@angular/fire/firestore';
 import { forkJoin, from, map, Observable } from 'rxjs';
@@ -141,5 +142,10 @@ export class EnergyService {
     });
 
     return forkJoin(queries).pipe(map((results) => results.flat()));
+  }
+
+  updateAnnualEnergy(systemId: string, annual: EnergySample[]) {
+    const docRef = doc(this.collection, systemId);
+    return from(updateDoc(docRef, { annual }));
   }
 }

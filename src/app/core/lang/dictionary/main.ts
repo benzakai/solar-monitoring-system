@@ -247,4 +247,12 @@ export const mainLang: Dictionary = {
     he: 'תאריך חיבור',
     en: 'Start time',
   },
+  save_comment: {
+    he: 'שמור הערה',
+    en: 'Save comment',
+  },
+  remove_comment: {
+    he: 'הסר הערה',
+    en: 'Remove comment',
+  },
 };

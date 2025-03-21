@@ -99,3 +99,7 @@ th {
   gap: 6px;
   align-items: center;
 }
+
+mat-progress-spinner.comment {
+  margin: auto;
+}
