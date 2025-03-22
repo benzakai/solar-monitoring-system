@@ -19,6 +19,7 @@ export interface Malfunction {
   golanSolarPrice: number | null;
   requestNumber?: string;
   '#modified': number;
+  days?: number;
 }
 
 export interface MalfunctionAction {

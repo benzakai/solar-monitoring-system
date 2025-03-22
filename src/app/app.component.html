@@ -15,6 +15,12 @@
           <mat-icon color="yellow">stacked_line_chart</mat-icon>
         </button>
 
+        <button mat-button color="white" (click)="redirect('malfunctions')">
+          {{ 'sidenav.malfunctions' | translate }}
+          <mat-icon color="yellow">notifications_active</mat-icon>
+        </button>
+
+
         @if (feature.energyPartitionDaily) {
           <button mat-button color="white" (click)="redirect('energy-update-partition')">
             Partition Daily

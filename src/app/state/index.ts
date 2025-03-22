@@ -8,6 +8,8 @@ import { energyReducer } from './energy/energy.reducer';
 import { EnergyEffects } from './energy/energy.effects';
 import { systemEnergyReducer } from './system-energy/system-energy.reducer';
 import { SystemEnergyEffects } from './system-energy/system-energy.effects';
+import { malfunctionsReducer } from './malfunctions/malfunctions.reducer';
+import { MalfunctionsEffects } from './malfunctions/malfunctions.effects';
 
 export interface State {}
 
@@ -15,6 +17,7 @@ export const reducers: ActionReducerMap<State> = {
   monitor: monitorReducer,
   energy: energyReducer,
   systemEnergy: systemEnergyReducer,
+  malfunctions: malfunctionsReducer,
 };
 
 const devTools: EnvironmentProviders[] = isDevMode()
@@ -23,6 +26,11 @@ const devTools: EnvironmentProviders[] = isDevMode()
 
 export const storeProviders: EnvironmentProviders[] = [
   provideStore(reducers),
-  provideEffects(MonitorEffects, EnergyEffects, SystemEnergyEffects),
+  provideEffects(
+    MonitorEffects,
+    EnergyEffects,
+    SystemEnergyEffects,
+    MalfunctionsEffects
+  ),
   ...devTools,
 ];

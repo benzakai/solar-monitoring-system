@@ -21,7 +21,7 @@ export class DirectMonitorService {
 
   getAllSnapshot(): Observable<MonitorItem[]> {
     const limitedQuery = isDevMode()
-      ? query(this.collection, limit(10))
+      ? query(this.collection, limit(200))
       : query(this.collection);
 
     return new Observable<MonitorItem[]>((observer) => {
@@ -47,7 +47,7 @@ export class DirectMonitorService {
 
   getAllChanged(): Observable<MonitorItem[]> {
     const limitedQuery = isDevMode()
-      ? query(this.collection, limit(200))
+      ? query(this.collection)
       : query(this.collection);
 
     return new Observable<MonitorItem[]>((observer) => {
@@ -74,7 +74,7 @@ export class DirectMonitorService {
 
   getAll(): Observable<MonitorItem[]> {
     const limitedQuery = isDevMode()
-      ? query(this.collection, limit(200))
+      ? query(this.collection)
       : query(this.collection);
     return collectionData(limitedQuery, { idField: 'id' }).pipe(
       map((data) => data || []),

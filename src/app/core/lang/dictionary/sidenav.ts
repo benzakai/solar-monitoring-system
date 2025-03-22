@@ -9,4 +9,8 @@ export const sidenav: Dictionary = {
     en: 'Go Out',
     he: 'יציאה',
   },
+  malfunctions: {
+    he: 'ניהול תקלות',
+    en: 'Malfunctions',
+  },
 };

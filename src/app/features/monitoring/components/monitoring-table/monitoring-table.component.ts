@@ -39,16 +39,16 @@ import * as XLSX from 'xlsx';
 import { HeaderComponent } from '../../../../core/header/header.component';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
 import { FiltersControlService } from '../../services/filters-control.service';
-import { selectMonitorItems } from '../../../../state/monitor/monitor.selectors';
 import { MonitorItem } from '../../../../domain/monitor-item';
 import { MonitoringFiltersComponent } from '../monitoring-filters/monitoring-filters.component';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { LANGUAGE } from '../../../../core/lang';
-import { SystemApiService } from '../../../systems/system-api.service';
 import { SortHeaderComponent } from '../sort-header/sort-header.component';
 import { RoutingService } from '../../../../core/routing/routing.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SystemCommentDialogComponent } from '../system-comment-dialog/system-comment-dialog.component';
+import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
+import { Malfunction } from '../../../../domain/malfunction';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -122,6 +122,8 @@ export class MonitoringTableComponent {
     }))
   );
 
+  monitorFacade = inject(MonitorFacade);
+
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
     this.filtersControls.portalControlState,
@@ -130,7 +132,7 @@ export class MonitoringTableComponent {
     this.filtersControls.clientsControlStateMap,
     this.filtersControls.regionsControlStateMap,
     this.filtersControls.contractsControlState,
-    this.store.select(selectMonitorItems).pipe(debounceTime(500)),
+    this.monitorFacade.monitorItems.pipe(debounceTime(500)),
   ]).pipe(
     map(
       ([
@@ -222,6 +224,10 @@ export class MonitoringTableComponent {
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
+  trackTable(i: number, item: Partial<MonitorItem>) {
+    return item?.id;
+  }
 
   monitorFilteredCount = this.monitorFiltered.pipe(
     map((data) => data.length),

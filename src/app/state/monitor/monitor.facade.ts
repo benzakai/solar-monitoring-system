@@ -1,9 +1,19 @@
 import { inject, Injectable } from '@angular/core';
-import { filter, first, map, shareReplay } from 'rxjs';
+import {
+  filter,
+  first,
+  map,
+  of,
+  pipe,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { IdName } from '../../domain/id-name';
 import { Store } from '@ngrx/store';
 import { selectMonitorItems } from './monitor.selectors';
 import { MonitorItem } from '../../domain/monitor-item';
+import { loadMonitorItems } from './monitor.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +21,15 @@ import { MonitorItem } from '../../domain/monitor-item';
 export class MonitorFacade {
   store = inject(Store);
 
-  public readonly monitor = this.store.select(selectMonitorItems).pipe(
+  public monitorItems = of(null).pipe(
+    tap((items) => {
+      this.store.dispatch(loadMonitorItems());
+    }),
+    switchMap(() => this.store.select(selectMonitorItems)),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  public readonly monitor = this.monitorItems.pipe(
     filter((arr): arr is MonitorItem[] => Boolean(arr?.length > 0)),
     first()
   );

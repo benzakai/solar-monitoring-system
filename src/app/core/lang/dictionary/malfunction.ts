@@ -126,4 +126,17 @@ export const malfunction = {
     production: { en: 'Production', he: 'תפוקה' },
     connection: { en: 'Connection', he: 'תקשורת' },
   },
+  list: {
+    edit: { he: 'עריכה', en: 'Edit' },
+    contact: { he: 'יצירת קשר', en: 'Contact' },
+    tracingDate: { he: 'תאריך מעקב', en: 'Tracing Date' },
+    difference: { he: 'הפרש', en: 'Difference' },
+    daysOfMalfunction: { he: 'ימי תקלה', en: 'Days of Malfunction' },
+    severity: { he: 'חומרה', en: 'Severity' },
+    reportStatus: { he: 'סטטוס דוח', en: 'Report Status' },
+    malfunctionType: { he: 'סוג התקלה', en: 'Malfunction Type' },
+    roofType: { he: 'סוג גג', en: 'Roof Type' },
+    portal: { he: 'פורטל', en: 'Portal' },
+    systemName: { he: 'שם מערכת', en: 'System Name' },
+  },
 };
