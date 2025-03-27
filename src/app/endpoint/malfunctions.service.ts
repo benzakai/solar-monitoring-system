@@ -10,8 +10,9 @@ import {
   deleteDoc,
   limit,
   onSnapshot,
+  getDoc,
 } from '@angular/fire/firestore';
-import { filter, from, map, Observable, switchMap } from 'rxjs';
+import { filter, firstValueFrom, from, map, Observable, switchMap } from 'rxjs';
 import { Malfunction, MalfunctionActionType } from '../domain/malfunction';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { DateUtil } from '../core/date/DateUtil';
@@ -84,6 +85,69 @@ export class MalfunctionsService {
     );
   }
 
+  public addLogEntry(
+    malfunctionId: string,
+    action: MalfunctionActionType,
+    text: string
+  ) {
+    const now = new Date().getTime();
+
+    return from(getDoc(doc(this.collection, malfunctionId))).pipe(
+      switchMap((docSnap) => {
+        const existingMalfunction = docSnap.exists() ? docSnap.data() : {};
+        const existingLogs = existingMalfunction['log'] || [];
+
+        return from(this.auth.currentUser).pipe(
+          filter((user) => !!user),
+          map((user) => ({
+            action,
+            by: user?.uid,
+            text,
+            time: now,
+          })),
+          switchMap((newLogEntry) => {
+            const docRef = doc(this.collection, malfunctionId);
+            return from(
+              setDoc(
+                docRef,
+                {
+                  log: [newLogEntry, ...existingLogs],
+                  '#modified': now,
+                },
+                { merge: true }
+              )
+            );
+          })
+        );
+      })
+    );
+  }
+
+  public deleteLogEntry(malfunctionId: string, logIndex: number) {
+    return from(getDoc(doc(this.collection, malfunctionId))).pipe(
+      switchMap((docSnap) => {
+        const existingMalfunction = docSnap.exists() ? docSnap.data() : {};
+        const existingLogs = existingMalfunction['log'] || [];
+
+        const newLogs = existingLogs.filter(
+          (_: any, i: number) => i !== logIndex
+        );
+
+        return from(this.auth.currentUser).pipe(
+          filter((user) => !!user),
+          map((user) => ({
+            log: newLogs,
+            '#modified': new Date().getTime(),
+          })),
+          switchMap((newLogEntry) => {
+            const docRef = doc(this.collection, malfunctionId);
+            return from(setDoc(docRef, newLogEntry, { merge: true }));
+          })
+        );
+      })
+    );
+  }
+
   deleteMalfunction(id: string): Observable<void> {
     const docRef = doc(this.collection, id);
     return from(deleteDoc(docRef));
@@ -93,7 +157,8 @@ export class MalfunctionsService {
     const limitedQuery = query(
       this.collection,
       where('status', 'in', statuses),
-      where('#modified', '>=', DateUtil.DaysBack(90))
+      where('#modified', '>=', DateUtil.DaysBack(90)),
+      limit(50)
     );
 
     return new Observable<Malfunction[]>((observer) => {
@@ -130,7 +195,36 @@ export class MalfunctionsService {
         (snapshot) => {
           const items = snapshot
             .docChanges()
-            .filter((d) => d.type === 'modified')
+            .filter((d) => d.type === 'modified' || d.type === 'added')
+            .map((doc) => {
+              const data = doc.doc.data();
+
+              return {
+                id: doc.doc.id,
+                ...data,
+              } as Malfunction;
+            });
+          observer.next(items);
+        },
+        (error) => observer.error(error)
+      );
+    });
+  }
+
+  getAllRemoved(statuses: string[] = ['open']): Observable<Malfunction[]> {
+    const limitedQuery = query(
+      this.collection,
+      where('status', 'in', statuses),
+      where('#modified', '>=', DateUtil.DaysBack(90))
+    );
+
+    return new Observable<Malfunction[]>((observer) => {
+      return onSnapshot(
+        limitedQuery,
+        (snapshot) => {
+          const items = snapshot
+            .docChanges()
+            .filter((d) => d.type === 'removed')
             .map((doc) => {
               const data = doc.doc.data();
 

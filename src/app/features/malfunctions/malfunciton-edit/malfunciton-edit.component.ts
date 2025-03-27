@@ -13,6 +13,7 @@ import {
 } from '../../../domain/malfunction';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -20,14 +21,15 @@ import {
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ActivatedRoute } from '@angular/router';
 import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   Observable,
   shareReplay,
   switchMap,
   take,
-  combineLatest,
-  distinctUntilChanged,
 } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '../../../core/lang/translate.pipe';
@@ -50,6 +52,7 @@ import { MalfunctionsService } from '../../../endpoint/malfunctions.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EnergyService } from '../../../endpoint/energy.service';
 import { EnergyCalc } from '../../../core/energy/energy-calculator';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-malfunciton-edit',
@@ -72,6 +75,7 @@ import { EnergyCalc } from '../../../core/energy/energy-calculator';
     DatePipe,
     DecimalPipe,
     NgForOf,
+    MatProgressSpinner,
   ],
   templateUrl: './malfunciton-edit.component.html',
   styleUrl: './malfunciton-edit.component.css',
@@ -93,7 +97,12 @@ export class MalfuncitonEditComponent {
     filter(Boolean)
   );
 
-  displayedColumns: string[] = ['text', 'handler', 'action', 'date'];
+  currentUserId = this.auth.user.pipe(
+    filter(Boolean),
+    map((user) => user.uid)
+  );
+
+  displayedColumns: string[] = ['btts', 'text', 'handler', 'action', 'date'];
 
   malfunction: Observable<Malfunction> = this.malfunctionId.pipe(
     takeUntilDestroyed(this.destroyRef),
@@ -198,6 +207,8 @@ export class MalfuncitonEditComponent {
       }
     });
   }
+
+  comment = new FormControl('');
 
   handlers = Object.values(MalfunctionHandler);
 
@@ -314,4 +325,46 @@ export class MalfuncitonEditComponent {
         this.save({ close: date });
       });
   }
+
+  commentUpdating = new BehaviorSubject(false);
+
+  addCommentLog() {
+    if (!this.comment.value) {
+      return;
+    }
+    this.commentUpdating.next(true);
+    this.malfunctionId
+      .pipe(
+        take(1),
+        switchMap((malfunctionId) =>
+          this.malfunctionsService.addLogEntry(
+            malfunctionId,
+            MalfunctionActionType.ADD_COMMENT,
+            this.comment.value || ''
+          )
+        )
+      )
+      .subscribe(() => {
+        this.commentUpdating.next(false);
+        this.comment.setValue('');
+      });
+  }
+
+  deletingLog = new BehaviorSubject(false);
+
+  deleteLog(idx: number) {
+    this.deletingLog.next(true);
+    this.malfunction
+      .pipe(
+        take(1),
+        switchMap((malfunction) =>
+          this.malfunctionsService.deleteLogEntry(malfunction.id, idx)
+        )
+      )
+      .subscribe(() => {
+        this.deletingLog.next(false);
+      });
+  }
+
+  protected readonly Boolean = Boolean;
 }

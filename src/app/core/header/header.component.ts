@@ -4,10 +4,13 @@ import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  filter,
   interval,
   map,
   Observable,
+  shareReplay,
   startWith,
+  switchMap,
   withLatestFrom,
 } from 'rxjs';
 import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
@@ -30,6 +33,7 @@ import { TranslatePipe } from '../lang/translate.pipe';
 import { LanguageService } from '../lang/language.service';
 import { LANGUAGE } from '../lang';
 import { MENU_TOOGLE } from './menu';
+import { UsersService } from '../../endpoint/users.service';
 
 @Component({
   selector: 'app-header',
@@ -64,6 +68,8 @@ export class HeaderComponent {
   lang = inject(LANGUAGE);
   langControl = new FormControl();
   menu = inject(MENU_TOOGLE);
+
+  usersService = inject(UsersService);
 
   @Input() public headerTitle: string | undefined;
 
@@ -129,15 +135,24 @@ export class HeaderComponent {
     }
   }
 
+  person = this.authState.pipe(
+    filter((auth) => !!auth),
+    switchMap((auth) => this.usersService.getUserByUid(auth?.uid)),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
   text$ = combineLatest([
     interval(60000).pipe(startWith(0)),
     this.personControl.valueChanges.pipe(startWith(this.personControl.value)),
-    this.authState,
+    this.lang,
+    this.person,
   ]).pipe(
-    map(([time, name, auth]) => this.generateGreeting(auth?.displayName || ''))
+    map(([time, name, lang, auth]) =>
+      this.generateGreeting(auth?.displayName || '', lang)
+    )
   );
 
-  generateGreeting(name: string): string {
+  generateGreeting(name: string, lang: 'en' | 'he'): string {
     const today = new Date();
     const israelTime = new Date(
       today.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })

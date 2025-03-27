@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { Malfunction } from '../../domain/malfunction';
 import {
   loadMalfunctionsSuccess,
+  loadRemovedMalfunctionsSuccess,
   setClosedLoadingStatus,
   setMalfunctionsStatus,
 } from './malfunctions.actions';
@@ -81,6 +82,14 @@ export const malfunctionsReducer = createReducer(
     return {
       ...state,
       closeStatus: status,
+    };
+  }),
+  on(loadRemovedMalfunctionsSuccess, (state, { items }) => {
+    return {
+      ...state,
+      items: state.items.filter(
+        (stateItem) => !items.find((item) => item.id === stateItem.id)
+      ),
     };
   })
 );

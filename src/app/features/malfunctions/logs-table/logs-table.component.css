@@ -1,0 +1,22 @@
+:host {
+  background-color: #afafaf;
+  color: #fff;
+  text-align: right;
+  width: 100%;
+  table {
+    width: 100%;
+  }
+
+  .log-text {
+
+  }
+  .log-action {
+    width: 10%;
+  }
+  .log-by {
+    width: 15%;
+  }
+  .log-time {
+    width: 200px;
+  }
+}

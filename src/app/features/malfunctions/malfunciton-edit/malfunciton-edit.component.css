@@ -66,3 +66,17 @@ svg {
 .system-desc {display:  flex;
   flex-direction: column;
   flex: 0 0 30%;}
+
+
+.add-comment {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  button {
+    margin: 20px 20px 30px 0;
+  }
+}
+
+.button-red {
+  color: #f44336;
+}

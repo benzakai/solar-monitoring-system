@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+<mat-dialog-content class="mat-typography">
+  <mat-form-field appearance="outline">
+    <mat-icon class="pref">search</mat-icon>
+    <input class="inp" matInput [formControl]="searchControl" [placeholder]="'header.search_placeholder' | translate" [matAutocomplete]="cps" />
+    <mat-autocomplete #cps="matAutocomplete">
+      @if (foundSystems | async; as sys) {
+        @for(s of sys; track s.id) {
+          <mat-option (click)="selection(s)">
+            {{ s?.system_name }}
+          </mat-option>
+        }
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+
+
+</mat-dialog-content>
+

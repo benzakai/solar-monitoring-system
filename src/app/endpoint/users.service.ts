@@ -28,4 +28,10 @@ export class UsersService {
     });
     return forkJoin(queries).pipe(map((results) => results.flat()));
   }
+
+  getUserByUid(uid: string): Observable<User | null> {
+    return this.getUsersByUids([uid]).pipe(
+      map((users) => (users?.length ? users[0] : null))
+    );
+  }
 }

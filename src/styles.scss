@@ -5,6 +5,8 @@
 
 body {
   background-color: rgb(219 226 235);
+  //direction: rtl;
+
 }
 :root {
   --max-width: 1428px;
@@ -51,7 +53,12 @@ body {
 
 @include sidenav();
 
-.mat-mdc-row:nth-child(odd) {
+table:not(.manual-odd) {
+  .mat-mdc-row:nth-child(odd) {
+    background-color: #f2f2f2;
+  }
+}
+.mat-mdc-row.odd {
   background-color: #f2f2f2;
 }
 

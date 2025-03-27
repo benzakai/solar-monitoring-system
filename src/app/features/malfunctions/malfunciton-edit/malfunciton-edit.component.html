@@ -229,10 +229,24 @@
 
   <div class="container logs">
     <h1>{{ 'malfunction.logs.header' | translate }}</h1>
-
+    @if (currentUserId | async; as cu) {
     @if (malfunction | async; as malf) {
       @if (users | async; as u) {
+
         <table mat-table [dataSource]="malf.log">
+
+          <ng-container matColumnDef="btts">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let log; let idx = index">
+              @if (log.action === 'comment' && log.by === cu) {
+                <button mat-icon-button class="button-red" (click)="deleteLog(idx)" [disabled]="deletingLog | async">
+                  <mat-icon>
+                    delete
+                  </mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
 
           <ng-container matColumnDef="text">
             <th mat-header-cell *matHeaderCellDef> {{ 'malfunction.logs.text' | translate }} </th>
@@ -257,9 +271,34 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-      }
-    }
 
+      }
+
+      <div class="add-comment">
+        <div class="form-line area">
+          <mat-form-field appearance="outline">
+            <textarea
+              matInput
+              placeholder="כתיבת הערה..."
+              [formControl]="comment"
+              [disabled]="Boolean(commentUpdating | async)"
+            ></textarea
+            >
+          </mat-form-field>
+        </div>
+        <button mat-mini-fab (click)="addCommentLog()" [disabled]="commentUpdating | async">
+          @if (commentUpdating | async) {
+            <mat-progress-spinner
+              diameter="15"
+              mode="indeterminate"
+            ></mat-progress-spinner>
+          } @else {
+            <mat-icon>add</mat-icon>
+          }
+
+        </button>
+      </div>
+    }}
   </div>
 
 </form>

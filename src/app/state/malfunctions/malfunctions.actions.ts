@@ -13,6 +13,11 @@ export const loadMalfunctionsSuccess = createAction(
   props<{ items: Malfunction[]; clean?: boolean }>()
 );
 
+export const loadRemovedMalfunctionsSuccess = createAction(
+  '[Malfunctions] Load All Removals Success',
+  props<{ items: Malfunction[] }>()
+);
+
 export const setClosedLoadingStatus = createAction(
   '[Malfunctions] Set Closed Loading Status',
   props<{ status: 'LOADING' | 'LOADED' | 'ERROR' }>()

@@ -17,6 +17,7 @@ import {
   loadAllMalfunctions,
   loadMalfunctionsFailure,
   loadMalfunctionsSuccess,
+  loadRemovedMalfunctionsSuccess,
   setClosedLoadingStatus,
 } from './malfunctions.actions';
 import { Store } from '@ngrx/store';
@@ -56,7 +57,13 @@ export class MalfunctionsEffects {
                   }
                 })
               ),
-              this.malfunctionsService.getAllChanged(statuses)
+              this.malfunctionsService.getAllChanged(statuses),
+              this.malfunctionsService.getAllRemoved(statuses).pipe(
+                tap((items) =>
+                  this.store.dispatch(loadRemovedMalfunctionsSuccess({ items }))
+                ),
+                map((items) => [])
+              )
             ).pipe(
               map((items) => loadMalfunctionsSuccess({ items })),
               catchError(this.permissions)

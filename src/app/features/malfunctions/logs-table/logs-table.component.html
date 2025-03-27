@@ -1,0 +1,10 @@
+<table>
+  @for (log of logs; track log.time) {
+    <tr>
+      <td class="log-text">{{log.text}}</td>
+      <td class="log-action">{{ 'malfunction.logs.actionTypes.' + log.action | translate }}</td>
+      <td class="log-by">{{people[log.by] || '...'}}</td>
+      <td class="log-time">{{log.time | date: 'HH:mm dd.M.yyyy'}}</td>
+    </tr>
+  }
+</table>
