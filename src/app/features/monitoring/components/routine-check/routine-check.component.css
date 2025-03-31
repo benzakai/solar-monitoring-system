@@ -1,0 +1,113 @@
+:host {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+}
+
+.table-container {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+}
+
+mat-icon {
+  vertical-align: middle;
+}
+
+.container {
+  margin: 0 20px 20px 20px;
+  flex: 1 1 1px;
+  overflow: hidden;
+}
+
+table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+  position: relative;
+}
+.icon-right {
+
+  gap: 5px;
+  width: 18px; /* Adjust the size as needed */
+}
+th {
+  position: relative;
+  overflow: visible;
+  .description {
+    position: absolute;
+    top: -40px;
+    display: flex;
+    white-space: nowrap;
+    padding: 0 10px;
+    align-items: center;
+    height: 40px;
+
+    &:not(.empty):before {
+      content: " ";
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 10px;
+      background-color: #fff;
+      left: -20px;
+      bottom: -5px;
+
+    }
+  }
+}
+
+.d-600 {
+  width: 600px;
+  justify-content: center;
+}
+
+.d-380 {
+  width: 380px;
+  justify-content: center;
+}
+
+.d-170 {
+  width: 170px;
+  justify-content: center;
+}
+
+.d-140 {
+  width: 140px;
+  justify-content: center;
+}
+
+.headline-2 {
+  flex-basis: 40px;
+}
+
+
+.mat-header-row, .mat-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+
+.aligner {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  align-items: center;
+}
+
+mat-progress-spinner.comment {
+  margin: auto;
+}
+.check-button {
+  width: 15px!important;
+  padding: 0!important;
+  background-color: #4caf50!important;
+  mat-icon {
+    margin: auto;
+  }
+}
