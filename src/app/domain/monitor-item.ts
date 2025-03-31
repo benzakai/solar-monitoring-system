@@ -1,4 +1,5 @@
 import { IdName } from './id-name';
+import { Check } from './checks';
 
 export interface MonitorItem {
   id: string;
@@ -31,4 +32,5 @@ export interface MonitorItem {
   today_percent: number;
   weekly_percent: number;
   yesterday_percent: number;
+  lastCheck?: Check;
 }

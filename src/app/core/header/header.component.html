@@ -25,11 +25,21 @@
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline" class="custom-select-single">
-            <mat-select [formControl]="personControl">
-              @if (person | async; as auth) {
-                <mat-option [value]="auth.email">{{ auth.displayName }}</mat-option>
-              }
 
+            <mat-select [formControl]="coordinatorsControl" multiple>
+              <mat-select-trigger>
+                @if (allCoordinators | async) {
+                  <span>{{ 'header.allCoordinatorsView' | translate }}</span>
+                } @else {
+                  <span>{{ selectedCoordinatorsString | async }} {{ ('selected' | translate)  }}</span>
+
+                }
+              </mat-select-trigger>
+              @if (coordinators | async; as coord) {
+                @for(c of coord; track c.uid) {
+                  <mat-option [value]="c.uid">{{ c.displayName }}</mat-option>
+                }
+              }
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline">

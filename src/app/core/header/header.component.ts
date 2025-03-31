@@ -16,16 +16,12 @@ import {
 import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
-import { MatSelect } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import {
-  MatButton,
-  MatButtonModule,
-  MatIconButton,
-} from '@angular/material/button';
+import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { MonitorItem } from '../../domain/monitor-item';
@@ -34,6 +30,7 @@ import { LanguageService } from '../lang/language.service';
 import { LANGUAGE } from '../lang';
 import { MENU_TOOGLE } from './menu';
 import { UsersService } from '../../endpoint/users.service';
+import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 
 @Component({
   selector: 'app-header',
@@ -53,6 +50,7 @@ import { UsersService } from '../../endpoint/users.service';
     JsonPipe,
     MatButtonModule,
     MatIconModule,
+    MatSelectModule,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -61,7 +59,7 @@ export class HeaderComponent {
   auth = inject(AngularFireAuth);
   authState = this.auth.authState.pipe(startWith(undefined));
   translatePipe = new TranslatePipe();
-
+  coordinatorsService = inject(CoordinatorsService);
   personControl = new FormControl();
   searchControl = new FormControl();
   langService = inject(LanguageService);
@@ -70,6 +68,15 @@ export class HeaderComponent {
   menu = inject(MENU_TOOGLE);
 
   usersService = inject(UsersService);
+
+  coordinators = this.coordinatorsService.coordinators;
+  coordinatorsControl = new FormControl([] as string[]);
+  allCoordinators = this.coordinatorsService.allCoorinatorsSelected;
+
+  selectedCoordinatorsString =
+    this.coordinatorsService.coordinatorsSelected.pipe(
+      map((ids) => ids?.length)
+    );
 
   @Input() public headerTitle: string | undefined;
 
@@ -101,6 +108,17 @@ export class HeaderComponent {
     this.authState.pipe(takeUntilDestroyed()).subscribe((a) => {
       this.personControl.setValue(a?.email);
     });
+
+    this.coordinatorsService.coordinatorsSelectedSource
+      .pipe(takeUntilDestroyed())
+      .subscribe((coords) =>
+        this.coordinatorsControl.setValue(coords, { emitEvent: false })
+      );
+    this.coordinatorsControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((coords) =>
+        this.coordinatorsService.coordinatorsSelectedSource.next(coords || [])
+      );
   }
 
   private searchForSystems(

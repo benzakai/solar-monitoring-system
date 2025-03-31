@@ -16,11 +16,13 @@ import {
 import { LANGUAGE } from './core/lang';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MENU_TOOGLE } from './core/header/menu';
-import { Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from './core/lang/translate.pipe';
 import { env } from './env/env';
+import { CurrentUserService } from './features/people/services/current-user.service';
+import { HeaderComponent } from './core/header/header.component';
 
 @Component({
   selector: 'app-root',
@@ -34,6 +36,7 @@ import { env } from './env/env';
     MatIconModule,
     MatButton,
     TranslatePipe,
+    HeaderComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -52,6 +55,8 @@ export class AppComponent implements AfterViewInit {
   cdr = inject(ChangeDetectorRef);
   toggle = inject(MENU_TOOGLE);
   auth = inject(AngularFireAuth);
+  currentUserService = inject(CurrentUserService);
+  currentRole = this.currentUserService.user.pipe(map((user) => user?.role));
   router = inject(Router);
 
   feature = env.feature;

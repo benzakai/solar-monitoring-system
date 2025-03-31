@@ -7,6 +7,10 @@ export const selectMonitorItems = createSelector(
   (state) => state.monitorItems || []
 );
 
+export const selectMonitorInited = createSelector(
+  selectMonitorState,
+  (state) => state.initial
+);
 export const selectMinMaxKwp = createSelector(selectMonitorItems, (items) => {
   const kwp = items.map((item) => item.kwp);
   return { min: Math.min(...kwp), max: Math.max(...kwp) };

@@ -6,6 +6,7 @@ import { UpdatePartitionComponent } from './features/energy/components/update-pa
 import { SystemDetailsComponent } from './features/monitoring/components/system-details/system-details.component';
 import { MalfuncitonEditComponent } from './features/malfunctions/malfunciton-edit/malfunciton-edit.component';
 import { MalfunctionsComponent } from './features/malfunctions/malfunctions/malfunctions.component';
+import { RoutineCheckComponent } from './features/monitoring/components/routine-check/routine-check.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'energy-update-partition', component: UpdatePartitionComponent },
   { path: 'malfunctions', component: MalfunctionsComponent },
   { path: 'malfunction-edit/:id', component: MalfuncitonEditComponent },
+  { path: 'routine-check', component: RoutineCheckComponent },
   { path: '**', redirectTo: 'systems' },
 ];

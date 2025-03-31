@@ -24,6 +24,7 @@
 .mat-column {
   &-notes { width: 60px; }
   &-actions { width: 100px; }
+  &-check { width: 100px; }
   &-openAlerts { width: 100px; }
   &-clearedAlerts { width: 110px; }
   &-startOfYear { width: 110px; }
@@ -40,6 +41,7 @@
   &-KWP { width: 60px; }
   &-name { text-align: right!important; }
   &-tested { width: 70px; }
+  &-daysFromCheck { width: 70px; }
   &-l { width: 0; padding: 0!important; }
   &-r { width: 0; padding: 0!important; }
 

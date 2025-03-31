@@ -253,9 +253,26 @@
           {{ 'tested' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
-          <mat-icon *ngIf="!element.tested" [style.color]="'#e00'"
-            >remove</mat-icon
-          >
+
+          @if (isWaitingCheck(element.id, element.checkedByMeToday)) {
+            <span class="aligner">
+            <mat-progress-spinner
+              diameter="15"
+              mode="indeterminate"
+            ></mat-progress-spinner>
+            </span>
+          } @else {
+            @if(element.checkedByMeToday) {
+              <button mat-icon-button class="checked-button" (click)="removeLastCheck(element.id)">
+                <mat-icon *ngIf="!element.tested">done</mat-icon>
+              </button>
+            } @else {
+              <button mat-icon-button class="not-checked-button" (click)="checked(element.id)">
+                <mat-icon *ngIf="!element.tested">remove</mat-icon>
+              </button>
+            }
+          }
+
         </td>
       </ng-container>
 

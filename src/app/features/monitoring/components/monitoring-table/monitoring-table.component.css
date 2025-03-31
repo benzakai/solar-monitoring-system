@@ -103,3 +103,15 @@ th {
 mat-progress-spinner.comment {
   margin: auto;
 }
+
+
+.checked-button {
+  mat-icon {
+    color: #4caf50;
+  }
+}
+.not-checked-button {
+  mat-icon {
+    color: #f44336;
+  }
+}

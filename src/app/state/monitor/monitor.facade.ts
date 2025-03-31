@@ -5,15 +5,18 @@ import {
   map,
   of,
   pipe,
+  share,
   shareReplay,
   switchMap,
   tap,
+  combineLatest,
 } from 'rxjs';
 import { IdName } from '../../domain/id-name';
 import { Store } from '@ngrx/store';
-import { selectMonitorItems } from './monitor.selectors';
+import { selectMonitorInited, selectMonitorItems } from './monitor.selectors';
 import { MonitorItem } from '../../domain/monitor-item';
 import { loadMonitorItems } from './monitor.actions';
+import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,14 +24,30 @@ import { loadMonitorItems } from './monitor.actions';
 export class MonitorFacade {
   store = inject(Store);
 
-  public monitorItems = of(null).pipe(
-    tap((items) => {
-      this.store.dispatch(loadMonitorItems());
+  coordinatorsService = inject(CoordinatorsService);
+
+  public monitorItems = this.store.select(selectMonitorInited).pipe(
+    tap((inited) => {
+      if (!inited) {
+        this.store.dispatch(loadMonitorItems());
+      }
     }),
-    switchMap(() => this.store.select(selectMonitorItems)),
+    switchMap(() =>
+      combineLatest([
+        this.store.select(selectMonitorItems),
+        this.coordinatorsService.allCustomersOfSelectedCoordinatorsMap.pipe(
+          filter((map) => map.size > 0)
+        ),
+      ]).pipe(
+        map(([items, customers]) =>
+          items.filter(
+            (item) => item?.client?.id && customers?.has(item.client.id)
+          )
+        )
+      )
+    ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
-
   public readonly monitor = this.monitorItems.pipe(
     filter((arr): arr is MonitorItem[] => Boolean(arr?.length > 0)),
     first()

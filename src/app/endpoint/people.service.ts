@@ -28,4 +28,13 @@ export class PeopleService {
     });
     return forkJoin(queries).pipe(map((results) => results.flat()));
   }
+
+  getAllPeople(): Observable<Person[]> {
+    const q = query(this.collection);
+    return from(getDocs(q)).pipe(
+      map((snapshot) =>
+        snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
+      )
+    );
+  }
 }

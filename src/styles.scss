@@ -51,6 +51,7 @@ body {
 }
 
 
+
 @include sidenav();
 
 table:not(.manual-odd) {
@@ -579,3 +580,6 @@ button.mat-flat-button {
   background-repeat: no-repeat;
 }
 
+input, textarea {
+  direction: rtl;
+}

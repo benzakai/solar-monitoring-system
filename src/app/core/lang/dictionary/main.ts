@@ -255,4 +255,12 @@ export const mainLang: Dictionary = {
     he: 'הסר הערה',
     en: 'Remove comment',
   },
+  perform_a_check: {
+    he: 'ביצוע בדיקה',
+    en: 'Check',
+  },
+  last_check_days: {
+    he: 'נבדק',
+    en: 'Checked',
+  },
 };

@@ -4,4 +4,5 @@ export interface Person {
   position: string;
   phone: string;
   email: string;
+  coordinatorUid?: string;
 }

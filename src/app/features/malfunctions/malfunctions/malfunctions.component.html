@@ -140,7 +140,7 @@
             {{ 'malfunction.list.contact' | translate }}
           </th>
           <td mat-cell *matCellDef="let m">
-            <button (click)="m.alertClass" mat-icon-button>
+            <button (click)="showPeople(m?.system?.id)" mat-icon-button>
               <mat-icon>phone</mat-icon>
             </button>
           </td>

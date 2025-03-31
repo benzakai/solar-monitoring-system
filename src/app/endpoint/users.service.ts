@@ -1,9 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { collection, Firestore, query, where } from '@angular/fire/firestore';
 import { User } from '../domain/user';
-import { forkJoin, from, map, Observable, of } from 'rxjs';
+import { forkJoin, from, map, Observable, of, shareReplay } from 'rxjs';
 import { chunkArray } from './chunk-array.function';
 import { getDocs } from 'firebase/firestore';
+
+export enum UserRole {
+  ADMIN = '1admin',
+  COORDINATOR = '3coordinator',
+  SIMPLE = '5simple',
+}
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +17,17 @@ import { getDocs } from 'firebase/firestore';
 export class UsersService {
   private firestore = inject(Firestore);
   private collection = collection(this.firestore, 'users');
+
+  getCoordinators() {
+    return from(
+      getDocs(query(this.collection, where('role', '==', UserRole.COORDINATOR)))
+    ).pipe(
+      map((snapshot) =>
+        snapshot.docs.map((doc) => ({ ...doc.data() }) as User)
+      ),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+  }
 
   getUsersByUids(userUids: string[]): Observable<User[]> {
     if (userUids.length === 0) {

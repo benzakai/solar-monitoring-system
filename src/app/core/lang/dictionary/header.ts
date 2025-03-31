@@ -12,4 +12,5 @@ export const header: Dictionary = {
     he: 'חיפוש לפי שם מערכת/שם לקוח',
   },
   monitoring_table: { en: 'Monitoring table', he: 'טבלת ניטור' },
+  allCoordinatorsView: { en: 'All coordinators view', he: 'צפייה בכל הרכזים' },
 };

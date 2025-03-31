@@ -361,6 +361,16 @@ export class MalfunctionsComponent {
     this.store.dispatch(setMalfunctionsStatus({ status: 'open' }));
   }
 
+  showPeople(id: string) {
+    this.dialogService.open(MalfunctionPeopleComponent, {
+      data: {
+        id,
+      },
+      width: '800px',
+      maxWidth: '90vw',
+    });
+  }
+
   trackTable(i: number, item: Partial<Malfunction>) {
     return item?.id;
   }

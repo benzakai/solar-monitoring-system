@@ -48,7 +48,9 @@ import { RoutingService } from '../../../../core/routing/routing.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SystemCommentDialogComponent } from '../system-comment-dialog/system-comment-dialog.component';
 import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
-import { Malfunction } from '../../../../domain/malfunction';
+import { DateUtil } from '../../../../core/date/DateUtil';
+import { CurrentUserService } from '../../../people/services/current-user.service';
+import { RoutineCheckService } from '../../../../endpoint/routine-check.service';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -106,7 +108,7 @@ export class MonitoringTableComponent {
   displayedHColumns: string[] = ['l', ...this.displayedColumns, 'r'];
   store = inject(Store);
   filtersControls = inject(FiltersControlService);
-
+  routineCheckService = inject(RoutineCheckService);
   dataSource = new MatTableDataSource<any>();
   route = inject(ActivatedRoute);
 
@@ -121,8 +123,24 @@ export class MonitoringTableComponent {
       sortDirection: sortDirection === 'asc' ? 1 : -1,
     }))
   );
-
+  currentUserService = inject(CurrentUserService);
   monitorFacade = inject(MonitorFacade);
+
+  monitorItemsForUser = combineLatest([
+    this.monitorFacade.monitorItems.pipe(debounceTime(500)),
+    this.currentUserService.user,
+  ]).pipe(
+    map(([items, user]) =>
+      (items || []).map((item) => {
+        const daysFromCheck = item?.lastCheck?.date
+          ? DateUtil.DaysFromToday(new Date(item?.lastCheck?.date || 0))
+          : undefined;
+        const checkedByMeToday =
+          daysFromCheck === 0 && item?.lastCheck?.uid === user.uid;
+        return { ...item, daysFromCheck, checkedByMeToday };
+      })
+    )
+  );
 
   monitorFiltered = combineLatest([
     this.filtersControls.kwpControlState,
@@ -132,7 +150,7 @@ export class MonitoringTableComponent {
     this.filtersControls.clientsControlStateMap,
     this.filtersControls.regionsControlStateMap,
     this.filtersControls.contractsControlState,
-    this.monitorFacade.monitorItems.pipe(debounceTime(500)),
+    this.monitorItemsForUser,
   ]).pipe(
     map(
       ([
@@ -244,6 +262,7 @@ export class MonitoringTableComponent {
 
   waitingOpenedIssues: { [key: string]: any } = {};
   waitingComments: { [key: string]: any } = {};
+  waitingChecks: { [key: string]: any } = {};
 
   constructor(
     private router: Router,
@@ -287,6 +306,17 @@ export class MonitoringTableComponent {
     if (this.waitingComments[id] !== undefined) {
       if (this.waitingComments[id] === currentValue) {
         delete this.waitingComments[id];
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isWaitingCheck(id: string, currentValue: any) {
+    if (this.waitingChecks[id] !== undefined) {
+      if (this.waitingChecks[id] === currentValue) {
+        delete this.waitingChecks[id];
       } else {
         return true;
       }
@@ -373,5 +403,15 @@ export class MonitoringTableComponent {
         this.changeDetectorRef.markForCheck();
       }
     });
+  }
+
+  removeLastCheck(id: string) {
+    this.waitingChecks[id] = false;
+    this.routineCheckService.removeLastCheck(id).subscribe();
+  }
+
+  checked(id: string) {
+    this.waitingChecks[id] = true;
+    this.routineCheckService.addCheck(id).subscribe(() => {});
   }
 }

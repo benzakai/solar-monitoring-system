@@ -1,13 +1,15 @@
 import { createReducer, on } from '@ngrx/store';
-import { loadMonitorItemsSuccess } from './monitor.actions';
+import { loadMonitorItems, loadMonitorItemsSuccess } from './monitor.actions';
 import { MonitorItem } from '../../domain/monitor-item';
 
 export interface MonitorState {
   monitorItems: MonitorItem[];
+  initial: boolean;
 }
 
 export const initialState: MonitorState = {
   monitorItems: [],
+  initial: false,
 };
 
 export const monitorReducer = createReducer(
@@ -29,6 +31,12 @@ export const monitorReducer = createReducer(
     return {
       ...state,
       monitorItems: updatedState,
+    };
+  }),
+  on(loadMonitorItems, (state) => {
+    return {
+      ...state,
+      initial: true,
     };
   })
 );
