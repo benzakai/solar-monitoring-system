@@ -17,6 +17,8 @@ import { selectMonitorInited, selectMonitorItems } from './monitor.selectors';
 import { MonitorItem } from '../../domain/monitor-item';
 import { loadMonitorItems } from './monitor.actions';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
+import { CurrentUserService } from '../../features/people/services/current-user.service';
+import { UserRole } from '../../endpoint/users.service';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +27,7 @@ export class MonitorFacade {
   store = inject(Store);
 
   coordinatorsService = inject(CoordinatorsService);
+  currentUserService = inject(CurrentUserService);
 
   public monitorItems = this.store.select(selectMonitorInited).pipe(
     tap((inited) => {
@@ -38,11 +41,14 @@ export class MonitorFacade {
         this.coordinatorsService.allCustomersOfSelectedCoordinatorsMap.pipe(
           filter((map) => map.size > 0)
         ),
+        this.coordinatorsService.coordinatorsShowAll,
       ]).pipe(
-        map(([items, customers]) =>
-          items.filter(
-            (item) => item?.client?.id && customers?.has(item.client.id)
-          )
+        map(([items, customers, showAll]) =>
+          showAll
+            ? items
+            : items.filter(
+                (item) => item?.client?.id && customers?.has(item.client.id)
+              )
         )
       )
     ),

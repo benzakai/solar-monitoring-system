@@ -17,4 +17,8 @@ export const sidenav: Dictionary = {
     he: 'בדיקת מערכות שגרתית',
     en: 'Routine Systems Check',
   },
+  reports: {
+    he: 'דוחות',
+    en: ' Reports ',
+  },
 };

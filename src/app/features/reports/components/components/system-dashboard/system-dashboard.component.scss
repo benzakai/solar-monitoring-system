@@ -1,0 +1,50 @@
+#data-grid {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-column-gap: 1em;
+  grid-auto-flow: column;
+  margin-bottom: 1em;
+
+  p {
+    color: #000;
+    text-align: center;
+    margin: 0;
+  }
+
+  h1 {
+    color:#000;
+    font-size: 1.75em;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .line {
+    padding-inline-end: 0.5em;
+    border-inline-end: solid lightgray 1px;
+  }
+
+  .contents {
+    display: contents;
+  }
+
+  .arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      height: 1.5em;
+      padding-inline-start: 0.25em;
+    }
+
+    &.up {
+      color: #000;
+    }
+
+    &.down {
+      color: #000;
+    }
+  }
+}

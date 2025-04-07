@@ -1,0 +1,42 @@
+<table class="whole-page">
+
+  <!--  Pseudo header-->
+  <thead>
+  <tr>
+    <td>
+      <div class="pseudo">&nbsp;</div>
+    </td>
+  </tr>
+  </thead>
+
+  <!--  Page body inside a single cell-->
+  <tbody>
+  <tr>
+    <td>
+      <div [ngStyle]="{marginBottom: innerMargin, marginTop: innerMargin}">
+        <ng-content></ng-content>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+
+  <!--  Pseudo footer-->
+  <tfoot>
+  <tr>
+    <td>
+      <div [ngStyle]="{height: footer?.clientHeight + 'px'}">&nbsp;</div>
+    </td>
+  </tr>
+  </tfoot>
+
+</table>
+
+<!--Header-->
+<div class="header" #header>
+  <ng-content select="[header]"></ng-content>
+</div>
+
+<!--Footer-->
+<div class="footer" #footer>
+  <ng-content select="[footer]"></ng-content>
+</div>

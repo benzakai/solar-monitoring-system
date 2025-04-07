@@ -12,6 +12,7 @@ import {
   share,
   tap,
   BehaviorSubject,
+  distinctUntilChanged,
 } from 'rxjs';
 import { CurrentUserService } from './current-user.service';
 import { User } from '../../../domain/user';
@@ -35,6 +36,16 @@ export class CoordinatorsService {
   );
 
   coordinatorsSelectedSource = new BehaviorSubject([] as string[]);
+
+  coordinatorsShowAllSource = new BehaviorSubject(true);
+  coordinatorsShowAll = this.currentUser.role.pipe(
+    switchMap((role) =>
+      role === UserRole.ADMIN
+        ? this.coordinatorsShowAllSource.asObservable()
+        : of(false)
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
   coordinatorsSelected = this.coordinatorsSelectedSource.asObservable();
 

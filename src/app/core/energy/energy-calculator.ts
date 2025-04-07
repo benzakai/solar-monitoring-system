@@ -1,4 +1,6 @@
-import { Energy, EnergyApiRecord } from '../../domain/energy';
+import { Energy, EnergyApiRecord, EnergySample } from '../../domain/energy';
+import { System } from '../../domain/system';
+import { DateUtil } from '../date/DateUtil';
 
 export interface SolarEdgeAlerts {
   quantity: number;
@@ -136,5 +138,114 @@ export class EnergyCalc {
       time: entry[0],
       valueKwh: entry[1],
     }));
+  }
+
+  static IsPartOfAverage(system: System): boolean {
+    return !!system.KWP && !system.excludeFromAverage;
+  }
+
+  static GetMeanCalculation(
+    envEnergies: { system: System; energy: Energy }[],
+    from: number,
+    to: number,
+    daily: boolean = false
+  ) {
+    const grouped = new Map<number, number[]>();
+
+    envEnergies.forEach(({ energy, system }) => {
+      const list = daily ? energy?.daily : energy?.annual;
+      if (!list) return;
+
+      for (const e of list) {
+        if (e.time >= from && e.time <= to) {
+          const centeredTime = daily
+            ? this.startOfHour(e.time)
+            : this.startOfDay(e.time);
+          const valueKwh = e.valueKwh / system.KWP;
+
+          if (!grouped.has(centeredTime)) {
+            grouped.set(centeredTime, []);
+          }
+          grouped.get(centeredTime)?.push(valueKwh);
+        }
+      }
+    });
+
+    return [...grouped.entries()]
+      .map(([time, values]) => ({
+        x: time,
+        y: EnergyCalc.Mean(values),
+      }))
+      .sort((a, b) => a.x - b.x);
+  }
+
+  static GetMeanCalculationReport(
+    envEnergies: { system: System; energy: Energy }[],
+    from: number,
+    to: number,
+    daily: boolean = false
+  ): EnergySample[] {
+    const grouped = new Map<number, number[]>();
+
+    envEnergies.forEach(({ energy, system }) => {
+      const list = daily ? energy?.daily : energy?.annual;
+      if (!list) return;
+
+      for (const e of list) {
+        if (e.time >= from && e.time <= to) {
+          const centeredTime = daily
+            ? this.startOfHour(e.time)
+            : this.startOfDay(e.time);
+          const valueKwh = e.valueKwh / system.KWP;
+
+          if (!grouped.has(centeredTime)) {
+            grouped.set(centeredTime, []);
+          }
+          grouped.get(centeredTime)?.push(valueKwh);
+        }
+      }
+    });
+
+    const data = [...grouped.entries()].map(([time, values]) => ({
+      time,
+      valueKwh: EnergyCalc.Mean(values),
+    }));
+
+    if (daily) {
+      this.addDayEmptyData(data);
+    }
+
+    return data;
+  }
+
+  static addDayEmptyData(energy: { valueKwh?: number; time: number }[]) {
+    if (energy.length) {
+      const lastValueIdx = energy
+        .slice()
+        .reverse()
+        .findIndex((e) => !!e.valueKwh);
+      if (lastValueIdx > 0) {
+        energy.splice(-lastValueIdx);
+      }
+      while (energy.length < 24) {
+        const last = energy.slice(-1)[0];
+        energy.push({
+          time: last.time + DateUtil.HOUR,
+          valueKwh: NaN,
+        });
+      }
+    }
+  }
+
+  static startOfDay(time: number): number {
+    const date = new Date(time);
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
+  }
+
+  static startOfHour(time: number): number {
+    const date = new Date(time);
+    date.setMinutes(0, 0, 0);
+    return date.getTime();
   }
 }

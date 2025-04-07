@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import {
   combineLatest,
@@ -79,6 +79,7 @@ export class HeaderComponent {
     );
 
   @Input() public headerTitle: string | undefined;
+  @Output() toggled = new EventEmitter<void>();
 
   facade = inject(MonitorFacade);
 

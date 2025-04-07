@@ -4,7 +4,8 @@ import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '../components/confirmation-dialog/confirmation-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { LoadingDialogComponent } from '../components/loading-dialog/loading-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -18,5 +19,9 @@ export class DialogService {
     });
 
     return dialogRef.afterClosed();
+  }
+
+  public loader(): MatDialogRef<LoadingDialogComponent> {
+    return this.dialog.open(LoadingDialogComponent);
   }
 }

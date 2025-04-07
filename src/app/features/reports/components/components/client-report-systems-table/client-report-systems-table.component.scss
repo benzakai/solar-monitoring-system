@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+#page-wrapper {
+  overflow: auto;
+}
+
+// PDF Table
+table.pdf-table {
+  width: calc(100% - 2em);
+  margin: auto;
+  border-collapse: collapse;
+  font-size: small;
+  border-radius: 1em;
+
+  thead, tfoot {
+    font-weight: 600;
+  }
+
+  .border {
+    border-inline-end: solid lightgray 1px;
+  }
+
+  td, th {
+    padding: 0.5em 0;
+    text-align: center;
+    &:first-child {
+      padding-inline: 0.5em;
+    }
+    &.overflow {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-inline: 0;
+      max-width: 15em;
+    }
+  }
+
+  thead {
+    background-color: #70c265;
+    border-top-right-radius: 1em;
+    border-top-left-radius: 1em;
+    tr:first-child th {
+      padding-bottom: 0;
+      &:first-child {
+        border-top-right-radius: 1em;
+      }
+      &:last-child {
+        border-top-left-radius: 1em;
+      }
+    }
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #eee;
+  }
+
+  tfoot {
+    background-color: var(--color-primary);
+    color: white;
+    border-bottom-right-radius: 1em;
+    border-bottom-left-radius: 1em;
+    font-weight: bold;
+    tr:last-child td {
+      &:first-child {
+        border-bottom-right-radius: 1em;
+      }
+      &:last-child {
+        border-bottom-left-radius: 1em;
+      }
+    }
+  }
+
+}
+

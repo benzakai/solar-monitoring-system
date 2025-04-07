@@ -1,5 +1,8 @@
+import { Tarifs } from './tarifs';
+
 export type App = {
   prediction: AppPrediction;
+  TaarifConstants: Tarifs;
 };
 
 export type AppPrediction = {

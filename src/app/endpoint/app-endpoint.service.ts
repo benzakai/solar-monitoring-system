@@ -23,4 +23,13 @@ export class AppEndpointService {
       })
     );
   }
+
+  public getMalfunctionsTypes() {
+    const docRef = doc(this.collection, 'malfunctionTypes');
+    return from(getDoc(docRef)).pipe(
+      map((snapshot) =>
+        snapshot.exists() ? ({ ...snapshot.data() } as any) : null
+      )
+    );
+  }
 }

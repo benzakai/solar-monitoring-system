@@ -1,0 +1,58 @@
+@if (!!systemsData.length) {
+  <table class="pdf-table">
+
+    <thead>
+    <tr>
+      <th colspan="3" class="border">פרטי מערכת</th>
+      <th *ngIf="!isAnnual" colspan="4" class="border">סיכום חודשי</th>
+      <th colspan="4">סיכום שנתי</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th class="ion-text-start">שם המערכת</th>
+      <th class="border">kWp</th>
+      <th *ngIf="!isAnnual">kWh</th>
+      <th *ngIf="!isAnnual">kWh/kWp</th>
+      <th *ngIf="!isAnnual">הכנסה</th>
+      <th *ngIf="!isAnnual" class="border">תקלות</th>
+      <th>kWh</th>
+      <th>kWh/kWp</th>
+      <th>הכנסה</th>
+      <th>תקלות</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr *ngFor="let row of systemsData; let idx = index">
+      <td>{{idx + 1}}</td>
+      <td class="ion-text-start overflow">{{row.systemName}}</td>
+      <td class="border">{{row.KWP | number : '1.0-0'}}</td>
+      <td *ngIf="!isAnnual">{{row.totalMonth | number : '1.0-0'}}</td>
+      <td *ngIf="!isAnnual">{{row.totalMonth ? (row.totalMonth / row.KWP | number : '1.0-0') : '--'}}</td>
+      <td *ngIf="!isAnnual">{{row.monthProfit | number : '1.0-0'}}₪</td>
+      <td *ngIf="!isAnnual" class="border">{{row.malfunctions.length}}</td>
+      <td>{{row.totalYear | number : '1.0-0'}}</td>
+      <td>{{row.totalYear ? (row.totalYear / row.KWP | number : '1.0-0') : '--'}}</td>
+      <td>{{row.annualProfit | number : '1.0-0'}}₪</td>
+      <td>{{row.annualMalfunctions.length}}</td>
+    </tr>
+    </tbody>
+
+    <tfoot>
+    <tr>
+      <td></td>
+      <td class="ion-text-start">סה"כ</td>
+      <td class="border">{{sum('KWP') | number : '1.0-0'}}</td>
+      <td *ngIf="!isAnnual">{{sum('totalMonth') | number : '1.0-0'}}</td>
+      <td *ngIf="!isAnnual">{{sum('totalMonth') / sum('KWP', 'totalMonth') | number : '1.0-0'}}</td>
+      <td *ngIf="!isAnnual">{{sum('monthProfit') | number : '1.0-0'}}₪</td>
+      <td *ngIf="!isAnnual" class="border">{{sum('malfunctions')}}</td>
+      <td>{{sum('totalYear') | number : '1.0-0'}}</td>
+      <td>{{sum('totalYear') / sum('KWP', 'totalYear') | number : '1.0-0'}}</td>
+      <td>{{sum('annualProfit') | number : '1.0-0'}}₪</td>
+      <td>{{sum('annualMalfunctions')}}</td>
+    </tr>
+    </tfoot>
+
+  </table>
+}

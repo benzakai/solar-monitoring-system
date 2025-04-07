@@ -1,0 +1,49 @@
+:host {
+  z-index: 1;
+  position: relative;
+}
+
+#header-background img {
+  width: 100%;
+}
+
+#logos {
+
+  // Change header background.
+  background: white url("/report/report_header.png") no-repeat right/contain;
+  width: 100vw;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: 3em;
+  margin-bottom: 1.5em;
+  .logo {
+    margin-inline: 3em;
+  }
+  .date-text {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    font-size: 16px;
+  }
+  .title-text {
+    font-size:24px;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    color: #0288d1;
+    &:last-child {
+      font-size: 20px;;
+    }
+  }
+}
+
+.date {
+  font: 600 1em / 1.25em Assistant, sans-serif;
+  letter-spacing: normal;
+  text-align: center;
+  color: #757575;
+}
+
+.transparent {
+  opacity: 0;
+}

@@ -1,0 +1,26 @@
+
+:host {
+  //position: absolute;
+  //bottom: 0;
+  width: 100%;
+}
+
+#wrapper {
+  background-color: #eee;
+}
+
+.footer-text {
+  padding: 1em;
+  text-align: center;
+  mat-icon {
+    color: #1877f2;
+    vertical-align: text-bottom;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.comment {
+  background-color: white;
+}

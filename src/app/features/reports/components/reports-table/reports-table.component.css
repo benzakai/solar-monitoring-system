@@ -1,0 +1,177 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+}
+
+.headline-1 {
+  display:flex;
+  flex: 0 0 auto;
+}
+
+
+
+.alert-3 {
+  color: #d50000;
+}
+
+.alert-2 {
+  color: #ff6c00;
+}
+
+table {
+  width: 100%;
+}
+
+mat-chip-listbox {
+  display: flex;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.table-container {
+  display: flex;
+  flex: 1 1 1px;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.viewport {
+  display: flex;
+  flex: 1 1 1px;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+
+}
+
+mat-chip-option {
+  mat-progress-spinner {
+    margin-left: 5px;
+  }
+}
+
+.inner {
+  background-color: #afafaf;
+  color: #fff;
+  text-align: right;
+  .log-text {
+
+  }
+  .log-action {
+    width: 10%;
+  }
+  .log-by {
+    width: 15%;
+  }
+  .log-time {
+    width: 200px;
+  }
+}
+
+th {
+  z-index: 19!important;
+}
+
+.edit-button {
+  color: #2196F3;
+}
+
+mat-chip-listbox {
+  app-severity-icon {
+    margin-right: 5px;
+  }
+}
+
+.main-spinner {
+  margin: auto;
+}
+
+.add-malfunction-button {
+  margin-left: 8px;
+
+  mat-icon {
+    background-repeat: no-repeat;
+    display: inline-block;
+    color: #f44336;
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-xls {
+  margin-right: 8px;
+  img {
+    width: 18px; height:18px;
+  }
+}
+
+.orange {
+  color: #ff6c00 !important;
+}
+.green {
+  color: #70c265 !important;
+}
+.red {
+  color: #d50000 !important;
+}
+.blue {
+  color: #2196F3 !important;
+}
+.PROCESSING {
+  color: #ff6c00;
+  font-weight: bold;
+}
+.SUCCESS {
+  color: #70c265;
+  font-weight: bold;
+}
+.ERROR {
+  color: #d50000;
+  font-weight: bold;
+}
+
+.eye-button {
+  .bell {
+    width: 100%;
+    height: 100%;
+    margin:0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  &.disab {
+    pointer-events: none;
+    .bell {
+      margin:0;
+      margin-left:1px;
+
+      background-color: #1287DE;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      color: rgba(255, 255, 255, 0.39) !important;
+    }
+    .arrow {
+      pointer-events: auto;
+    }
+  }
+}

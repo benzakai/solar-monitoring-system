@@ -107,6 +107,16 @@ button[mat-button][mat-flat-button] {
     margin: 0;
     border-right: 1px solid #9e0003;
   }
+
+  &.eye-button {
+    background-color: #1287DE;
+    .arrow {
+      border-right: 1px solid #107fca;
+    }
+    &:hover {
+      background-color: #1390ed;
+    }
+  }
 }
 
 button[mat-button][mat-flat-button] mat-icon {
@@ -582,4 +592,9 @@ button.mat-flat-button {
 
 input, textarea {
   direction: rtl;
+}
+
+mat-sidenav-content.mat-drawer-content {
+  display: flex;
+  flex-direction: column;
 }

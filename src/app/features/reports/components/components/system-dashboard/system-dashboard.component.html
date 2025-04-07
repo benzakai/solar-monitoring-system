@@ -1,0 +1,23 @@
+<div id="data-grid" [ngStyle]="{gridTemplateColumns: cssColumnsTemplate}">
+
+  @for (dv of dashboardView; track dv.label) {
+  <div  class="contents">
+
+    <div class="contents">
+
+      <p [class.line]="dv.lineSection">{{dv.label}}</p>
+
+      <div [ngClass]="dv.withArrow ? 'arrow ' + dv.arrowClass : 'contents'" [class.line]="dv.lineSection" *ngIf="!dv.noData; else noData">
+        <h1>{{dv.displayValue}}</h1>
+        <img *ngIf="dv.withArrow && dv.arrowClass" [src]="'/report/arrow-' + dv.arrowClass + '.png'">
+      </div>
+
+    </div>
+
+    <ng-template #noData>
+      <h1>--</h1>
+    </ng-template>
+
+  </div>
+  }
+</div>

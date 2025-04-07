@@ -1,0 +1,125 @@
+<div id="page-wrapper">
+
+  @if(reps | async; as r) {
+
+    <div>
+      <app-page-template innerMargin="1.5em">
+        <div header>
+          <app-report-header [isAnnual]="isAnnual"
+                             [date]="date"
+                             [title]="title"
+                             [client]="clientName"
+          ></app-report-header>
+        </div>
+
+        <app-client-report-systems-table [systemsData]="r" [isAnnual]="isAnnual"></app-client-report-systems-table>
+        <div footer>
+          <app-report-footer comment=""></app-report-footer>
+        </div>
+
+      </app-page-template>
+    </div>
+
+    @for (systemData of r; track systemData.systemId) {
+      <div>
+        <app-page-template innerMargin="1.5em">
+
+          <div header>
+            <app-report-header [isAnnual]="isAnnual"
+                               [date]="date"
+                               [title]="title"
+                               [client]="clientName"
+            ></app-report-header>
+          </div>
+
+          <section>
+
+            <div id="system-main">
+              <div id="title-container">
+                <h1 id="title"><b>{{systemData.systemName}}&nbsp;&nbsp;</b></h1>
+                <h1 id="kwp" dir="ltr">
+                  <span>{{systemData.KWP | number : '1.0-0'}} </span>
+                  <span>KWP</span>
+                </h1>
+              </div>
+              <div id="portal-logo">
+                <img [src]="'/portals-logos/' + systemData.systemType.toLowerCase() + '.png'">
+              </div>
+            </div>
+
+            <app-system-dashboard
+              [date]="date"
+              [isAnnual]="isAnnual"
+              [systemData]="systemData"
+            ></app-system-dashboard>
+
+          </section>
+
+          <section>
+
+            <div class="ion-padding-vertical" id="charts" [class.annual]="isAnnual">
+              @if (systemData.monthProduction) {
+                <app-month-chart
+                  [monthProduction]="systemData.monthProduction"
+                  [environmentProduction]="systemData.environmentMonthEnergy"
+                  [malfunctionsStartDates]="systemData.malfunctionsStartDates"
+                  [malfunctionsEndDates]="systemData.malfunctionsEndDates"
+                  [washesDates]="systemData.washesDates"
+                ></app-month-chart>
+              }
+
+              <app-annual-chart
+                [date]="date"
+                [productionPerMonth]="systemData.productionPerMonth"
+                [productionPerMonthLastYear]="systemData.productionPerMonthLastYear"
+                [predictionPerMonth]="systemData.predictionPerMonth"
+              ></app-annual-chart>
+
+            </div>
+
+          </section>
+
+          <section>
+            <p class="title">
+              <span>תקלות</span>
+              @if (systemData?.malfunctions?.length) {
+                <span>&nbsp;({{systemData?.malfunctions?.length }})</span>
+              } @else {
+                <span>
+                  <span> - </span>
+                  <span class="alert-0">אין</span>
+                </span>
+              }
+
+
+            </p>
+            <app-report-malfunction-table [malfunctions]="systemData?.malfunctions || []"></app-report-malfunction-table>
+          </section>
+
+          @if (systemData.washesDates?.length) {
+            <section>
+              <p class="title">שטיפות</p>
+              <div id="washes">
+                @for( wash of systemData?.washesDates; let idx = $index; track idx) {
+                  <p>
+                    <span>#{{idx + 1}}</span><br>
+                    <span>{{wash | date: 'short' }}</span>
+                  </p>
+                }
+
+              </div>
+            </section>
+          }
+
+          <div footer>
+            <app-report-footer [comment]="documents[1]?.comment"></app-report-footer>
+          </div>
+
+        </app-page-template>
+      </div>
+    }
+  }
+
+</div>
+
+

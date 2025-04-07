@@ -1,4 +1,6 @@
 import { AppPrediction } from '../../domain/app';
+import { System } from '../../domain/system';
+import { EnergyCalc } from './energy-calculator';
 
 export class PredictionCalculator {
   static calcDefaultValue(system: any, predictions: AppPrediction): number {
@@ -62,5 +64,29 @@ export class PredictionCalculator {
     predictions: AppPrediction
   ): number {
     return production * (1 - age * predictions.AGE_FACTOR);
+  }
+
+  static getPredictionCalculation(
+    system: System,
+    predictions: AppPrediction
+  ): number[] {
+    const annual =
+      EnergyCalc.Sum(system.annualPredictionPerMonth) ||
+      PredictionCalculator.calcDefaultValue(system, predictions);
+    const age = PredictionCalculator.calcSystemAge(
+      system.startTime ? new Date(system.startTime).getTime() : Date.now(),
+      predictions
+    );
+    const calcedAnnualPrediction = PredictionCalculator.calcProductionByAge(
+      annual,
+      age,
+      predictions
+    );
+    const isTaoz = !!system.taoz;
+    return PredictionCalculator.calcMonthsDistribution(
+      calcedAnnualPrediction,
+      isTaoz,
+      predictions
+    );
   }
 }

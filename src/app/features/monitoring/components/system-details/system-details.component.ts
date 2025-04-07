@@ -228,7 +228,7 @@ export class SystemDetailsComponent implements AfterViewInit {
               .pipe(
                 switchMap((relatedSystems) => {
                   const relatedMaps: { [k: string]: System } = relatedSystems
-                    .filter((s) => this.isPartOfAverage(s))
+                    .filter((s) => EnergyCalc.IsPartOfAverage(s))
                     .reduce((acc, s) => Object.assign(acc, { [s.id]: s }), {});
 
                   return this.systemEnergyFacade
@@ -453,7 +453,12 @@ export class SystemDetailsComponent implements AfterViewInit {
         });
       }
 
-      meanEnergyPath = this.getMeanCalculation(relatedEnergy, start, end, true);
+      meanEnergyPath = EnergyCalc.GetMeanCalculation(
+        relatedEnergy,
+        start,
+        end,
+        true
+      );
     } else {
       const measureStart = range.start.getTime() || 0;
 
@@ -472,16 +477,14 @@ export class SystemDetailsComponent implements AfterViewInit {
         }))
         .sort((a, b) => +a.x - +b.x);
 
-      meanEnergyPath = this.getMeanCalculation(
+      meanEnergyPath = EnergyCalc.GetMeanCalculation(
         relatedEnergy,
         measureStart,
         end
       );
 
-      const calcedAnnualPredictionPerMonth = this.getPredictionCalculation(
-        system,
-        prediction
-      );
+      const calcedAnnualPredictionPerMonth =
+        PredictionCalculator.getPredictionCalculation(system, prediction);
 
       const date = new Date(start);
       date.setHours(0, 0, 0, 0);
@@ -540,69 +543,6 @@ export class SystemDetailsComponent implements AfterViewInit {
     }
   }
 
-  getPredictionCalculation(
-    system: System,
-    predictions: AppPrediction
-  ): number[] {
-    const annual =
-      EnergyCalc.Sum(system.annualPredictionPerMonth) ||
-      PredictionCalculator.calcDefaultValue(system, predictions);
-    const age = PredictionCalculator.calcSystemAge(
-      system.startTime ? new Date(system.startTime).getTime() : Date.now(),
-      predictions
-    );
-    const calcedAnnualPrediction = PredictionCalculator.calcProductionByAge(
-      annual,
-      age,
-      predictions
-    );
-    const isTaoz = !!system.taoz;
-    return PredictionCalculator.calcMonthsDistribution(
-      calcedAnnualPrediction,
-      isTaoz,
-      predictions
-    );
-  }
-
-  isPartOfAverage(system: System): boolean {
-    return !!system.KWP && !system.excludeFromAverage;
-  }
-
-  getMeanCalculation(
-    envEnergies: { system: System; energy: Energy }[],
-    from: number,
-    to: number,
-    daily: boolean = false
-  ) {
-    const grouped = new Map<number, number[]>();
-
-    envEnergies.forEach(({ energy, system }) => {
-      const list = daily ? energy?.daily : energy?.annual;
-      if (!list) return;
-
-      for (const e of list) {
-        if (e.time >= from && e.time <= to) {
-          const centeredTime = daily
-            ? this.startOfHour(e.time)
-            : this.startOfDay(e.time);
-          const valueKwh = e.valueKwh / system.KWP;
-
-          if (!grouped.has(centeredTime)) {
-            grouped.set(centeredTime, []);
-          }
-          grouped.get(centeredTime)?.push(valueKwh);
-        }
-      }
-    });
-
-    return [...grouped.entries()]
-      .map(([time, values]) => ({
-        x: time,
-        y: EnergyCalc.Mean(values),
-      }))
-      .sort((a, b) => a.x - b.x);
-  }
-
   createMalfunction() {
     this.system.pipe(first()).subscribe((system) => {
       const dialogRef = this.matDialog.open(CreateAlertDialogComponent, {
@@ -629,7 +569,9 @@ export class SystemDetailsComponent implements AfterViewInit {
           {
             data: [
               { system, energy },
-              ...relatedEnergy.filter((e) => this.isPartOfAverage(e.system)),
+              ...relatedEnergy.filter((e) =>
+                EnergyCalc.IsPartOfAverage(e.system)
+              ),
             ],
             width: '1200px',
             maxWidth: '90vw',
@@ -657,18 +599,6 @@ export class SystemDetailsComponent implements AfterViewInit {
           this.generation.next(this.generation.value + 1);
         }
       });
-  }
-
-  startOfDay(time: number): number {
-    const date = new Date(time);
-    date.setHours(0, 0, 0, 0);
-    return date.getTime();
-  }
-
-  startOfHour(time: number): number {
-    const date = new Date(time);
-    date.setMinutes(0, 0, 0);
-    return date.getTime();
   }
 
   onSort(sortState: Sort) {

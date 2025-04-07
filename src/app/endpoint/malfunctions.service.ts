@@ -11,8 +11,9 @@ import {
   limit,
   onSnapshot,
   getDoc,
+  orderBy,
 } from '@angular/fire/firestore';
-import { filter, firstValueFrom, from, map, Observable, switchMap } from 'rxjs';
+import { filter, from, map, Observable, switchMap } from 'rxjs';
 import { Malfunction, MalfunctionActionType } from '../domain/malfunction';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { DateUtil } from '../core/date/DateUtil';
@@ -157,8 +158,7 @@ export class MalfunctionsService {
     const limitedQuery = query(
       this.collection,
       where('status', 'in', statuses),
-      where('#modified', '>=', DateUtil.DaysBack(90)),
-      limit(50)
+      where('#modified', '>=', DateUtil.DaysBack(90))
     );
 
     return new Observable<Malfunction[]>((observer) => {

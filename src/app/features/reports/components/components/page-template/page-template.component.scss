@@ -1,0 +1,21 @@
+.header, .footer {
+  position: fixed;
+  width: 100%;
+}
+
+.header {
+  top: 0;
+}
+
+.footer {
+  bottom: 0;
+}
+
+.whole-page {
+  width: 100%;
+  page-break-after: always;
+}
+
+.pseudo {
+  height: 196px;
+}

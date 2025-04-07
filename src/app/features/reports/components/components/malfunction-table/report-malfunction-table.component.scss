@@ -1,0 +1,20 @@
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  td, th {
+    padding: 0.5em;
+    text-align: start;
+  }
+  td {
+    font-size: small;
+  }
+  thead tr {
+    font-size: smaller;
+    border-bottom: solid black 1px;
+  }
+  tbody tr:nth-child(even) {
+    background-color: grey;
+  }
+}

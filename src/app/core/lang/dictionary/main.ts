@@ -263,4 +263,54 @@ export const mainLang: Dictionary = {
     he: 'נבדק',
     en: 'Checked',
   },
+  months: {
+    0: {
+      en: 'January',
+      he: 'ינואר',
+    },
+    1: {
+      en: 'February',
+      he: 'פברואר',
+    },
+    2: {
+      en: 'March',
+      he: 'מרץ',
+    },
+    3: {
+      en: 'April',
+      he: 'אפריל',
+    },
+    4: {
+      en: 'May',
+      he: 'מאי',
+    },
+    5: {
+      en: 'June',
+      he: 'יוני',
+    },
+    6: {
+      en: 'July',
+      he: 'יולי',
+    },
+    7: {
+      en: 'August',
+      he: 'אוגוסט',
+    },
+    8: {
+      en: 'September',
+      he: 'ספטמבר',
+    },
+    9: {
+      en: 'October',
+      he: 'אוקטובר',
+    },
+    10: {
+      en: 'November',
+      he: 'נובמבר',
+    },
+    11: {
+      en: 'December',
+      he: 'דצמבר',
+    },
+  },
 };

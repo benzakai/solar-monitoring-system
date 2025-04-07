@@ -37,4 +37,13 @@ export class PeopleService {
       )
     );
   }
+
+  getAllClients(): Observable<Person[]> {
+    const q = query(this.collection, where('isClient', '==', true));
+    return from(getDocs(q)).pipe(
+      map((snapshot) =>
+        snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
+      )
+    );
+  }
 }

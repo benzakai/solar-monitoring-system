@@ -7,7 +7,12 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   AngularFireAuth,
@@ -16,7 +21,14 @@ import {
 import { LANGUAGE } from './core/lang';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MENU_TOOGLE } from './core/header/menu';
-import { map, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  map,
+  Subject,
+  tap,
+  combineLatest,
+  filter,
+} from 'rxjs';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from './core/lang/translate.pipe';
@@ -51,15 +63,26 @@ import { HeaderComponent } from './core/header/header.component';
 export class AppComponent implements AfterViewInit {
   private lang = inject(LANGUAGE);
   private renderer = inject(Renderer2);
-  @ViewChild('drawer', { static: true }) drawer?: MatDrawer;
+  @ViewChild('drawer', { static: false }) drawer?: MatDrawer;
   cdr = inject(ChangeDetectorRef);
   toggle = inject(MENU_TOOGLE);
   auth = inject(AngularFireAuth);
   currentUserService = inject(CurrentUserService);
   currentRole = this.currentUserService.user.pipe(map((user) => user?.role));
   router = inject(Router);
-
   feature = env.feature;
+
+  layout = this.router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    map((event: NavigationEnd) => event.urlAfterRedirects.split('/')[1])
+  );
+
+  translatePipe = inject(TranslatePipe);
+
+  title = new BehaviorSubject('');
+  titleTranslated = combineLatest([this.title, this.lang]).pipe(
+    map(([title, lang]) => this.translatePipe.transform(title))
+  );
 
   constructor() {
     this.lang.subscribe((lang) => {
@@ -89,5 +112,17 @@ export class AppComponent implements AfterViewInit {
     this.auth.signOut().then(() => {
       this.router.navigate(['login']);
     });
+  }
+
+  setTitle(cs: any) {
+    const [, page] = this.router.url.split('/');
+    const translationKeys: { [key in string]: string } = {
+      systems: 'header.monitoring_table',
+      system: 'sidenav.system_monitoring',
+      malfunctions: 'sidenav.malfunctions',
+      'malfunction-edit': 'sidenav.malfunctions',
+      'routine-check': 'sidenav.routine_check',
+    };
+    this.title.next(translationKeys[page] || '');
   }
 }

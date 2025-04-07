@@ -1,0 +1,195 @@
+:host {
+  background-color: white!important;
+  direction: rtl;
+}
+
+
+#page-wrapper {
+  overflow: auto;
+  background-color: white!important;
+}
+
+
+   table.pdf-table {
+     width: calc(100% - 2em);
+     margin: auto;
+     border-collapse: collapse;
+     font-size: small;
+     border-radius: 1em;
+
+     thead, tfoot {
+     }
+
+     .border {
+       border-inline-end: solid lightgray 1px;
+     }
+
+     td, th {
+       padding: 0.5em 0;
+       text-align: center;
+       &:first-child {
+         padding-inline: 0.5em;
+       }
+       &.overflow {
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         padding-inline: 0;
+         max-width: 15em;
+       }
+     }
+
+     thead {
+       background-color: palevioletred;
+       border-top-right-radius: 1em;
+       border-top-left-radius: 1em;
+       tr:first-child th {
+         padding-bottom: 0;
+         &:first-child {
+           border-top-right-radius: 1em;
+         }
+         &:last-child {
+           border-top-left-radius: 1em;
+         }
+       }
+     }
+
+     tbody tr:nth-child(even) {
+       background-color: grey;
+     }
+
+     tfoot {
+       background-color: #0288d1;
+       color: white;
+       border-bottom-right-radius: 1em;
+       border-bottom-left-radius: 1em;
+       font-weight: bold;
+       tr:last-child td {
+         &:first-child {
+           border-bottom-right-radius: 1em;
+         }
+         &:last-child {
+           border-bottom-left-radius: 1em;
+         }
+       }
+     }
+
+   }
+
+
+$dark-primary: #0288d1;
+
+section {
+  border-top: solid $dark-primary 2px;
+  padding: 0 1em;
+
+  &:last-child {
+    margin-bottom: 2em;
+  }
+}
+
+#system-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5em 1em 1em;
+
+  #title-container {
+    display: flex;
+    align-items: flex-end;
+
+    #title {
+      font-size: 2em;
+      line-height: 1;
+    }
+
+    #kwp {
+      color: $dark-primary;
+      text-align: right;
+      span:last-child {
+        font-size: medium;
+      }
+    }
+
+    h1 {
+      margin: 0;
+      line-height: 1.2;
+    }
+  }
+
+  #portal-logo {
+    img {
+      height: 1em;
+    }
+  }
+}
+
+#charts {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  &.annual {
+    grid-template-columns: 65% 35%;
+  //:first-child {
+  //  border: none;
+  //}
+  }
+
+  :first-child {
+    padding-inline-end: calc(0.5em - 1px);
+    border-left: solid black 1px;
+  }
+
+  :last-child {
+    padding-inline-start: 0.5em;
+  }
+
+// Delete some bug line
+::ng-deep line[x1="0"] {
+  display: none;
+}
+}
+
+p.title {
+  font-weight: bold;
+  margin-top: 1em;
+}
+
+#washes {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 6em);
+}
+
+.alert-0 {
+  color: #70c265;
+}
+
+.alert-3 {
+  color: #70c265;
+}
+
+h1 {
+  color: #000;
+}
+
+.region-ratio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 1px black;
+  border-radius: 50%;
+  height: 11em;
+  width: 11em;
+  margin-inline: 1em;
+
+  p {
+    margin: 0 !important;
+    font-size: small;
+  }
+
+  h1 {
+    font-size: 3em;
+    line-height: 1;
+  }
+}
