@@ -15,7 +15,16 @@
   flex: 0 0 auto;
 }
 
-
+.filters {
+  display:flex;
+  justify-content: center;
+  mat-chip-listbox {
+    margin: 0 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+}
 
 .alert-3 {
   color: #d50000;

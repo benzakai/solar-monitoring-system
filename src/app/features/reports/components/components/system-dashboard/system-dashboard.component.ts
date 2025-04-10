@@ -13,17 +13,11 @@ import {
 } from '@angular/common';
 
 interface DashboardProps {
-  // The datum label (can be affected by the date)
   label: (date: number) => string;
-  // The datum value from the report data
   value: (data: any) => number;
-  // How to display the value (convert to some string)
   displayValue: (value: number) => string;
-  // Whether there is not sufficient data
   noData?: (data: any) => boolean;
-  // Whether to show an arrow near the value
   withArrow?: boolean;
-  // A separated line
   lineSection?: boolean;
 }
 
@@ -201,7 +195,6 @@ export class SystemDashboardComponent implements OnInit {
     this.cssColumnsTemplate = `repeat(${this.dashboardView.length}, 1fr)`;
   }
 
-  // Show up/down arrow according to the ratio value
   arrowClass(value: number): string {
     if (value > 1) {
       return 'up';

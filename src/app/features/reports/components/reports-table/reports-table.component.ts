@@ -1,11 +1,19 @@
 import { Component, inject } from '@angular/core';
-import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe } from '@angular/common';
+import {
+  AsyncPipe,
+  DatePipe,
+  DecimalPipe,
+  formatDate,
+  JsonPipe,
+  NgForOf,
+} from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PeopleService } from '../../../../endpoint/people.service';
 import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
 import {
   BehaviorSubject,
   combineLatest,
+  distinctUntilChanged,
   filter,
   first,
   forkJoin,
@@ -13,20 +21,22 @@ import {
   of,
   pipe,
   shareReplay,
+  startWith,
   switchMap,
   take,
+  tap,
 } from 'rxjs';
 import { EmailsService } from '../../../../endpoint/emails.service';
 import { Email } from '../../../../domain/email';
 import { LogsTableComponent } from '../../../malfunctions/logs-table/logs-table.component';
 import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { SeverityIconComponent } from '../../../malfunctions/severity-icon/severity-icon.component';
 import { SortHeaderComponent } from '../../../monitoring/components/sort-header/sort-header.component';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { Person } from '../../../../domain/person';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import { ReportsService } from '../../../../endpoint/reports.serivce';
 import { ReportData } from '../../../../domain/report';
@@ -48,6 +58,33 @@ import {
 } from './createReport';
 import { ReportFilesService } from '../../../../endpoint/report-files.service';
 import { DialogService } from '../../../../core/dialog/services/dialog.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ReportComentComponent } from '../report-coment/report-coment.component';
+import {
+  MatError,
+  MatFormField,
+  MatFormFieldModule,
+  MatPrefix,
+} from '@angular/material/form-field';
+import { MatOption } from '@angular/material/core';
+import {
+  MatSelect,
+  MatSelectModule,
+  MatSelectTrigger,
+} from '@angular/material/select';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MalfunctionsFiltersComponent } from '../../../malfunctions/malfunctions-filters/malfunctions-filters.component';
+import {
+  MatDatepickerToggle,
+  MatDateRangeInput,
+  MatDateRangePicker,
+  MatEndDate,
+  MatStartDate,
+} from '@angular/material/datepicker';
+import { FiltersControlService } from '../../../monitoring/services/filters-control.service';
+import { MatInput } from '@angular/material/input';
+import { MatSlider, MatSliderRangeThumb } from '@angular/material/slider';
+import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 
 const ZERO_TIME_EMAIL: Pick<Email, 'delivery'> = {
   delivery: {
@@ -68,6 +105,8 @@ type See = {
   imports: [
     AsyncPipe,
     MatProgressSpinnerModule,
+    FormsModule,
+    ReactiveFormsModule,
     DatePipe,
     DecimalPipe,
     LogsTableComponent,
@@ -78,9 +117,24 @@ type See = {
     SortHeaderComponent,
     TranslatePipe,
     JsonPipe,
-    MatCheckbox,
+    MatSelectModule,
+    MatCheckboxModule,
     MatMenuModule,
+    MatFormFieldModule,
+    MatFormField,
+    MatIcon,
+    MatInput,
+    MatOption,
+    MatSelect,
+    MatSelectTrigger,
+    MatSlider,
+    MatSliderRangeThumb,
+    NgForOf,
+    MalfunctionsFiltersComponent,
+    MatChipListbox,
+    MatChipOption,
   ],
+  providers: [FiltersControlService],
   templateUrl: './reports-table.component.html',
   styleUrl: './reports-table.component.css',
 })
@@ -106,6 +160,11 @@ export class ReportsTableComponent {
   washesService = inject(WashesService);
   reportFileService = inject(ReportFilesService);
   dialogService = inject(DialogService);
+  dialog = inject(MatDialog);
+  controls = inject(FiltersControlService);
+
+  d = new Date();
+  dateControl = new FormControl(this.d.getMonth() - 1);
 
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
@@ -119,11 +178,31 @@ export class ReportsTableComponent {
     }))
   );
 
-  checked = {};
+  statusesList = ['PROCESSING', 'SUCCESS', 'ERROR', 'not_created', 'project'];
+  currentStatuses = new BehaviorSubject({
+    PROCESSING: true,
+    SUCCESS: true,
+    ERROR: true,
+    not_created: true,
+    project: true,
+  } as Record<string, boolean>);
 
-  d = new Date();
-  nowDontUse = Date.UTC(this.d.getFullYear(), this.d.getMonth() - 1, 1);
-  selectedDate = of(new Date(this.nowDontUse));
+  loading = new BehaviorSubject(true);
+
+  selectedDate = this.dateControl.valueChanges.pipe(
+    startWith(this.dateControl.value),
+    distinctUntilChanged(),
+    map((month) => {
+      const newDate = Date.UTC(
+        this.d.getFullYear(),
+        month || this.d.getMonth() - 1,
+        1
+      );
+      return new Date(newDate);
+    }),
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
+
   selectedMonth = this.selectedDate.pipe(map((date) => date.getUTCMonth()));
   selectedYear = this.selectedDate.pipe(map((date) => date.getUTCFullYear()));
 
@@ -161,7 +240,7 @@ export class ReportsTableComponent {
 
   clientsWithReports = combineLatest([
     this.clientsWithSystems,
-    this.selectedDate,
+    this.selectedDate.pipe(tap(() => this.loading.next(true))),
   ]).pipe(
     switchMap(([clients, dateSelected]) =>
       combineLatest([
@@ -206,6 +285,7 @@ export class ReportsTableComponent {
             )
           ),
       ]).pipe(
+        tap(() => this.loading.next(false)),
         map(([emailsMapByClient, reportsMapByClient]) => {
           let missing = 0;
 
@@ -222,7 +302,6 @@ export class ReportsTableComponent {
             });
           });
 
-          console.log('Missing emails for clients:', missing);
           return clientsWithEmails;
         })
       )
@@ -230,14 +309,38 @@ export class ReportsTableComponent {
     shareReplay({ refCount: true, bufferSize: 1 })
   );
 
+  filteredReports = combineLatest([
+    this.clientsWithReports,
+    this.controls.clientsControlStateMap,
+    this.currentStatuses,
+  ]).pipe(
+    map(([clientAndReports, clientsSelectedMap, statusesSelected]) => {
+      const filters: Array<(item: (typeof clientAndReports)[0]) => boolean> =
+        [];
+
+      filters.push((item) => {
+        const status =
+          item?.email?.delivery.state ||
+          (item.report ? 'project' : 'not_created');
+        return Boolean(statusesSelected[status]);
+      });
+
+      if (Object.keys(clientsSelectedMap || {}).length) {
+        filters.push((item) =>
+          Boolean(item._id && clientsSelectedMap[item._id])
+        );
+      }
+      return clientAndReports.filter((item) =>
+        filters.every((filter) => filter(item))
+      );
+    })
+  );
+
   compare(a: any, b: any, isAsc: boolean) {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
-  sortedReports = combineLatest([
-    this.clientsWithReports,
-    this.sortParams,
-  ]).pipe(
+  sortedReports = combineLatest([this.filteredReports, this.sortParams]).pipe(
     map(([reports, sorts]) =>
       [...reports].sort((a, b) => {
         const isAsc = sorts.sortDirection === 1;
@@ -303,7 +406,7 @@ export class ReportsTableComponent {
           const docId = this.reportDocId(client._id, time, isAnnual);
 
           return this.reportFileService
-            .generatePdf('report-view', docId)
+            .generatePdf('report-preview', docId)
             .pipe(map((response) => ({ response, time })));
         })
       )
@@ -435,5 +538,75 @@ export class ReportsTableComponent {
       sortDirection: sortState.direction,
       sortField: sortState.active,
     });
+  }
+
+  numberOfClients = this.controls.clientsControlState.pipe(
+    map((systems) => systems?.length || 'All')
+  );
+
+  comment(name: string, systems: System[], report?: ReportData) {
+    this.dialog
+      .open(ReportComentComponent, {
+        data: {
+          name,
+          comment: report?.reportComment,
+        },
+      })
+      .afterClosed()
+      .subscribe((comment) => {
+        if (comment) {
+          this.recreateReport(systems, false, comment);
+        }
+      });
+  }
+
+  toggleStatus(status: string) {
+    const current = this.currentStatuses.value;
+    this.currentStatuses.next({
+      ...current,
+      [status]: !Boolean(current[status]),
+    });
+  }
+
+  sendEmail(client: Person, date: number, isAnnual: boolean = false) {
+    const dialog = this.dialogService.loader();
+    const dock = {
+      toUids: [client._id],
+      ccUids: client.sendingList?.filter(Boolean),
+      template: this.createEmailTemplate(client, date, isAnnual),
+    };
+
+    this.emailsService.saveDocsToSend([dock]).subscribe((response) => {
+      dialog.close();
+    });
+  }
+
+  emailDocId(clientId: string, date: number, isAnnual: boolean): string {
+    const tags = [clientId, date];
+    if (isAnnual) {
+      tags.push('A');
+    }
+    return tags.join('_');
+  }
+
+  private createEmailTemplate(
+    client: Person,
+    date: number,
+    isAnnual: boolean
+  ): any {
+    const d = new Date(date);
+    date = Date.UTC(d.getFullYear(), d.getMonth(), 1);
+    const dateFormat = isAnnual ? 'yyyy' : 'MMMM yyyy';
+    const docId = this.emailDocId(client._id, date, isAnnual);
+    return {
+      name: isAnnual ? 'annualReport' : 'report',
+      data: {
+        clientId: client._id,
+        clientName: client.clientName || client.name,
+        date: date,
+        dateString: formatDate(date, dateFormat, 'he'),
+        fileUrl: `https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/report-preview/${docId}`,
+      },
+    };
   }
 }

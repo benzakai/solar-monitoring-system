@@ -23,6 +23,7 @@ export const routes: Routes = [
   { path: 'reports', component: ReportsTableComponent },
   { path: 'reports/:year', component: ReportsTableComponent },
   { path: 'reports/:year/:month', component: ReportsTableComponent },
+  { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
   { path: '**', redirectTo: 'systems' },

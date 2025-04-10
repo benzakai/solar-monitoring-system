@@ -3,6 +3,8 @@ export interface Person {
   name: string;
   position: string;
   phone: string;
+  clientName?: string;
+  sendingList?: string[];
   email: string;
   coordinatorUid?: string;
 }

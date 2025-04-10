@@ -1,5 +1,4 @@
 <div id="page-wrapper">
-
   @if(reps | async; as r) {
 
     <div>
@@ -112,7 +111,7 @@
           }
 
           <div footer>
-            <app-report-footer [comment]="documents[1]?.comment"></app-report-footer>
+            <app-report-footer [comment]="comment"></app-report-footer>
           </div>
 
         </app-page-template>

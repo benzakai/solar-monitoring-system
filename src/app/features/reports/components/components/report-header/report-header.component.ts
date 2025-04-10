@@ -15,7 +15,7 @@ import { DatePipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportHeaderComponent implements OnInit {
-  @Input() date: number = Date.now();
+  @Input() date: number = 0;
 
   @Input() isAnnual: boolean = false;
 

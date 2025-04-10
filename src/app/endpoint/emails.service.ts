@@ -7,8 +7,11 @@ import {
   limit,
   orderBy,
   getDocs,
+  doc,
+  writeBatch,
+  getFirestore,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { Email } from '../domain/email';
 import {} from 'firebase/firestore';
 
@@ -87,5 +90,21 @@ export class EmailsService {
         }
       })();
     });
+  }
+
+  saveDocsToSend(docs: any[] = []) {
+    const firestore = getFirestore();
+    const batch = writeBatch(firestore);
+    const batchId = doc(this.collection).id;
+
+    docs.forEach((docData, idx) => {
+      const docId = batchId + '_' + idx;
+      console.log(docId);
+      const docRef = doc(this.collection, docId);
+      docData.batchId = batchId;
+      batch.set(docRef, docData);
+    });
+
+    return from(batch.commit());
   }
 }
