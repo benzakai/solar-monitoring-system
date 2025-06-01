@@ -29,6 +29,7 @@ import { EnergySample } from '../../../../domain/energy';
 import { Malfunction } from '../../../../domain/malfunction';
 import { ClientReportSystemsTableComponent } from '../components/client-report-systems-table/client-report-systems-table.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ReportData } from '../../../../domain/report';
 
 export interface SystemReportData {
   systemId: string;
@@ -91,6 +92,8 @@ export class ReportPreviewComponent {
   activatedRoute = inject(ActivatedRoute);
   auth = inject(AngularFireAuth);
 
+  noBg = false;
+
   title: string = 'דו"ח ניטור ';
   documents: (any | null)[] = [];
   clientName = '';
@@ -109,13 +112,9 @@ export class ReportPreviewComponent {
     tap(() => console.log(2)),
     switchMap(([pageParam, botpass]) => {
       if (botpass) {
-        console.log(3);
         return from(
           this.auth.signInWithEmailAndPassword('pdfbot@golansolar.app', botpass)
-        ).pipe(
-          tap(() => console.log(5)),
-          map(() => pageParam)
-        );
+        ).pipe(map(() => pageParam));
       } else {
         console.log(4);
         return of(pageParam);
@@ -124,16 +123,26 @@ export class ReportPreviewComponent {
     map((d) => d.split('_')),
     switchMap(([clientId, time, isAnnual]) => {
       this.date = time;
-      console.log(clientId);
-      console.log(time);
 
       return this.reportService
         .getForClientAndTime(clientId, Number(time))
         .pipe(
-          map((reports) =>
-            reports
-              .map((d) => createSystemReportData(d as any as SystemReportDoc))
-              .sort((a, b) => a.systemName.localeCompare(b.systemName))
+          map(
+            (reports) =>
+              reports
+                .map((d) => createSystemReportData(d as any as SystemReportDoc))
+                .sort((a, b) => a.systemName.localeCompare(b.systemName))
+            // .filter((r) => {
+            //   const lastYear = r.productionPerMonthLastYear.reduce(
+            //     (acc, i) => acc + i,
+            //     0
+            //   );
+            //   const thisYear = r.productionPerMonth.reduce(
+            //     (acc, i) => acc + i,
+            //     0
+            //   );
+            //   return thisYear || lastYear;
+            // })
           ),
           tap((clientSystemsData) => {
             console.log(8);
@@ -141,9 +150,13 @@ export class ReportPreviewComponent {
             this.clientName = clientSystemsData[0].clientName;
             this.comment = clientSystemsData[0].comment;
 
+            if (clientSystemsData?.length > 16) {
+              this.noBg = true;
+            }
+
             setTimeout(() => {
               console.log('READY_FOR_PDF');
-            }, 200);
+            }, 300);
           })
         );
     })

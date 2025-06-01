@@ -9,6 +9,8 @@
     "build:new-site:alpha": "ng build --configuration alpha",
     "deploy:new-site:prod": "npm run build:new-site:prod && firebase deploy --only hosting:new-solar-golan",
     "deploy:new-site:alpha": "npm run build:new-site:alpha && firebase deploy --only hosting:alpha-new-solar-golan",
+    "deploy:all": "npm run deploy:new-site:alpha && npm run deploy:new-site:prod",
+    "deploy:reports": "firebase deploy --only hosting:reports-solar-golan",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,css,scss}\""
@@ -23,6 +25,7 @@
     "@angular/fire": "^18.0.1",
     "@angular/forms": "^18.2.0",
     "@angular/material": "^18.2.11",
+
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",

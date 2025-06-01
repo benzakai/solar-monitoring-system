@@ -13,4 +13,5 @@ export const header: Dictionary = {
   },
   monitoring_table: { en: 'Monitoring table', he: 'טבלת ניטור' },
   allCoordinatorsView: { en: 'All coordinators view', he: 'צפייה בכל הרכזים' },
+  selectAll: { en: 'Select all', he: 'סמן הכל' },
 };

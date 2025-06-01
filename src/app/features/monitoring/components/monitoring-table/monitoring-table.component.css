@@ -115,3 +115,12 @@ mat-progress-spinner.comment {
     color: #f44336;
   }
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.red {
+  color: #f44336;
+  font-weight: bold;
+}

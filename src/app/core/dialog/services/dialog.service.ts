@@ -21,7 +21,9 @@ export class DialogService {
     return dialogRef.afterClosed();
   }
 
-  public loader(): MatDialogRef<LoadingDialogComponent> {
-    return this.dialog.open(LoadingDialogComponent);
+  public loader(disableClose = false): MatDialogRef<LoadingDialogComponent> {
+    return this.dialog.open(LoadingDialogComponent, {
+      disableClose,
+    });
   }
 }

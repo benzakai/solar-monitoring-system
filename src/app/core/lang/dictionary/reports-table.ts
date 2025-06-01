@@ -65,4 +65,24 @@ export const reportsTable = {
       he: 'יצירה מחדש',
     },
   },
+  customerStatus: {
+    he: 'סטטוס לקוח',
+    en: 'Customer Status',
+  },
+  allSelected: {
+    en: 'All customers',
+    he: 'כל הלקוחות',
+  },
+  noCustomers: {
+    en: 'No customers',
+    he: 'אין לקוחות',
+  },
+  customersActive: {
+    he: 'לקוחות פעילים',
+    en: 'Active Customers',
+  },
+  customersInactive: {
+    he: 'לקוחות לא פעילים',
+    en: 'Inactive Customers',
+  },
 };

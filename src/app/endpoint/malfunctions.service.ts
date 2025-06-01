@@ -52,9 +52,14 @@ export class MalfunctionsService {
       ? query(
           this.collection,
           where('systemId', '==', systemId),
+          where('#modified', '>=', DateUtil.DaysBack(90)),
           where('status', '==', status)
         )
-      : query(this.collection, where('systemId', '==', systemId));
+      : query(
+          this.collection,
+          where('systemId', '==', systemId),
+          where('#modified', '>=', DateUtil.DaysBack(90))
+        );
     return from(getDocs(q)).pipe(
       map((querySnapshot) => {
         return querySnapshot.docs.map(

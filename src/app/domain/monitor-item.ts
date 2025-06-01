@@ -33,4 +33,5 @@ export interface MonitorItem {
   weekly_percent: number;
   yesterday_percent: number;
   lastCheck?: Check;
+  lastUpdated?: number;
 }

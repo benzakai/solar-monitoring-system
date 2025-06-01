@@ -7,4 +7,5 @@ export interface Person {
   sendingList?: string[];
   email: string;
   coordinatorUid?: string;
+  isActive?: boolean;
 }

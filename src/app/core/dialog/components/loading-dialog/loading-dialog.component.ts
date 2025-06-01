@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
@@ -8,4 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   templateUrl: './loading-dialog.component.html',
   styleUrl: './loading-dialog.component.css',
 })
-export class LoadingDialogComponent {}
+export class LoadingDialogComponent {
+  @Input() message = '';
+  setMessage(text: string) {
+    this.message = text;
+  }
+}

@@ -16,6 +16,15 @@
   }
 }
 
+.coordinator-inner {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    margin: 0 6px 8px 6px;
+  }
+}
+
 .header-container {
   display: flex;
   margin: 0 20px;

@@ -62,6 +62,7 @@ import { CreateAlertDialogComponent } from '../../monitoring/components/create-a
 import { System } from '../../../domain/system';
 import { SelectSystemDialogComponent } from '../select-system-dialog/select-system-dialog.component';
 import * as XLSX from 'xlsx';
+import { MalfunctionsFiltersControlService } from '../../monitoring/services/malfunctions-filters-control.service';
 
 @Component({
   selector: 'app-malfunctions',
@@ -97,7 +98,7 @@ import * as XLSX from 'xlsx';
     MatNativeDateModule,
     MalfunctionsFiltersComponent,
   ],
-  providers: [FiltersControlService],
+  providers: [MalfunctionsFiltersControlService],
   templateUrl: './malfunctions.component.html',
   styleUrl: './malfunctions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -141,7 +142,7 @@ export class MalfunctionsComponent {
     open: true,
     closed: false,
   });
-  //filtersControls = inject(FiltersControlService);
+
   openSelected = this.statuses.pipe(map((statuses) => statuses.open));
   closedSelected = this.statuses.pipe(map((statuses) => statuses.closed));
 
@@ -197,7 +198,6 @@ export class MalfunctionsComponent {
   > = combineLatest([
     this.monitorFacade.monitorItems.pipe(
       filter((items): items is MonitorItem[] => Boolean(items?.length > 0)),
-      take(1),
       map((items) => new Map(items.map((item) => [item.id, item])))
     ),
     this.filteredMalfunctions,
@@ -213,7 +213,7 @@ export class MalfunctionsComponent {
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );
-  filtersControls = inject(FiltersControlService);
+  filtersControls = inject(MalfunctionsFiltersControlService);
   doubleFilteredMergedMalfunctions = combineLatest([
     this.mergedMalfunctions,
     this.rangeChanges,
@@ -239,6 +239,8 @@ export class MalfunctionsComponent {
         });
       }
 
+      filters.push((item) => Boolean(item?.system?.id));
+
       if (portals?.length) {
         filters.push(
           (item) => item.system.portal && portals.includes(item.system.portal)
@@ -246,7 +248,9 @@ export class MalfunctionsComponent {
       }
 
       if (Object.keys(systems).length) {
-        filters.push((item) => Boolean(item.id && systems[item.id]));
+        filters.push((item) =>
+          Boolean(item.systemId && systems[item.systemId])
+        );
       }
 
       if (Object.keys(clients).length) {

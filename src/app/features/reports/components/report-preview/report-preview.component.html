@@ -67,12 +67,14 @@
                 ></app-month-chart>
               }
 
-              <app-annual-chart
-                [date]="date"
-                [productionPerMonth]="systemData.productionPerMonth"
-                [productionPerMonthLastYear]="systemData.productionPerMonthLastYear"
-                [predictionPerMonth]="systemData.predictionPerMonth"
-              ></app-annual-chart>
+              @if (date) {
+                <app-annual-chart
+                  [date]="date"
+                  [productionPerMonth]="systemData.productionPerMonth"
+                  [productionPerMonthLastYear]="systemData.productionPerMonthLastYear"
+                  [predictionPerMonth]="systemData.predictionPerMonth"
+                ></app-annual-chart>
+              }
 
             </div>
 
@@ -80,7 +82,7 @@
 
           <section>
             <p class="title">
-              <span>תקלות</span>
+              <span>הודעות/תחזוקה שוטפת</span>
               @if (systemData?.malfunctions?.length) {
                 <span>&nbsp;({{systemData?.malfunctions?.length }})</span>
               } @else {
@@ -111,7 +113,7 @@
           }
 
           <div footer>
-            <app-report-footer [comment]="comment"></app-report-footer>
+
           </div>
 
         </app-page-template>

@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,25 @@ export class ReportFilesService {
         '/' +
         docId,
       { responseType: 'blob' }
+    );
+  }
+
+  generatePdfForEmail(page: string, docId: string): Observable<string> {
+    const headers = new HttpHeaders().set('X-Url-Only', 'true');
+    const url =
+      'https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/' +
+      page +
+      '-M' +
+      '/' +
+      docId;
+
+    return this.http.get(url).pipe(
+      map((response: unknown) => {
+        if (response && typeof response === 'object' && 'url' in response) {
+          return response.url as string;
+        }
+        return '';
+      })
     );
   }
 

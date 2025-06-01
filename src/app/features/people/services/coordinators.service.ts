@@ -38,14 +38,6 @@ export class CoordinatorsService {
   coordinatorsSelectedSource = new BehaviorSubject([] as string[]);
 
   coordinatorsShowAllSource = new BehaviorSubject(true);
-  coordinatorsShowAll = this.currentUser.role.pipe(
-    switchMap((role) =>
-      role === UserRole.ADMIN
-        ? this.coordinatorsShowAllSource.asObservable()
-        : of(false)
-    ),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
 
   coordinatorsSelected = this.coordinatorsSelectedSource.asObservable();
 
@@ -76,6 +68,13 @@ export class CoordinatorsService {
     this.coordinatorsSelected,
   ]).pipe(
     map(([users, selected]) => users.length === selected?.length),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  coordinatorsShowAll = this.currentUser.role.pipe(
+    switchMap((role) =>
+      role === UserRole.ADMIN ? this.allCoorinatorsSelected : of(false)
+    ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 

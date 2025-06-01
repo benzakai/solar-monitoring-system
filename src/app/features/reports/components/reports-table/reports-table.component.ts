@@ -13,10 +13,12 @@ import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
 import {
   BehaviorSubject,
   combineLatest,
+  concatMap,
   distinctUntilChanged,
   filter,
   first,
   forkJoin,
+  from,
   map,
   of,
   pipe,
@@ -60,12 +62,7 @@ import { ReportFilesService } from '../../../../endpoint/report-files.service';
 import { DialogService } from '../../../../core/dialog/services/dialog.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ReportComentComponent } from '../report-coment/report-coment.component';
-import {
-  MatError,
-  MatFormField,
-  MatFormFieldModule,
-  MatPrefix,
-} from '@angular/material/form-field';
+import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import {
   MatSelect,
@@ -74,23 +71,14 @@ import {
 } from '@angular/material/select';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MalfunctionsFiltersComponent } from '../../../malfunctions/malfunctions-filters/malfunctions-filters.component';
-import {
-  MatDatepickerToggle,
-  MatDateRangeInput,
-  MatDateRangePicker,
-  MatEndDate,
-  MatStartDate,
-} from '@angular/material/datepicker';
 import { FiltersControlService } from '../../../monitoring/services/filters-control.service';
 import { MatInput } from '@angular/material/input';
 import { MatSlider, MatSliderRangeThumb } from '@angular/material/slider';
 import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 
-const ZERO_TIME_EMAIL: Pick<Email, 'delivery'> = {
+const ZERO_TIME_EMAIL = {
   delivery: {
-    endTime: 0,
     startTime: 0,
-    state: '',
   },
 };
 
@@ -163,8 +151,27 @@ export class ReportsTableComponent {
   dialog = inject(MatDialog);
   controls = inject(FiltersControlService);
 
+  selections: { [k in string]: any } = {};
+
+  setSelection(m: any, selected: boolean) {
+    this.selections[m._id] = selected;
+  }
+
+  isAnySelected(): boolean {
+    return Object.keys(this.selections)
+      .map((key) => this.selections[key])
+      .some(Boolean);
+  }
+
   d = new Date();
   dateControl = new FormControl(this.d.getMonth() - 1);
+  yearControl = new FormControl(this.d.getFullYear());
+
+  activeClient = new FormControl([true, false]);
+
+  activeClientState = this.activeClient.valueChanges.pipe(
+    startWith(this.activeClient.value)
+  );
 
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
@@ -189,12 +196,23 @@ export class ReportsTableComponent {
 
   loading = new BehaviorSubject(true);
 
-  selectedDate = this.dateControl.valueChanges.pipe(
+  selectedDateMonth = this.dateControl.valueChanges.pipe(
     startWith(this.dateControl.value),
-    distinctUntilChanged(),
-    map((month) => {
+    distinctUntilChanged()
+  );
+
+  selectedDateYear = this.yearControl.valueChanges.pipe(
+    startWith(this.yearControl.value),
+    distinctUntilChanged()
+  );
+
+  selectedDate = combineLatest([
+    this.selectedDateMonth,
+    this.selectedDateYear,
+  ]).pipe(
+    map(([month, year]) => {
       const newDate = Date.UTC(
-        this.d.getFullYear(),
+        year || this.d.getUTCFullYear(),
         month || this.d.getMonth() - 1,
         1
       );
@@ -211,7 +229,6 @@ export class ReportsTableComponent {
     this.clients.pipe(filter(Boolean)),
     this.monitorFacade.monitorItems.pipe(
       filter(Boolean),
-      take(1),
       map((m) => (m || []).filter((s) => s.system_active))
     ),
   ]).pipe(
@@ -227,13 +244,15 @@ export class ReportsTableComponent {
         {} as { [clientId: string]: any[] }
       );
 
-      return clients.map((client) => {
-        const systems = systemsMapByClientId[client._id] || [];
-        return Object.assign(client, {
-          systems,
-          numberOfSystems: systems?.length || 0,
+      return clients
+        .filter((client) => systemsMapByClientId[client._id])
+        .map((client) => {
+          const systems = systemsMapByClientId[client._id] || [];
+          return Object.assign(client, {
+            systems,
+            numberOfSystems: systems?.length || 0,
+          });
         });
-      });
     }),
     shareReplay({ refCount: true, bufferSize: 1 })
   );
@@ -260,6 +279,7 @@ export class ReportsTableComponent {
                 ensureArray.forEach((uid) => {
                   const comparison = emailsByClientId[uid] || ZERO_TIME_EMAIL;
                   if (
+                    email.delivery?.startTime &&
                     comparison.delivery.startTime < email.delivery.startTime
                   ) {
                     emailsByClientId[uid] = email;
@@ -313,27 +333,45 @@ export class ReportsTableComponent {
     this.clientsWithReports,
     this.controls.clientsControlStateMap,
     this.currentStatuses,
+    this.activeClientState,
   ]).pipe(
-    map(([clientAndReports, clientsSelectedMap, statusesSelected]) => {
-      const filters: Array<(item: (typeof clientAndReports)[0]) => boolean> =
-        [];
+    map(
+      ([
+        clientAndReports,
+        clientsSelectedMap,
+        statusesSelected,
+        activeClients,
+      ]) => {
+        this.selections = {};
+        const filters: Array<(item: (typeof clientAndReports)[0]) => boolean> =
+          [];
 
-      filters.push((item) => {
-        const status =
-          item?.email?.delivery.state ||
-          (item.report ? 'project' : 'not_created');
-        return Boolean(statusesSelected[status]);
-      });
+        filters.push((item) => {
+          const status =
+            item?.email?.delivery.state ||
+            (item.report ? 'project' : 'not_created');
+          return Boolean(statusesSelected[status]);
+        });
 
-      if (Object.keys(clientsSelectedMap || {}).length) {
-        filters.push((item) =>
-          Boolean(item._id && clientsSelectedMap[item._id])
+        if (Object.keys(clientsSelectedMap || {}).length) {
+          filters.push((item) =>
+            Boolean(item._id && clientsSelectedMap[item._id])
+          );
+        }
+
+        const activityOfClientsArray = activeClients || [];
+
+        if (activityOfClientsArray.length !== 2) {
+          filters.push((item) =>
+            activityOfClientsArray.includes(item.isActive || false)
+          );
+        }
+
+        return clientAndReports.filter((item) =>
+          filters.every((filter) => filter(item))
         );
       }
-      return clientAndReports.filter((item) =>
-        filters.every((filter) => filter(item))
-      );
-    })
+    )
   );
 
   compare(a: any, b: any, isAsc: boolean) {
@@ -354,6 +392,58 @@ export class ReportsTableComponent {
     ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
+  sendToSelected(isAnnual = false) {
+    const dialog = this.dialogService.loader(true);
+    let sent = 1;
+
+    this.filteredReports
+      .pipe(
+        take(1),
+        switchMap((reports) => {
+          const toBeSent = reports.filter((r) => this.selections[r._id]);
+          dialog.componentInstance.setMessage(`1/${toBeSent.length}`);
+
+          return from(toBeSent).pipe(
+            concatMap((client) => {
+              const time = client.report.date;
+              const docId = this.reportDocId(client._id, time, isAnnual);
+
+              return this.reportFileService
+                .generatePdfForEmail('report-preview', docId)
+                .pipe(
+                  switchMap((url) => {
+                    const dock = {
+                      toUids: [client._id],
+                      ccUids: client.sendingList?.filter(Boolean),
+                      template: this.createEmailTemplate(
+                        url,
+                        client,
+                        time,
+                        isAnnual
+                      ),
+                    };
+                    return this.emailsService.saveDocsToSend([dock]).pipe(
+                      tap(() => {
+                        sent++;
+                        dialog.componentInstance.setMessage(
+                          `${sent}/${toBeSent.length}`
+                        );
+                      })
+                    );
+                  })
+                );
+            })
+          );
+        })
+      )
+      .subscribe({
+        complete: () => {
+          dialog.close();
+          this.selections = {};
+        },
+      });
+  }
 
   trackTable(i: number, item: Partial<Person>) {
     return item?._id;
@@ -568,17 +658,23 @@ export class ReportsTableComponent {
     });
   }
 
-  sendEmail(client: Person, date: number, isAnnual: boolean = false) {
+  sendEmail(client: Person, time: number, isAnnual: boolean = false) {
     const dialog = this.dialogService.loader();
-    const dock = {
-      toUids: [client._id],
-      ccUids: client.sendingList?.filter(Boolean),
-      template: this.createEmailTemplate(client, date, isAnnual),
-    };
+    const docId = this.reportDocId(client._id, time, isAnnual);
 
-    this.emailsService.saveDocsToSend([dock]).subscribe((response) => {
-      dialog.close();
-    });
+    this.reportFileService
+      .generatePdfForEmail('report-preview', docId)
+      .pipe(
+        switchMap((url) => {
+          const dock = {
+            toUids: [client._id],
+            ccUids: client.sendingList?.filter(Boolean),
+            template: this.createEmailTemplate(url, client, time, isAnnual),
+          };
+          return this.emailsService.saveDocsToSend([dock]);
+        })
+      )
+      .subscribe(() => dialog.close());
   }
 
   emailDocId(clientId: string, date: number, isAnnual: boolean): string {
@@ -590,6 +686,7 @@ export class ReportsTableComponent {
   }
 
   private createEmailTemplate(
+    fileUrl: string,
     client: Person,
     date: number,
     isAnnual: boolean
@@ -605,7 +702,8 @@ export class ReportsTableComponent {
         clientName: client.clientName || client.name,
         date: date,
         dateString: formatDate(date, dateFormat, 'he'),
-        fileUrl: `https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/report-preview/${docId}`,
+        fileUrl,
+        //fileUrl: `https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/report-preview/${docId}`,
       },
     };
   }

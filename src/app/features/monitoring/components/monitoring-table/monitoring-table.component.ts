@@ -30,6 +30,9 @@ import {
   debounceTime,
   take,
   startWith,
+  interval,
+  switchMap,
+  filter,
 } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-dialog.component';
@@ -51,6 +54,15 @@ import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
 import { DateUtil } from '../../../../core/date/DateUtil';
 import { CurrentUserService } from '../../../people/services/current-user.service';
 import { RoutineCheckService } from '../../../../endpoint/routine-check.service';
+import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
+import { EnvironmentalSystemsDialogComponent } from '../environmental-systems-dialog/environmental-systems-dialog.component';
+import { EnergyCalc } from '../../../../core/energy/energy-calculator';
+import { EnergyService } from '../../../../endpoint/energy.service';
+import { Energy } from '../../../../domain/energy';
+import { AppEndpointService } from '../../../../endpoint/app-endpoint.service';
+import { SystemsService } from '../../../../endpoint/systems.service';
+import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
+import { DialogService } from '../../../../core/dialog/services/dialog.service';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -111,6 +123,26 @@ export class MonitoringTableComponent {
   routineCheckService = inject(RoutineCheckService);
   dataSource = new MatTableDataSource<any>();
   route = inject(ActivatedRoute);
+  malfunctionsService = inject(MalfunctionsService);
+  appEndpointService = inject(AppEndpointService);
+  systemsService = inject(SystemsService);
+  environmentalEnergyService = inject(EnvironmentalEnergyService);
+  dialogService = inject(DialogService);
+
+  israelTime$ = interval(1000).pipe(
+    startWith(0),
+    map(() => {
+      const now = new Date();
+      const options: Intl.DateTimeFormatOptions = {
+        timeZone: 'Asia/Jerusalem',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      };
+      return new Intl.DateTimeFormat('en-GB', options).format(now);
+    })
+  );
 
   sortParams = this.route.queryParams.pipe(
     startWith({ sort: 'tested,desc' }),
@@ -125,6 +157,7 @@ export class MonitoringTableComponent {
   );
   currentUserService = inject(CurrentUserService);
   monitorFacade = inject(MonitorFacade);
+  energyService = inject(EnergyService);
 
   monitorItemsForUser = combineLatest([
     this.monitorFacade.monitorItems.pipe(debounceTime(500)),
@@ -137,7 +170,13 @@ export class MonitoringTableComponent {
           : undefined;
         const checkedByMeToday =
           daysFromCheck === 0 && item?.lastCheck?.uid === user.uid;
-        return { ...item, daysFromCheck, checkedByMeToday };
+        const toBeChecked = (daysFromCheck || 100) > 10;
+        return {
+          ...item,
+          daysFromCheck,
+          checkedByMeToday,
+          toBeChecked,
+        };
       })
     )
   );
@@ -263,6 +302,15 @@ export class MonitoringTableComponent {
   waitingOpenedIssues: { [key: string]: any } = {};
   waitingComments: { [key: string]: any } = {};
   waitingChecks: { [key: string]: any } = {};
+
+  testedByMeTodayCount = this.monitorFiltered.pipe(
+    map((data) => data.filter((item) => item.checkedByMeToday).length)
+  );
+
+  needsTest = this.monitorFiltered.pipe(
+    map((data) => data.filter((item) => item.toBeChecked).length)
+  );
+  element: any;
 
   constructor(
     private router: Router,
@@ -413,5 +461,56 @@ export class MonitoringTableComponent {
   checked(id: string) {
     this.waitingChecks[id] = true;
     this.routineCheckService.addCheck(id).subscribe(() => {});
+  }
+
+  openEnvironmental(minitorItem: any) {
+    const loader = this.dialogService.loader();
+    combineLatest([
+      this.systemsService.getById(minitorItem.id),
+      this.energyService.getEnergy(minitorItem.id),
+      this.appEndpointService.get('prediction').pipe(filter((p) => !!p)),
+    ])
+      .pipe(
+        switchMap(([system, energy, prediction]) =>
+          this.environmentalEnergyService.getEnvironmentalEnergies(
+            system,
+            prediction
+          )
+        )
+      )
+      .subscribe((result) => {
+        loader.close();
+        const { system, energy, prediction, relatedEnergy } = result || {};
+        this.matDialog.open(EnvironmentalSystemsDialogComponent, {
+          data: [
+            { system, energy },
+            ...(relatedEnergy || []).filter((e) =>
+              EnergyCalc.IsPartOfAverage(e.system)
+            ),
+          ],
+          width: '1200px',
+          maxWidth: '90vw',
+        });
+      });
+  }
+
+  openIssuesLink(e: MonitorItem): void {
+    if (e.open_issues > 1) {
+      this.router.navigate(['malfunctions'], {
+        queryParams: {
+          sys: [e.id],
+        },
+      });
+    }
+    if (e.open_issues === 1) {
+      this.malfunctionsService
+        .getForSystem(e.id, 'open')
+        .pipe(first())
+        .subscribe((malf) => {
+          if (malf.length) {
+            this.router.navigate(['malfunction-edit', malf[0].id]);
+          }
+        });
+    }
   }
 }

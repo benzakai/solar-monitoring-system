@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h1>{{ data?.name }}</h1>
+</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="form-line area">
+    <mat-form-field appearance="outline">
+        <textarea
+          matInput
+          placeholder="כתיבת הערה..."
+          [formControl]="comment"
+        ></textarea
+        >
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="save()"
+  >
+    {{ 'save_comment' | translate
+    }}
+  </button>
+</mat-dialog-actions>

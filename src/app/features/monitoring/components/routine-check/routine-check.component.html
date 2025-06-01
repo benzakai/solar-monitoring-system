@@ -2,7 +2,7 @@
 <div class="container">
   <div class="headline-1">
 
-    {{ 'total_kv' | translate }}:<span>{{ totalKv | async | number: '1.2-2' }}</span>
+    <span>{{ totalKv | async | number: '1.2-2' }}</span> :{{ 'total_kv' | translate }}
     |
     @if ((lang | async) === 'en') {
       {{ 'systems_appear_in_table' | translate }}:
@@ -13,9 +13,9 @@
       }}
       |
     }
-    {{ 'were_checked_today' | translate }}: <span>12</span> |
-    {{ 'should_check_today' | translate }}: <span>0</span> |
-    {{ 'read_data_from_server' | translate }}: <span>12:47:29</span>
+    <span>{{ testedByMeTodayCount | async }}</span> :{{ 'were_checked_today' | translate }} |
+    <span>{{needsTest | async}}</span> :{{ 'should_check_today' | translate }} |
+    <span>{{ israelTime$ | async }}</span> :{{ 'read_data_from_server' | translate }}
   </div>
   <div class="table-container page-table">
     <table

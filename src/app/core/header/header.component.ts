@@ -5,6 +5,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  first,
   interval,
   map,
   Observable,
@@ -31,7 +32,7 @@ import { LANGUAGE } from '../lang';
 import { MENU_TOOGLE } from './menu';
 import { UsersService } from '../../endpoint/users.service';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -66,6 +67,8 @@ export class HeaderComponent {
   lang = inject(LANGUAGE);
   langControl = new FormControl();
   menu = inject(MENU_TOOGLE);
+
+  router = inject(Router);
 
   usersService = inject(UsersService);
 
@@ -148,9 +151,15 @@ export class HeaderComponent {
     return [...systemsFoundByName, ...systemsFoundByClient];
   }
 
+  selectAllCoordinators() {
+    this.coordinators.pipe(first()).subscribe((coord) => {
+      this.coordinatorsControl.setValue(coord.map((c) => c.uid));
+    });
+  }
+
   goToSystemDetails(id?: string) {
     if (id) {
-      window.location.href = `https://solar-golan.web.app/solar-system/${id}`;
+      this.router.navigate(['/system', id]);
     }
   }
 

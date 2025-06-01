@@ -10,10 +10,15 @@ import {
   doc,
   writeBatch,
   getFirestore,
+  Query,
+  DocumentData,
+  onSnapshot,
+  QuerySnapshot,
 } from '@angular/fire/firestore';
-import { from, Observable } from 'rxjs';
+import { from, map, Observable, switchMap } from 'rxjs';
 import { Email } from '../domain/email';
 import {} from 'firebase/firestore';
+import { ReportData } from '../domain/report';
 
 const alignDateToReport = (date: Date) => {
   date.setUTCDate(1);
@@ -73,6 +78,24 @@ export class EmailsService {
       where('template.data.date', '<=', endDate.getTime())
     );
 
+    return this.getSnap(q).pipe(
+      switchMap((snapshot) => {
+        let state = (snapshot || []).reduce(
+          (acc, email) => Object.assign(acc, { [email.id]: email }),
+          {} as Record<string, Email & { id: string }>
+        );
+        return this.getChanges(q).pipe(
+          map((changes) => {
+            (changes.added || []).forEach((e) => (state[e.id] = e));
+            (changes.modified || []).forEach((e) => (state[e.id] = e));
+            (changes.removed || []).forEach((e) => delete state[e.id]);
+
+            return Object.keys(state).map((id) => state[id]);
+          })
+        );
+      })
+    );
+
     return new Observable<Email[]>((observer) => {
       (async () => {
         try {
@@ -106,5 +129,51 @@ export class EmailsService {
     });
 
     return from(batch.commit());
+  }
+
+  private getSnap(
+    query: Query<DocumentData, DocumentData>
+  ): Observable<(Email & { id: string })[]> {
+    return from(getDocs(query)).pipe(
+      map((snapshot) =>
+        snapshot.docs.map((doc) => {
+          const data = doc.data() as Record<string, unknown>;
+          return {
+            id: doc.id,
+            ...data,
+          } as Email & { id: string };
+        })
+      )
+    );
+  }
+
+  private getChanges(
+    query: Query
+  ): Observable<
+    Record<'added' | 'modified' | 'removed', (Email & { id: string })[]>
+  > {
+    return new Observable<
+      Record<'added' | 'modified' | 'removed', (Email & { id: string })[]>
+    >((observer) => {
+      return onSnapshot(query, (snapshot: QuerySnapshot) => {
+        const changes: Record<
+          'added' | 'modified' | 'removed',
+          (Email & { id: string })[]
+        > = {
+          added: [],
+          modified: [],
+          removed: [],
+        };
+
+        snapshot.docChanges().map((doc) => {
+          changes[doc.type].push({
+            id: doc.doc.id,
+            ...doc.doc.data(),
+          } as Email & { id: string });
+        });
+
+        observer.next(changes);
+      });
+    });
   }
 }

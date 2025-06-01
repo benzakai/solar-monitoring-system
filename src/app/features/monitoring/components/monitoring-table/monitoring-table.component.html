@@ -2,7 +2,7 @@
 <div class="container">
   <div class="headline-1">
 
-    {{ 'total_kv' | translate }}:<span>{{ totalKv | async | number: '1.2-2' }}</span>
+    <span>{{ totalKv | async | number: '1.2-2' }}</span> :{{ 'total_kv' | translate }}
      |
     @if ((lang | async) === 'en') {
       {{ 'systems_appear_in_table' | translate }}:
@@ -13,9 +13,9 @@
       }}
       |
     }
-    {{ 'were_checked_today' | translate }}: <span>12</span> |
-    {{ 'should_check_today' | translate }}: <span>0</span> |
-    {{ 'read_data_from_server' | translate }}: <span>12:47:29</span>
+    <span>{{ testedByMeTodayCount | async }}</span> :{{ 'were_checked_today' | translate }} |
+    <span>{{needsTest | async}}</span> :{{ 'should_check_today' | translate }} |
+    <span>{{ israelTime$ | async }}</span> :{{ 'read_data_from_server' | translate }}
   </div>
   <div class="table-container page-table">
     <table
@@ -85,7 +85,7 @@
         </th>
         <td mat-cell *matCellDef="let element">
           <span class="aligner">
-          {{ element.open_issues }}
+            <span (click)="openIssuesLink(element)" [class.red]="element.open_issues > 0" [class.clickable]="element.open_issues > 0">{{ element.open_issues }}</span>
             @if (isWaiting(element.id, element.open_issues)) {
               <mat-progress-spinner
                 diameter="15"
@@ -102,7 +102,7 @@
           <app-sort-header [active]="sortParams | async" column="close_issues" (onSort)="onSort($event)"></app-sort-header>
           {{ 'cleared_alerts' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" [class.red]="element.close_issues > 0">
           {{ element.close_issues }}
         </td>
       </ng-container>
@@ -162,7 +162,7 @@
             {{ 'benchmarks' | translate }}
           </div>
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
           <span>{{ element?.monthly_percent | number: '1.0-0' }}%</span>
         </td>
       </ng-container>
@@ -171,7 +171,7 @@
         <th mat-header-cell *matHeaderCellDef>
           <app-sort-header [active]="sortParams | async" column="weekly_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'weekly' | translate }}</th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
           <span>{{ element?.weekly_percent | number: '1.0-0' }}%</span>
         </td>
       </ng-container>
@@ -181,7 +181,7 @@
           <app-sort-header [active]="sortParams | async" column="three_days_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'three_days' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
           {{ element?.three_days_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
@@ -190,7 +190,7 @@
         <th mat-header-cell *matHeaderCellDef>
           <app-sort-header [active]="sortParams | async" column="yesterday_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'yesterday' | translate }}</th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
           {{ element?.yesterday_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
@@ -200,22 +200,22 @@
           <app-sort-header [active]="sortParams | async" column="today_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'today' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
           {{ element?.today_percent | number: '1.0-0' }}%
         </td>
       </ng-container>
 
       <ng-container matColumnDef="communication">
         <th mat-header-cell *matHeaderCellDef>
-          <app-sort-header [active]="sortParams | async" column="communication" (onSort)="onSort($event)"></app-sort-header>
+          <app-sort-header [active]="sortParams | async" column="lastUpdated" (onSort)="onSort($event)"></app-sort-header>
           {{ 'communication' | translate }}
           <div class="description"></div>
         </th>
         <td mat-cell *matCellDef="let element">
           <mat-icon
-            [style.color]="element.communication ? '#60B952' : '#FC5507'"
+            [style.color]="element.lastUpdated ? '#60B952' : '#FC5507'"
           >
-            {{ element.communication ? 'wifi' : 'running_with_errors' }}
+            {{ element.lastUpdated ? 'wifi' : 'running_with_errors' }}
           </mat-icon>
         </td>
       </ng-container>

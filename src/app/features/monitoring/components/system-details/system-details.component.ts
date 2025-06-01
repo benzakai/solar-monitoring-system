@@ -63,8 +63,8 @@ import { CreateAlertDialogComponent } from '../create-alert-dialog/create-alert-
 import { MatDialog } from '@angular/material/dialog';
 import { EnvironmentalSystemsDialogComponent } from '../environmental-systems-dialog/environmental-systems-dialog.component';
 import { SortHeaderComponent } from '../sort-header/sort-header.component';
-import { SystemCommentDialogComponent } from '../system-comment-dialog/system-comment-dialog.component';
 import { ManualEnergyUpdateComponent } from '../manual-energy-update/manual-energy-update.component';
+import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
 
 @Component({
   selector: 'app-system-details',
@@ -135,6 +135,7 @@ export class SystemDetailsComponent implements AfterViewInit {
   systemsService = inject(SystemsService);
   appEndpointService = inject(AppEndpointService);
   systemEnergyFacade = inject(SystemEnergyFacade);
+  environmentalEnergyService = inject(EnvironmentalEnergyService);
   destroyRef = inject(DestroyRef);
   malfunctionsService = inject(MalfunctionsService);
   matDialog = inject(MatDialog);
@@ -220,38 +221,10 @@ export class SystemDetailsComponent implements AfterViewInit {
 
   systemDetailsAndEnergy = this.systemDetails.pipe(
     switchMap(({ system, prediction }) =>
-      system?.id
-        ? combineLatest([
-            this.systemEnergyFacade.getSystemEnergy(system?.id),
-            this.systemsService
-              .getSystemsByIds(system?.location?.relatedSystems || [])
-              .pipe(
-                switchMap((relatedSystems) => {
-                  const relatedMaps: { [k: string]: System } = relatedSystems
-                    .filter((s) => EnergyCalc.IsPartOfAverage(s))
-                    .reduce((acc, s) => Object.assign(acc, { [s.id]: s }), {});
-
-                  return this.systemEnergyFacade
-                    .getSystemEnergyList(Object.keys(relatedMaps))
-                    .pipe(
-                      map((energies) =>
-                        energies.map((energy) => ({
-                          energy,
-                          system: relatedMaps[energy.id],
-                        }))
-                      )
-                    );
-                })
-              ),
-          ]).pipe(
-            map(([energy, relatedEnergy]) => ({
-              system,
-              energy,
-              prediction,
-              relatedEnergy,
-            }))
-          )
-        : of(null)
+      this.environmentalEnergyService.getEnvironmentalEnergies(
+        system,
+        prediction
+      )
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
     filter((data) => !!data)
@@ -377,41 +350,44 @@ export class SystemDetailsComponent implements AfterViewInit {
       this.chartDiv!.nativeElement,
       this.chartBaseOptions
     );
-    this.chart.render();
 
-    this.systemDetailsAndEnergy
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        switchMap(({ system, energy, prediction, relatedEnergy }) =>
-          combineLatest([
-            this.selectedPeriodChanges,
-            this.periodTypeChange,
-          ]).pipe(
-            map(([range, type]) => ({
-              system,
-              energy,
-              prediction,
-              relatedEnergy,
-              range,
-              type,
-            }))
+    setTimeout(() => {
+      this.chart?.render();
+
+      this.systemDetailsAndEnergy
+        .pipe(
+          takeUntilDestroyed(this.destroyRef),
+          switchMap(({ system, energy, prediction, relatedEnergy }) =>
+            combineLatest([
+              this.selectedPeriodChanges,
+              this.periodTypeChange,
+            ]).pipe(
+              map(([range, type]) => ({
+                system,
+                energy,
+                prediction,
+                relatedEnergy,
+                range,
+                type,
+              }))
+            )
           )
         )
-      )
-      .subscribe(
-        ({ system, energy, prediction, relatedEnergy, range, type }) => {
-          if (system && energy) {
-            this.pushChart(
-              system,
-              energy,
-              prediction,
-              relatedEnergy,
-              range,
-              type
-            );
+        .subscribe(
+          ({ system, energy, prediction, relatedEnergy, range, type }) => {
+            if (system && energy) {
+              this.pushChart(
+                system,
+                energy,
+                prediction,
+                relatedEnergy,
+                range,
+                type
+              );
+            }
           }
-        }
-      );
+        );
+    });
   }
 
   sumValue = (v: number) => (isNaN(v) ? 'אין נתונים' : twoDecimalNumber(v));
@@ -588,7 +564,7 @@ export class SystemDetailsComponent implements AfterViewInit {
           this.matDialog
             .open(ManualEnergyUpdateComponent, {
               data: { system, energy },
-              width: '800px',
+              width: '1000px',
               maxWidth: '90vw',
             })
             .afterClosed()
@@ -596,7 +572,7 @@ export class SystemDetailsComponent implements AfterViewInit {
       )
       .subscribe((result) => {
         if (result) {
-          this.generation.next(this.generation.value + 1);
+          setTimeout(() => this.generation.next(this.generation.value + 1));
         }
       });
   }

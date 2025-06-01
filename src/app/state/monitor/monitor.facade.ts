@@ -18,7 +18,6 @@ import { MonitorItem } from '../../domain/monitor-item';
 import { loadMonitorItems } from './monitor.actions';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 import { CurrentUserService } from '../../features/people/services/current-user.service';
-import { UserRole } from '../../endpoint/users.service';
 
 @Injectable({
   providedIn: 'root',
@@ -52,9 +51,22 @@ export class MonitorFacade {
         )
       )
     ),
+    share()
+  );
+
+  public monitorItemsAll = this.store.select(selectMonitorItems);
+
+  public monitorItemsMap = this.monitorItems.pipe(
+    map((items) => new Map(items.map((item) => [item.id, item]))),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
   public readonly monitor = this.monitorItems.pipe(
+    filter((arr): arr is MonitorItem[] => Boolean(arr?.length > 0)),
+    first()
+  );
+
+  public readonly monitorAll = this.monitorItemsAll.pipe(
     filter((arr): arr is MonitorItem[] => Boolean(arr?.length > 0)),
     first()
   );
@@ -70,6 +82,22 @@ export class MonitorFacade {
   );
 
   public readonly clients = this.monitor.pipe(
+    map((data) => {
+      const clients: Record<string, IdName> = {};
+      data.forEach((item) => {
+        if (item?.client?.id && item?.client?.name) {
+          clients[item.client.id] = item.client;
+        }
+      });
+      return Object.keys(clients).map((id) => ({
+        ...clients[id],
+        fulltext: clients[id].name.toLowerCase(),
+      }));
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  public readonly clientsAll = this.monitorAll.pipe(
     map((data) => {
       const clients: Record<string, IdName> = {};
       data.forEach((item) => {

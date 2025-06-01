@@ -35,11 +35,15 @@
 
                 }
               </mat-select-trigger>
-              @if (coordinators | async; as coord) {
-                @for(c of coord; track c.uid) {
-                  <mat-option [value]="c.uid">{{ c.displayName }}</mat-option>
+              <div class="coordinator-inner">
+                <button mat-button [disabled]="allCoordinators | async" (click)="selectAllCoordinators()">{{'header.selectAll' | translate}}</button>
+                @if (coordinators | async; as coord) {
+                  @for(c of coord; track c.uid) {
+                    <mat-option [value]="c.uid">{{ c.displayName }}</mat-option>
+                  }
                 }
-              }
+              </div>
+
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline">

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AsyncPipe, NgForOf } from '@angular/common';
+import { AsyncPipe, JsonPipe, NgForOf } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -13,6 +13,7 @@ import { FiltersControlService } from '../../monitoring/services/filters-control
 import { Store } from '@ngrx/store';
 import { selectMinMaxKwp } from '../../../state/monitor/monitor.selectors';
 import { filter, first, map, share } from 'rxjs';
+import { MalfunctionsFiltersControlService } from '../../monitoring/services/malfunctions-filters-control.service';
 
 @Component({
   selector: 'app-malfunctions-filters',
@@ -30,13 +31,14 @@ import { filter, first, map, share } from 'rxjs';
     NgForOf,
     ReactiveFormsModule,
     TranslatePipe,
+    JsonPipe,
   ],
   templateUrl: './malfunctions-filters.component.html',
   styleUrl: './malfunctions-filters.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MalfunctionsFiltersComponent {
-  controls = inject(FiltersControlService);
+  controls = inject(MalfunctionsFiltersControlService);
   store = inject(Store);
 
   systemStatuses = [

@@ -247,9 +247,14 @@ export class MalfuncitonEditComponent {
           const type = malfunction.type || ['', ''];
           type[0] = this.form.value.type;
 
+          const trackingDate = this.form.value.tracingTime
+            ? new Date(this.form.value.tracingTime)
+            : null;
+
           let result: Malfunction = {
             ...malfunction,
             ...this.form.value,
+            tracingTime: trackingDate ? trackingDate.toISOString() : null,
             type,
           };
 

@@ -1,16 +1,19 @@
-import {formatDate} from '@angular/common';
+import { formatDate } from '@angular/common';
 
 export type ValidDate = Date | number | string;
 
 export class DateUtil {
-
   /** Time constants */
   static readonly MINUTE = 60000;
   static readonly HOUR = 3600000;
   static readonly DAY = 86400000;
 
   /** The app's datetime format. custom message for invalid date */
-  static ToAppDate(d?: ValidDate | null, invalid: string = '', dateOnly: boolean = false) : string {
+  static ToAppDate(
+    d?: ValidDate | null,
+    invalid: string = '',
+    dateOnly: boolean = false
+  ): string {
     try {
       let format = 'dd/MM/yyyy';
       if (!dateOnly) {
@@ -32,7 +35,9 @@ export class DateUtil {
 
   /** Check whether two times are on the same day */
   static IsSameDay(d1: ValidDate, d2: ValidDate): boolean {
-    return new Date(d1).toLocaleDateString() === new Date(d2).toLocaleDateString();
+    return (
+      new Date(d1).toLocaleDateString() === new Date(d2).toLocaleDateString()
+    );
   }
 
   /** Whether some time is on the same day as today */
@@ -67,7 +72,7 @@ export class DateUtil {
   }
 
   /** Get the number of days of the given month (of the current year if not specified) */
-  static DaysInMonth(month: number, year?: number) : number {
+  static DaysInMonth(month: number, year?: number): number {
     const d = new Date();
     if (year) {
       d.setFullYear(year);
@@ -130,7 +135,17 @@ export class DateUtil {
   static IsSameMonth(date1: ValidDate, date2: ValidDate) {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
-    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
+    return (
+      d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth()
+    );
   }
 
+  static IsSameMonthUTC(date1: ValidDate, date2: ValidDate) {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    return (
+      d1.getUTCFullYear() === d2.getUTCFullYear() &&
+      d1.getUTCMonth() === d2.getUTCMonth()
+    );
+  }
 }

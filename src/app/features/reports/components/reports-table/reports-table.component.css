@@ -184,3 +184,22 @@ mat-chip-listbox {
     }
   }
 }
+
+.headline-1 {
+  justify-content: flex-start;
+}
+
+.mass-message {
+  color: #70c265;
+  &.mat-mdc-button-disabled {
+    opacity: 0.5;
+  }
+}
+
+.mat-mdc-checkbox-disabled {
+  opacity: 0.5;
+  ::ng-deep .mdc-checkbox__background {
+    background-color: #f0f0f0!important;
+    border-color: #d1d1d1!important;
+  }
+}

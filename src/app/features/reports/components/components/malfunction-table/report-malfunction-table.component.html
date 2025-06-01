@@ -9,12 +9,14 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let row of malfunctions">
-    <td>{{row.openTime | date : 'short' }}</td>
-    <td>{{row.closeTime | date : 'short'}}</td>
-    <td>{{row.type?.join('')}}</td>
-    <td>{{row.reportText}}</td>
-  </tr>
+  @for (row of malfunctions; track row.id) {
+    <tr>
+      <td>{{row.openTime | date : 'd/M/yy' }}</td>
+      <td>{{row.closeTime | date : 'd/M/yy'}}</td>
+      <td>{{row.type?.join('')}}</td>
+      <td>{{row.reportText}}</td>
+    </tr>
+  }
   </tbody>
 </table>
 }

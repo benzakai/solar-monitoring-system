@@ -25,6 +25,10 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="custom-select">
+    <input matInput type="number" [formControl]="yearControl" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="custom-select">
     <mat-select [placeholder]="'all_clients' | translate" multiple [formControl]="controls.clientsControl" panelClass="filter-multi-selector">
       <mat-select-trigger>
         {{ (numberOfClients | async) + ' ' + ('selected' | translate)   }}
@@ -36,16 +40,38 @@
         <mat-option [value]="clients">{{ clients.name || '' }}</mat-option>
       }
       <div class="filter-multi-selector-scroll">
-      @for (clients of (controls.clients | async); track clients.id) {
+      @for (clients of (controls.clientsAll | async); track clients.id) {
         <mat-option [value]="clients">{{ clients.name || '' }}</mat-option>
       }
+      </div>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="custom-select">
+    <mat-select multiple [formControl]="activeClient" panelClass="filter-multi-selector">
+      <mat-select-trigger>
+        @if(activeClient.value?.length === 0) {
+          {{ 'reportsTable.noCustomers' | translate }}
+        } @else if (activeClient.value?.length === 2) {
+          {{ 'reportsTable.allSelected' | translate }}
+        } @else if (activeClient.value?.includes(true)) {
+          {{ 'reportsTable.customersActive' | translate }}
+        } @else if (activeClient.value?.includes(false)) {
+          {{ 'reportsTable.customersInactive' | translate }}
+        }
+      </mat-select-trigger>
+      <div class="filter-multi-selector-scroll">
+        <mat-option [value]="true">{{ 'reportsTable.customersActive' | translate }}</mat-option>
+        <mat-option [value]="false">{{ 'reportsTable.customersInactive' | translate }}</mat-option>
       </div>
     </mat-select>
   </mat-form-field>
 </div>
 <div class="container">
   <div class="headline-1">
-
+    <button mat-icon-button class="mass-message" (click)="sendToSelected()" [disabled]="!isAnySelected()">
+      <mat-icon>email</mat-icon>
+    </button>
   </div>
   <div class="table-container">
 
@@ -74,7 +100,7 @@
                 {{ 'reportsTable.columns.checkbox' | translate }}
               </th>
               <td mat-cell *matCellDef="let m">
-                <mat-checkbox></mat-checkbox>
+                <mat-checkbox [checked]="selections[m.id]" (change)="setSelection(m, $event.checked)" [disabled]="!m.report"></mat-checkbox>
               </td>
             </ng-container>
 

@@ -74,12 +74,15 @@ export const createReport = (
     monthProfit = TaarifCalculator.calcProfit(system, energyInMonth, tarifs);
   }
 
-  const annualEnergy = DateUtil.GetMonths(date)
+  const monthsForEnergy = DateUtil.GetMonths(date);
+
+  const annualEnergy = monthsForEnergy
     .filter((m) => isAnnual || m.getUTCMonth() <= date.getUTCMonth())
     .map(
       (d) =>
-        systemEnergy?.multiAnnual?.find((e) => DateUtil.IsSameMonth(e.time, d))
-          ?.valueKwh || 0
+        systemEnergy?.multiAnnual?.find((e) =>
+          DateUtil.IsSameMonthUTC(e.time, d)
+        )?.valueKwh || 0
     );
 
   const lastYear = new Date(date.getTime());
@@ -128,10 +131,10 @@ export const createReport = (
       openTime: m.openTime,
       // Hide future close time
       closeTime:
-        +new Date(m.closeTime || 0) <=
+        (+new Date(m.closeTime || 0) <=
         (isAnnual ? DateUtil.EndOfYear(date) : DateUtil.EndOfMonth(date))
           ? m.closeTime
-          : undefined,
+          : undefined) || null,
       type: [malfunctionTypeString(m, malfunctionTypesTree), ''],
       handler: m.handler,
       status: m.status,

@@ -29,6 +29,25 @@
           "destination": "/index.html"
         }
       ]
+    },
+    {
+      "site": "reports-solar-golan",
+      "public": "src/reports",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/temp/**",
+          "destination": "https://storage.googleapis.com/solar-golan.appspot.com/temp/**"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
     }
   ]
 }

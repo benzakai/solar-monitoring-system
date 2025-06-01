@@ -65,12 +65,12 @@ export class AnnualChartComponent implements AfterViewInit {
       colors: ['#039be5', '#70c265', '#000000'],
       series: [
         {
-          name: new Date(this.date).getFullYear(),
+          name: new Date(Number(this.date)).getFullYear(),
           type: 'column',
           data: this.productionPerMonth,
         },
         {
-          name: new Date(this.date).getFullYear() - 1,
+          name: new Date(Number(this.date)).getFullYear() - 1,
           type: 'column',
           data: this.productionPerMonthLastYear,
         },

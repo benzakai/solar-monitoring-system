@@ -50,7 +50,9 @@ body {
   //--mat-form-field-container-text-size: 40px;
 }
 
-
+.cdk-overlay-container mat-form-field {
+  width: calc(100% - 20px);
+}
 
 @include sidenav();
 
@@ -597,4 +599,14 @@ input, textarea {
 mat-sidenav-content.mat-drawer-content {
   display: flex;
   flex-direction: column;
+}
+
+
+.mdc-checkbox__background {
+  background-color: #fff9c4!important;
+  border-width: 1px !important;
+  border-color: #fdd835!important;
+  .mdc-checkbox__checkmark {
+    color: black;
+  }
 }

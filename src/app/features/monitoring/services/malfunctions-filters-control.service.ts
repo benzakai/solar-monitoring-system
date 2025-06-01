@@ -8,13 +8,14 @@ import {
   combineLatest,
   Observable,
   filter,
+  defer,
 } from 'rxjs';
 import { MonitorFacade } from '../../../state/monitor/monitor.facade';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable()
-export class FiltersControlService {
+export class MalfunctionsFiltersControlService {
   monitorFacade = inject(MonitorFacade);
   router = inject(Router);
   route = inject(ActivatedRoute);
@@ -45,9 +46,12 @@ export class FiltersControlService {
       filter((data): data is string[] => Boolean(data))
     );
 
-  systemsControl = new FormControl();
-  systemsControlState = this.systemsControl.valueChanges.pipe(
-    startWith(this.systemsControl.value || [])
+  systemsControl = new FormControl([] as any[]);
+  systemsControlState = defer(() =>
+    this.systemsControl.valueChanges.pipe(
+      startWith(this.systemsControl.value || []),
+      map((value) => value || [])
+    )
   );
   systemsSearchControl = new FormControl();
   systems = combineLatest([
@@ -92,28 +96,6 @@ export class FiltersControlService {
   clientsSearchControl = new FormControl();
   clients = combineLatest([
     this.monitorFacade.clients,
-    this.clientsSearchControl.valueChanges.pipe(startWith(null)),
-    this.clientsControlState,
-  ]).pipe(
-    map(([data, search, selected]) => {
-      let result;
-      if (!search) {
-        result = data;
-      } else {
-        const lowerSearch = search.toLowerCase();
-        result = data.filter((item) => item.fulltext.includes(lowerSearch));
-      }
-
-      const selectedSet: Record<string, any> = {};
-      selected.forEach((item: { id: string }) => {
-        selectedSet[item.id] = true;
-      });
-
-      return result.filter((item) => !selectedSet[item.id]);
-    })
-  );
-  clientsAll = combineLatest([
-    this.monitorFacade.clientsAll,
     this.clientsSearchControl.valueChanges.pipe(startWith(null)),
     this.clientsControlState,
   ]).pipe(
@@ -180,4 +162,37 @@ export class FiltersControlService {
       return result;
     })
   );
+
+  constructor() {
+    this.systemsControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) => {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { sys: (value || []).map((v: any) => v?.id) },
+          queryParamsHandling: 'merge',
+        });
+      });
+
+    combineLatest([
+      this.route.queryParams.pipe(startWith(this.route.snapshot.queryParams)),
+      this.monitorFacade.monitorItemsMap,
+    ])
+      .pipe(takeUntilDestroyed())
+      .subscribe(([params, systems]) => {
+        const v = params['sys'] || [];
+        const urlValue = Array.isArray(v) ? v : [v];
+        const controlValue = (this.systemsControl.value || []).map(
+          (v: any) => v?.id
+        );
+
+        const strUrl = urlValue.sort().join(',');
+        const strVal = controlValue.sort().join(',');
+
+        if (strUrl !== strVal) {
+          const res = urlValue.map((id: string) => systems.get(id));
+          this.systemsControl.setValue(res, { emitEvent: true });
+        }
+      });
+  }
 }

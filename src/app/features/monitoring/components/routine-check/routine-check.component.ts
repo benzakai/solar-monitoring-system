@@ -18,7 +18,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { FiltersControlService } from '../../services/filters-control.service';
-import { RoutineCheckService } from '../../../../endpoint/routine-check.service';
 
 @Component({
   selector: 'app-routine-check',
