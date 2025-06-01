@@ -122,6 +122,7 @@ export class AppComponent implements AfterViewInit {
       malfunctions: 'sidenav.malfunctions',
       'malfunction-edit': 'sidenav.malfunctions',
       'routine-check': 'sidenav.routine_check',
+      users: 'sidenav.users',
     };
     this.title.next(translationKeys[page] || '');
   }

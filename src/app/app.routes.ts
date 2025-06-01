@@ -9,6 +9,7 @@ import { MalfunctionsComponent } from './features/malfunctions/malfunctions/malf
 import { RoutineCheckComponent } from './features/monitoring/components/routine-check/routine-check.component';
 import { ReportsTableComponent } from './features/reports/components/reports-table/reports-table.component';
 import { ReportPreviewComponent } from './features/reports/components/report-preview/report-preview.component';
+import { USERS_ROUTES } from './features/users/users.routes';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -26,5 +27,6 @@ export const routes: Routes = [
   { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
+  { path: 'users', children: USERS_ROUTES },
   { path: '**', redirectTo: 'systems' },
 ];

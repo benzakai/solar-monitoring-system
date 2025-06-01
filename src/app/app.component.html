@@ -25,17 +25,19 @@
               <mat-icon color="yellow">pending_actions</mat-icon>
             </button>
 
-
             <button mat-button color="white" (click)="redirect('malfunctions')">
               {{ 'sidenav.malfunctions' | translate }}
               <mat-icon color="yellow">notifications_active</mat-icon>
             </button>
 
-
-
             <button mat-button color="white" (click)="redirect('reports')">
               {{ 'sidenav.reports' | translate }}
               <mat-icon color="yellow">leaderboard</mat-icon>
+            </button>
+
+            <button mat-button color="white" (click)="redirect('users')">
+              {{ 'sidenav.users' | translate }}
+              <mat-icon color="yellow">people</mat-icon>
             </button>
 
             @if (feature.energyPartitionDaily) {
@@ -54,6 +56,5 @@
       </mat-drawer>
     </mat-sidenav-container>
   }
-
 }
 

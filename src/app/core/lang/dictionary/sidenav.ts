@@ -21,4 +21,8 @@ export const sidenav: Dictionary = {
     he: 'דוחות',
     en: ' Reports ',
   },
+  users: {
+    he: 'ניהול משתמשים',
+    en: 'User Management',
+  },
 };
