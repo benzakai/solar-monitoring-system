@@ -13,6 +13,10 @@ export const sidenav: Dictionary = {
     he: 'ניהול תקלות',
     en: 'Malfunctions',
   },
+  washes: {
+    he: 'ניהול שטיפות',
+    en: 'Washes',
+  },
   routine_check: {
     he: 'בדיקת מערכות שגרתית',
     en: 'Routine Systems Check',

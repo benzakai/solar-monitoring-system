@@ -10,6 +10,7 @@ import { RoutineCheckComponent } from './features/monitoring/components/routine-
 import { ReportsTableComponent } from './features/reports/components/reports-table/reports-table.component';
 import { ReportPreviewComponent } from './features/reports/components/report-preview/report-preview.component';
 import { USERS_ROUTES } from './features/users/users.routes';
+import { WashesComponent } from './features/washes/washes.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -28,5 +29,6 @@ export const routes: Routes = [
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
   { path: 'users', children: USERS_ROUTES },
+  { path: 'washes', component: WashesComponent },
   { path: '**', redirectTo: 'systems' },
 ];
