@@ -28,6 +28,18 @@ export const users: Dictionary = {
       en: 'Administrator',
       he: 'מנהל מערכת',
     },
+    manager: {
+      en: 'Manager',
+      he: 'מנהל',
+    },
+    accountancy: {
+      en: 'Accountancy',
+      he: 'הנהלת חשבונות',
+    },
+    tech: {
+      en: 'Technician',
+      he: 'טכנאי',
+    },
     coordinator: {
       en: 'Coordinator',
       he: 'רכז',

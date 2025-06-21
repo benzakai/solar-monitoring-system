@@ -19,6 +19,7 @@ import localeHe from '@angular/common/locales/he';
 import { registerLocaleData } from '@angular/common';
 import { TranslatePipe } from './app/core/lang/translate.pipe';
 import { provideHttpClient } from '@angular/common/http';
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
 
 registerLocaleData(localeHe);
 
@@ -31,6 +32,7 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()),
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
+    provideFunctions(() => getFunctions(app)),
     provideHttpClient(),
     { provide: MAT_DATE_LOCALE, useValue: 'he' },
     { provide: FIREBASE_OPTIONS, useValue: firebaseConfig },

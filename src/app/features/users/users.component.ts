@@ -8,7 +8,7 @@ import { TranslatePipe } from '../../core/lang/translate.pipe';
 import { UsersService } from '../../endpoint/users.service';
 import { User } from '../../domain/user';
 import { UserRole } from '../../endpoint/users.service';
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
 import { DeleteUserDialogComponent } from './delete-user-dialog/delete-user-dialog.component';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
@@ -16,6 +16,7 @@ import { ToggleStatusDialogComponent } from './toggle-status-dialog/toggle-statu
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 
 @Component({
   selector: 'app-users',
@@ -37,6 +38,7 @@ export class UsersComponent {
   private usersService = inject(UsersService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
+  private functions = inject(Functions);
 
   displayedColumns = [
     'name',
@@ -57,6 +59,12 @@ export class UsersComponent {
     switch (role) {
       case UserRole.ADMIN:
         return 'admin';
+      case UserRole.MANAGER:
+        return 'manager';
+      case UserRole.ACCOUNTANCY:
+        return 'accountancy';
+      case UserRole.TECH:
+        return 'tech';
       case UserRole.COORDINATOR:
         return 'coordinator';
       case UserRole.SIMPLE:
@@ -103,16 +111,12 @@ export class UsersComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
         if (result) {
-          this.usersService
-            .createUser({
-              displayName: result.displayName,
-              email: result.email,
-              role: result.role,
+          from(
+            this.setUser({
+              ...result,
               isActive: true,
-              lastLogin: new Date().toISOString(),
-              phone: '',
             })
-            .subscribe();
+          ).subscribe();
         }
       });
   }
@@ -127,13 +131,13 @@ export class UsersComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
         if (result) {
-          this.usersService
-            .updateUser(user.uid, {
+          from(
+            this.setUser({
+              uid: user.uid,
               displayName: result.displayName,
-              email: result.email,
               role: result.role,
             })
-            .subscribe();
+          ).subscribe();
         }
       });
   }
@@ -145,11 +149,36 @@ export class UsersComponent {
 
     dialogRef
       .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((newPassword) => {
-        if (newPassword) {
-          this.usersService.changePassword(user, newPassword).subscribe();
-        }
-      });
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap((password: string) =>
+          from(
+            this.setUser({
+              uid: user.uid,
+              password,
+            })
+          )
+        )
+      )
+      .subscribe();
+  }
+
+  async setUser(
+    userSettings: Partial<{
+      role: UserRole;
+      isActive: boolean;
+      lastLogin: Date | null;
+      password?: string;
+      displayName: string | null;
+      email: string | null;
+      phoneNumber: string | null;
+      photoURL: string | null;
+      providerId: string;
+      uid: string;
+    }>
+  ) {
+    const setUsers = httpsCallable(this.functions, 'users-setUser');
+    const result = await setUsers(userSettings);
+    return result.data;
   }
 }

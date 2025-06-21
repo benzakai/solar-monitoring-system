@@ -104,7 +104,7 @@
                 @for( wash of systemData?.washesDates; let idx = $index; track idx) {
                   <p>
                     <span>#{{idx + 1}}</span><br>
-                    <span>{{wash | date: 'short' }}</span>
+                    <span>{{wash | date: 'dd/MM/yy' }}</span>
                   </p>
                 }
 

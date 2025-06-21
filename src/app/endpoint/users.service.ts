@@ -22,8 +22,11 @@ import {
 
 export enum UserRole {
   ADMIN = '1admin',
+  MANAGER = '2manager',
+  ACCOUNTANCY = '3accountancy',
+  TECH = '3tech',
   COORDINATOR = '3coordinator',
-  SIMPLE = '5simple',
+  SIMPLE = '4simple'
 }
 
 @Injectable({

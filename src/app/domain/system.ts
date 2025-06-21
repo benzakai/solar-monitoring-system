@@ -20,4 +20,5 @@ export interface System {
   lastConnectionTime?: string;
   comments: string | null;
   contactsIds: string[];
+  contract: string;
 }

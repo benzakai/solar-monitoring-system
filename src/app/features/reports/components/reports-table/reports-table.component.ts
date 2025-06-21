@@ -518,16 +518,22 @@ export class ReportsTableComponent {
       .pipe(
         switchMap((date) => {
           const dateOfFirstDay: Date = alignDateToReport(date);
-          return forkJoin(
-            systems.map((s) =>
-              this.createReportFromSystem(
-                s.id,
-                dateOfFirstDay,
-                isAnnual,
-                comment
-              )
-            )
+          const systemsWithContracts = systems.filter((s) =>
+            Boolean(s.contract)
           );
+
+          return systemsWithContracts.length
+            ? forkJoin(
+                systemsWithContracts.map((s) =>
+                  this.createReportFromSystem(
+                    s.id,
+                    dateOfFirstDay,
+                    isAnnual,
+                    comment
+                  )
+                )
+              )
+            : of([]);
         })
       )
       .subscribe(() => {
