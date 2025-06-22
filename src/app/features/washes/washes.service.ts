@@ -95,4 +95,56 @@ export class WashesService {
       })
     );
   }
+
+  updateWashComment(systemId: string, comment: string) {
+    const washRef = doc(this.firestore, 'washes', systemId);
+    return from(
+      runTransaction(this.firestore, async (transaction) => {
+        const washDoc = await transaction.get(washRef);
+        if (!washDoc.exists()) {
+          return;
+        }
+
+        const washes: WashData[] = (washDoc.data() as any).washes || [];
+        if (washes.length === 0) {
+          return;
+        }
+
+        const lastWash = washes[washes.length - 1];
+        const updatedWash = { ...lastWash, comment };
+
+        const newWashes = washes.slice(0, washes.length - 1);
+
+        transaction.update(washRef, {
+          washes: [...newWashes, updatedWash],
+        });
+      })
+    );
+  }
+
+  updateWashDone(systemId: string, washDone: boolean) {
+    const washRef = doc(this.firestore, 'washes', systemId);
+    return from(
+      runTransaction(this.firestore, async (transaction) => {
+        const washDoc = await transaction.get(washRef);
+        if (!washDoc.exists()) {
+          return;
+        }
+
+        const washes: WashData[] = (washDoc.data() as any).washes || [];
+        if (washes.length === 0) {
+          return;
+        }
+
+        const lastWash = washes[washes.length - 1];
+        const updatedWash = { ...lastWash, washDone };
+
+        const newWashes = washes.slice(0, washes.length - 1);
+
+        transaction.update(washRef, {
+          washes: [...newWashes, updatedWash],
+        });
+      })
+    );
+  }
 }

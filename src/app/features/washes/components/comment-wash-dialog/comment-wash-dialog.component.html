@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h1>
+    {{ 'washes.editComment' | translate }}: {{ data.washRow.name }}
+  </h1>
+</h2>
+<mat-dialog-content [formGroup]="form">
+
+
+  <div class="form-line area">
+    <mat-form-field appearance="outline">
+        <textarea
+          matInput
+          [placeholder]="'washes.comment' | translate"
+          formControlName="comment"
+          rows="5"
+        ></textarea
+        >
+    </mat-form-field>
+  </div>
+
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-flat-button color="primary" (click)="save()">
+    {{ 'save' | translate }}
+  </button>
+</mat-dialog-actions>

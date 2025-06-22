@@ -144,7 +144,11 @@
       <ng-container matColumnDef="washDone">
         <th mat-header-cell *matHeaderCellDef> {{ '' | translate }} </th>
         <td mat-cell *matCellDef="let element">
-          <mat-checkbox [checked]="element.washDone" [disabled]="!element.nextWash"></mat-checkbox>
+          <mat-checkbox
+            [checked]="element.washDone"
+            [disabled]="!element.nextWash"
+            (change)="toggleWashDone(element, $event.checked)"
+          ></mat-checkbox>
         </td>
       </ng-container>
 
@@ -203,7 +207,7 @@
         <th mat-header-cell *matHeaderCellDef> {{ 'washes.comment' | translate }} </th>
         <td mat-cell *matCellDef="let element">
           @if(element.lastWash) {
-            <button mat-icon-button>
+            <button mat-icon-button (click)="editComment(element)">
               <mat-icon>{{element.lastWash.comment ? 'error' : 'error_outline'}}</mat-icon>
             </button>
           }

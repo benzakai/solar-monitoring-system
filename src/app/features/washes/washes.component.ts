@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -34,6 +35,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-dialog.component';
 import { EditWashDialogComponent } from './components/edit-wash-dialog/edit-wash-dialog.component';
+import { CommentWashDialogComponent } from './components/comment-wash-dialog/comment-wash-dialog.component';
 
 @Component({
   selector: 'app-washes',
@@ -59,6 +61,7 @@ import { EditWashDialogComponent } from './components/edit-wash-dialog/edit-wash
     MatCheckbox,
     AddWashDialogComponent,
     EditWashDialogComponent,
+    CommentWashDialogComponent,
   ],
   templateUrl: './washes.component.html',
   styleUrl: './washes.component.scss',
@@ -71,6 +74,7 @@ export class WashesComponent implements OnInit {
   energyService = inject(EnergyService);
   dialog = inject(MatDialog);
 
+  cdf = inject(ChangeDetectorRef);
   destroyRef = inject(DestroyRef);
 
   activeSort = new BehaviorSubject({
@@ -192,7 +196,10 @@ export class WashesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.sortedRows.subscribe((rows) => (this.dataSource.data = rows));
+    this.sortedRows.subscribe((rows) => {
+      this.dataSource.data = rows;
+      this.cdf.markForCheck();
+    });
   }
 
   trackTable(index: number, item: WashRow) {
@@ -211,6 +218,9 @@ export class WashesComponent implements OnInit {
       data: {
         washRow,
       },
+
+      width: '800px',
+      maxWidth: '90vw',
     });
   }
 
@@ -219,7 +229,25 @@ export class WashesComponent implements OnInit {
       data: {
         washRow,
       },
+
+      width: '800px',
+      maxWidth: '90vw',
     });
+  }
+
+  editComment(washRow: WashRow) {
+    this.dialog.open(CommentWashDialogComponent, {
+      data: {
+        washRow,
+      },
+      width: '800px',
+      panelClass: 'ytong',
+      maxWidth: '90vw',
+    });
+  }
+
+  toggleWashDone(washRow: WashRow, washDone: boolean) {
+    this.washesService.updateWashDone(washRow.system.id, washDone).subscribe();
   }
 
   washTypes: any = {

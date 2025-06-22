@@ -77,4 +77,8 @@ export const washes: Dictionary = {
     en: 'Edit Wash',
     he: 'עריכת שטיפה',
   },
+  editComment: {
+    en: 'Edit Comment',
+    he: 'עריכת הערה',
+  },
 };

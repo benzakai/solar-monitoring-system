@@ -21,7 +21,7 @@ import {
   MatDatepickerModule,
   MatDatepickerToggle,
 } from '@angular/material/datepicker';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import {
   FormBuilder,
   FormGroup,
@@ -31,6 +31,7 @@ import {
 import { WashesService } from '../../washes.service';
 import { WashRow } from '../../WashRow';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-add-wash-dialog',
@@ -52,6 +53,8 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     MatDatepickerModule,
     MatInputModule,
     MatError,
+    MatIcon,
+    MatIconButton,
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-wash-dialog.component.html',
