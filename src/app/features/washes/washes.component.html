@@ -134,7 +134,7 @@
           ></app-sort-header>
           {{ 'washes.lastWashDate' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" (click)="editWash(element)">
           <a class="link" href="javascript:void(0)">
             {{element.lastWashDate ? (element.lastWashDate | date:'dd/MM/yyyy') : ''}}
           </a>
@@ -187,7 +187,9 @@
           ></app-sort-header>
           {{ 'washes.supplier' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element"> <a class="link" href="javascript:void(0)">{{element.lastWash?.supplier || ''}}</a> </td>
+        <td mat-cell *matCellDef="let element" (click)="editWash(element)">
+          <a class="link" href="javascript:void(0)">{{element.lastWash?.supplier || ''}}</a>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="numOfWashes">

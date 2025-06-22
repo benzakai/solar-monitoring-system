@@ -9,15 +9,24 @@ import {
   updateDoc,
 } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
+import { SystemWash } from '../../domain/system-wash';
 
 export interface Wash {
   id: string;
   last_wash_date: number;
   comment?: string;
-  washes?: any[];
+  washes?: WashData[];
   nextWash?: number;
   supplier?: string;
   numOfWashes?: number;
+}
+
+export interface WashData {
+  date: any;
+  supplier: string;
+  price: number;
+  comment?: string;
+  nextWash?: any;
 }
 
 @Injectable({
@@ -26,10 +35,10 @@ export interface Wash {
 export class WashesService {
   private firestore: Firestore = inject(Firestore);
 
-  getWashes(): Observable<Wash[]> {
+  getWashes(): Observable<SystemWash[]> {
     const washesCollection = collection(this.firestore, 'washes');
     return collectionData(washesCollection, { idField: 'id' }) as Observable<
-      Wash[]
+      SystemWash[]
     >;
   }
 
@@ -51,6 +60,37 @@ export class WashesService {
 
         transaction.update(washRef, {
           washes: [...washes, newWash],
+        });
+      })
+    );
+  }
+
+  updateWash(systemId: string, wash: WashData) {
+    const washRef = doc(this.firestore, 'washes', systemId);
+    return from(
+      runTransaction(this.firestore, async (transaction) => {
+        const washDoc = await transaction.get(washRef);
+        if (!washDoc.exists()) {
+          return;
+        }
+
+        const washes: WashData[] = (washDoc.data() as any).washes || [];
+        if (washes.length === 0) {
+          return;
+        }
+
+        const newWash = {
+          ...wash,
+          date: Timestamp.fromDate(new Date(wash.date)),
+          nextWash: wash.nextWash
+            ? Timestamp.fromDate(new Date(wash.nextWash))
+            : null,
+        };
+
+        const newWashes = washes.slice(0, washes.length - 1);
+
+        transaction.update(washRef, {
+          washes: [...newWashes, newWash],
         });
       })
     );

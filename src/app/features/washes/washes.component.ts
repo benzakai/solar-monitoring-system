@@ -33,6 +33,7 @@ import { EnergyService } from '../../endpoint/energy.service';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-dialog.component';
+import { EditWashDialogComponent } from './components/edit-wash-dialog/edit-wash-dialog.component';
 
 @Component({
   selector: 'app-washes',
@@ -56,6 +57,8 @@ import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-di
     MatProgressSpinnerModule,
     DatePipe,
     MatCheckbox,
+    AddWashDialogComponent,
+    EditWashDialogComponent,
   ],
   templateUrl: './washes.component.html',
   styleUrl: './washes.component.scss',
@@ -205,6 +208,14 @@ export class WashesComponent implements OnInit {
 
   addWash(washRow: WashRow) {
     this.dialog.open(AddWashDialogComponent, {
+      data: {
+        washRow,
+      },
+    });
+  }
+
+  editWash(washRow: WashRow) {
+    this.dialog.open(EditWashDialogComponent, {
       data: {
         washRow,
       },

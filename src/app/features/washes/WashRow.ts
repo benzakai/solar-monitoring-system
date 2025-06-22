@@ -1,12 +1,6 @@
 import { MonitorItem } from '../../domain/monitor-item';
-import { Wash } from './washes.service';
 import { DateUtil } from '../../core/date/DateUtil';
-import { Energy } from '../../domain/energy';
-import { DestroyRef } from '@angular/core';
-import { last, Observable } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EnergyCalc } from '../../core/energy/energy-calculator';
-import { TaarifCalculator } from '../../core/energy/taarif-calculator';
+import { SystemWash, Wash } from '../../domain/system-wash';
 
 export class WashRow {
   id: string;
@@ -31,7 +25,7 @@ export class WashRow {
 
   constructor(
     public system: MonitorItem,
-    public wash: Wash | undefined
+    public systemWash: SystemWash | undefined
   ) {
     this.id = system.id;
     this.name = system.system_name;
@@ -46,20 +40,13 @@ export class WashRow {
       ? Math.round(this.potentialRate * 100) + '%'
       : '';
 
-    if (wash) {
-      this.nextWash = wash.nextWash;
-      this.supplier = wash.supplier;
-      this.numOfWashes = wash.washes?.length ?? 0;
-      if (wash.last_wash_date) {
-        this.sinceLastWash = DateUtil.DaysFromToday(
-          new Date(wash.last_wash_date * 1000)
-        );
-      }
-
-      if (wash?.washes?.length) {
-        this.lastWash = wash?.washes.sort((a, b) => b.date - a.date)[0];
+    if (systemWash) {
+      this.numOfWashes = systemWash.washes?.length ?? 0;
+      if (systemWash?.washes?.length) {
+        this.lastWash = systemWash?.washes.sort((a, b) => b.date - a.date)[0];
         this.lastWashDate = (this.lastWash as any).date;
         this.washDone = Boolean((this.lastWash as any).done);
+        this.supplier = this.lastWash.supplier;
         this.nextWash = this.lastWash?.nextWash;
         if (this.lastWashDate) {
           this.daysFromLast = DateUtil.DaysFromToday(this.lastWashDate);

@@ -73,4 +73,8 @@ export const washes: Dictionary = {
     en: 'Type',
     he: 'סוג חוזה שטיפות',
   },
+  editWash: {
+    en: 'Edit Wash',
+    he: 'עריכת שטיפה',
+  },
 };

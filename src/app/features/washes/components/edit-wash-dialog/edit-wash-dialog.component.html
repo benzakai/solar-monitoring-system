@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ 'washes.editWash' | translate }}: {{ data.washRow.name }}</h2>
+<mat-dialog-content [formGroup]="form">
+  <div class="content">
+    <div class="form-line">
+      <mat-label>{{ 'washes.lastWashDate' | translate }}</mat-label>
+      <mat-form-field appearance="outline">
+        <input matInput [matDatepicker]="picker" formControlName="date">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-line">
+      <mat-label>{{ 'washes.nextWash' | translate }}</mat-label>
+      <mat-form-field appearance="outline">
+        <input matInput [matDatepicker]="nextPicker" formControlName="nextWash">
+        <mat-datepicker-toggle matIconSuffix [for]="nextPicker"></mat-datepicker-toggle>
+        <mat-datepicker #nextPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-line">
+      <mat-label>{{ 'washes.supplier' | translate }}</mat-label>
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="supplier">
+      </mat-form-field>
+    </div>
+
+    <div class="form-line">
+      <mat-label>{{ 'washes.washRate' | translate }}</mat-label>
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="price" type="number">
+      </mat-form-field>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="undefined" class="cancel-button">{{ 'cancel' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="save()">{{ 'save' | translate }}</button>
+</mat-dialog-actions> 
