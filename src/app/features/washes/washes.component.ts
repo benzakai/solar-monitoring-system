@@ -31,6 +31,8 @@ import { SystemsWashService } from './systems-wash.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EnergyService } from '../../endpoint/energy.service';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-dialog.component';
 
 @Component({
   selector: 'app-washes',
@@ -64,6 +66,7 @@ export class WashesComponent implements OnInit {
   monitorFacade = inject(MonitorFacade);
   systemsWashService = inject(SystemsWashService);
   energyService = inject(EnergyService);
+  dialog = inject(MatDialog);
 
   destroyRef = inject(DestroyRef);
 
@@ -197,6 +200,14 @@ export class WashesComponent implements OnInit {
     this.activeSort.next({
       sortDirection: sortState.direction,
       sortField: sortState.active,
+    });
+  }
+
+  addWash(washRow: WashRow) {
+    this.dialog.open(AddWashDialogComponent, {
+      data: {
+        washRow,
+      },
     });
   }
 

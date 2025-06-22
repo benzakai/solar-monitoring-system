@@ -1,6 +1,14 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, collectionData, Firestore } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import {
+  collection,
+  collectionData,
+  doc,
+  Firestore,
+  runTransaction,
+  Timestamp,
+  updateDoc,
+} from '@angular/fire/firestore';
+import { from, Observable } from 'rxjs';
 
 export interface Wash {
   id: string;
@@ -24,4 +32,27 @@ export class WashesService {
       Wash[]
     >;
   }
-} 
+
+  addWash(systemId: string, wash: { date: any; supplier: any; price: any }) {
+    const washRef = doc(this.firestore, 'washes', systemId);
+
+    return from(
+      runTransaction(this.firestore, async (transaction) => {
+        const washDoc = await transaction.get(washRef);
+        if (!washDoc.exists()) {
+          return;
+        }
+
+        const washes = (washDoc.data() as any).washes || [];
+        const newWash = {
+          ...wash,
+          date: Timestamp.fromDate(new Date(wash.date)),
+        };
+
+        transaction.update(washRef, {
+          washes: [...washes, newWash],
+        });
+      })
+    );
+  }
+}

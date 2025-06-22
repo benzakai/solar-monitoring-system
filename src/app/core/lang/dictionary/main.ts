@@ -145,7 +145,14 @@ export const mainLang: Dictionary = {
     en: 'Inactive',
     he: 'לא פעיל',
   },
-
+  save: {
+    en: 'Save',
+    he: 'שמור',
+  },
+  cancel: {
+    en: 'Cancel',
+    he: 'בטל',
+  },
   region_select_all: {
     en: 'Select all',
     he: 'בחר ',
@@ -202,7 +209,6 @@ export const mainLang: Dictionary = {
     en: 'South',
     he: 'דרום',
   },
-
   tag_select_all: {
     en: 'Select All',
     he: 'בחר הכל',
