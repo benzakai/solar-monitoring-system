@@ -127,12 +127,52 @@ export class WashesComponent implements OnInit {
       [...rows].sort((a, b) => {
         const isAsc = sorts.sortDirection === 1;
         switch (sorts.sortField) {
+          case 'clientName':
+            return this.compare(a.clientName, b.clientName, isAsc);
+          case 'name':
+            return this.compare(a.name, b.name, isAsc);
+          case 'washType':
+            return this.compare(
+              a.system.washType || 0,
+              b.system.washType || 0,
+              isAsc
+            );
+          case 'KWP':
+            return this.compare(a.system.kwp, b.system.kwp, isAsc);
+          case 'potential':
+            return this.compare(a.potential, b.potential, isAsc);
+          case 'week1':
+            return this.compare(
+              a.system.past1Week || 0,
+              b.system.past1Week || 0,
+              isAsc
+            );
+          case 'week2':
+            return this.compare(
+              a.system.past2Week || 0,
+              b.system.past2Week || 0,
+              isAsc
+            );
+          case 'week3':
+            return this.compare(
+              a.system.past3Week || 0,
+              b.system.past3Week || 0,
+              isAsc
+            );
+          case 'washRate':
+            return this.compare(a.washRate, b.washRate, isAsc);
+          case 'sinceLastWash':
+            return this.compare(a.sinceLastWash, b.sinceLastWash, isAsc);
           case 'lastWashDate':
             return this.compare(
               a.lastWashDate || 0,
               b.lastWashDate || 0,
               isAsc
             );
+          case 'nextWash':
+            return this.compare(a.nextWash || 0, b.nextWash || 0, isAsc);
+          case 'supplier':
+            return this.compare(a.supplier, b.supplier, isAsc);
           default:
             return 0;
         }

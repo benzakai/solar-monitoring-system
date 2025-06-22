@@ -7,34 +7,69 @@
       matSort
     >
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.systemName' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="name"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.systemName' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           <a class="link" href="javascript:void(0)">{{ element.name }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="clientName">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.clientName' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="clientName"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.clientName' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           <a class="link" href="javascript:void(0)">{{ element.clientName }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="washType">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.washType' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="washType"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.washType' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           {{washTypes[element.system.washType]}}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="KWP">
-        <th mat-header-cell *matHeaderCellDef> {{ 'kWp' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="KWP"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'kWp' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           {{element.KWP | number:'1.0-0'}}</td>
       </ng-container>
 
       <ng-container matColumnDef="washRate">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.washRate' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="washRate"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.washRate' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           ₪
           {{(element.system.washRate || 0) | number:'1.2-2'}}
@@ -42,23 +77,51 @@
       </ng-container>
 
       <ng-container matColumnDef="week1">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.week1' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="week1"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.week1' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element"> {{element.system.past1Week | number:'1.2-2'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="week2">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.week2' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="week2"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.week2' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element"> {{element.system.past2Week | number:'1.2-2'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="week3">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.week3' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="week3"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.week3' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element"> {{element.system.past3Week | number:'1.2-2'}} </td>
       </ng-container>
 
 
       <ng-container matColumnDef="sinceLastWash">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.sinceLastWash' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="sinceLastWash"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.sinceLastWash' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element" style="font-weight: bold;"> {{element.daysFromLast ?? ''}} </td>
       </ng-container>
 
@@ -86,14 +149,28 @@
       </ng-container>
 
       <ng-container matColumnDef="potential">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.potentialRate' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="potential"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.potentialRate' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           {{ element.potential || '' }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="nextWash">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.nextWash' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="nextWash"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.nextWash' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element">
           <a class="link" href="javascript:void(0)">
             {{element.nextWash ? (element.nextWash | date:'dd/MM/yyyy') : ''}}
@@ -102,7 +179,14 @@
       </ng-container>
 
       <ng-container matColumnDef="supplier">
-        <th mat-header-cell *matHeaderCellDef> {{ 'washes.supplier' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header
+            [active]="sortParams | async"
+            column="supplier"
+            (onSort)="onSort($event)"
+          ></app-sort-header>
+          {{ 'washes.supplier' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element"> <a class="link" href="javascript:void(0)">{{element.lastWash?.supplier || ''}}</a> </td>
       </ng-container>
 
