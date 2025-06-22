@@ -14,6 +14,7 @@ export interface MonitorItem {
   system_name: string;
   today_comparable: number;
   last_month_average: number;
+  weekly_average: number;
   three_days_comparable: number;
   yesterday_comparable: number;
   system_active: boolean;
@@ -34,4 +35,13 @@ export interface MonitorItem {
   yesterday_percent: number;
   lastCheck?: Check;
   lastUpdated?: number;
+
+  washControl: boolean;
+  washRate: number;
+  washType: number;
+
+  past1Week: number;
+  past2Week: number;
+  past3Week: number;
+  potential: number;
 }

@@ -521,6 +521,15 @@ button.mat-flat-button {
     top: -40px;
   }
 
+  &.header80 {
+    thead {
+      top: -80px;
+      tr {
+        height: 75px;
+      }
+    }
+  }
+
   tr {
     display: table;
     width: 100%;

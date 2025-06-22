@@ -9,6 +9,7 @@ import { sidenav } from './dictionary/sidenav';
 import { malfunction } from './dictionary/malfunction';
 import { reportsTable } from './dictionary/reports-table';
 import { users } from './dictionary/users';
+import { washes } from './dictionary/washes';
 
 export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
   new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
@@ -24,4 +25,5 @@ export const language: Dictionary = {
   malfunction,
   reportsTable,
   users,
+  washes,
 };

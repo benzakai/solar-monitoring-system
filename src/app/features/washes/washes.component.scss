@@ -8,7 +8,7 @@
 
 .table-container {
 
-  margin-top: 40px;
+  margin-top: 80px;
   display: flex;
   flex-direction: column;
   flex: 1 1 1px;
@@ -29,6 +29,9 @@ table {
   flex-direction: column;
   flex: 1 1 1px;
   position: relative;
+
+
+
 }
 .icon-right {
 
@@ -40,12 +43,12 @@ th {
   overflow: visible;
   .description {
     position: absolute;
-    top: -40px;
+    top: -80px;
     display: flex;
     white-space: nowrap;
     padding: 0 10px;
     align-items: center;
-    height: 40px;
+    height: 80px;
 
     &:not(.empty):before {
       content: " ";
@@ -110,5 +113,34 @@ mat-progress-spinner.comment {
   background-color: #4caf50!important;
   mat-icon {
     margin: auto;
+  }
+}
+
+.mat-mdc-checkbox-disabled {
+  opacity: 0.5;
+  ::ng-deep .mdc-checkbox__background {
+    background-color: #f0f0f0!important;
+    border-color: #d1d1d1!important;
+  }
+}
+
+.mat-column {
+  &-addWash { width: 60px; }
+  &-comment { width: 60px; }
+  &-numOfWashes { width: 60px; }
+  &-washDone { width: 60px; }
+  &-supplier { width: 60px; }
+  &-nextWash { width: 100px; }
+  &-lastWashDate { width: 100px; }
+  &-sinceLastWash { width: 60px; }
+  &-week3 { width: 60px; }
+  &-week2 { width: 60px; }
+  &-week1 { width: 60px; }
+  &-potential { width: 60px; }
+  &-washRate { width: 80px; }
+  &-KWP { width: 60px; }
+  &-washType { width: 80px; }
+  &-clientName {
+    text-align: right!important;
   }
 }
