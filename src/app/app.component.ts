@@ -123,6 +123,7 @@ export class AppComponent implements AfterViewInit {
       'malfunction-edit': 'sidenav.malfunctions',
       'routine-check': 'sidenav.routine_check',
       users: 'sidenav.users',
+      'system-settings': 'sidenav.system_settings',
     };
     this.title.next(translationKeys[page] || '');
   }

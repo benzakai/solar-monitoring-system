@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Inject,
   inject,
 } from '@angular/core';
 import {
@@ -53,6 +54,9 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { EnergyService } from '../../../endpoint/energy.service';
 import { EnergyCalc } from '../../../core/energy/energy-calculator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { DialogService } from '../../../core/dialog/services/dialog.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../../core/dialog/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-malfunciton-edit',
@@ -77,6 +81,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     NgForOf,
     MatProgressSpinner,
   ],
+  providers: [DialogService],
   templateUrl: './malfunciton-edit.component.html',
   styleUrl: './malfunciton-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -97,6 +102,8 @@ export class MalfuncitonEditComponent {
     filter(Boolean)
   );
 
+  dialogService = inject(DialogService);
+  translatePipe = new TranslatePipe();
   currentUserId = this.auth.user.pipe(
     filter(Boolean),
     map((user) => user.uid)
@@ -218,6 +225,8 @@ export class MalfuncitonEditComponent {
   }
 
   save(options?: { reopen?: boolean; close?: Date }) {
+    const dial = this.dialogService;
+    const loader = this.dialogService.loader();
     this.form?.markAllAsTouched();
     if (this.form?.valid) {
       this.malfunction
@@ -275,12 +284,17 @@ export class MalfuncitonEditComponent {
             };
           }
 
-          console.log('SAVE', result);
-
           this.afs
             .collection('malfunctions')
             .doc(this.activatedRoute.snapshot.params['id'])
-            .update(result);
+            .update(result)
+            .then(() => {
+              loader.close();
+              dial.confirm({
+                message: this.translatePipe.transform('malfunction.dataSaved'),
+                displayCancel: false,
+              });
+            });
         });
     }
   }

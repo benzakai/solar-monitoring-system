@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>בחירת מיקום</h1>
+
+<div mat-dialog-content class="dialog-content">
+  <!-- Search Box -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>חיפוש מקום</mat-label>
+      <input matInput 
+             #searchInput
+             placeholder="הקלד כתובת או שם מקום"
+             (input)="onSearchInputChange()">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Map Container -->
+  <div class="map-container">
+    <div #map class="map"></div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <p>
+      <mat-icon>info</mat-icon>
+      לחץ על המפה או גרור את הסמן לבחירת מיקום
+    </p>
+  </div>
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="cancel()">ביטול</button>
+  <button mat-flat-button 
+          color="primary" 
+          (click)="save()"
+          [disabled]="!hasChanges()">
+    שמירה
+  </button>
+</div> 

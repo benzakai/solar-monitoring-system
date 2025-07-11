@@ -154,9 +154,11 @@
             {{ 'malfunction.list.tracingDate' | translate }}
           </th>
           <td mat-cell *matCellDef="let m">
-            <Span [attr.class]="alertClass(m.tracingTime)">{{
-              m.tracingTime | date: 'dd/MM/yyyy'
-            }}</Span>
+
+            <span [attr.class]="alertClass(m.tracingTime)">{{
+                m.tracingTime ? (m.tracingTime | date: 'dd/MM/yyyy') : ''
+
+            }}</span>
           </td>
         </ng-container>
 
@@ -246,7 +248,7 @@
             {{ 'malfunction.list.portal' | translate }}
           </th>
           <td mat-cell *matCellDef="let m">
-            <a class="link" (click)="navigateToSystemApi(m?.system?.portal)" href="javascript:void(0)">{{ m?.system?.portal }}</a></td>
+            <a class="link" (click)="navigateToSystemApi(m?.system?.id)" href="javascript:void(0)">{{ m?.system?.portal }}</a></td>
         </ng-container>
 
         <ng-container matColumnDef="systemName">

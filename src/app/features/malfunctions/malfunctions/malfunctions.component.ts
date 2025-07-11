@@ -429,7 +429,7 @@ export class MalfunctionsComponent {
   }
 
   alertClass(date: any) {
-    const daysPassed = DateUtil.DaysFromToday(date);
+    const daysPassed = date ? DateUtil.DaysFromToday(date) : -1;
     if (daysPassed > 0) {
       return 'alert-3';
     } else if (daysPassed === 0) {

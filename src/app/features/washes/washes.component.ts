@@ -36,6 +36,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-dialog.component';
 import { EditWashDialogComponent } from './components/edit-wash-dialog/edit-wash-dialog.component';
 import { CommentWashDialogComponent } from './components/comment-wash-dialog/comment-wash-dialog.component';
+import { WashesFiltersComponent } from './components/washes-filters/washes-filters.component';
+import { FiltersControlService } from '../monitoring/services/filters-control.service';
+import { MonitorItem } from '../../domain/monitor-item';
+import { RoutingService } from '../../core/routing/routing.service';
 
 @Component({
   selector: 'app-washes',
@@ -62,8 +66,10 @@ import { CommentWashDialogComponent } from './components/comment-wash-dialog/com
     AddWashDialogComponent,
     EditWashDialogComponent,
     CommentWashDialogComponent,
+    WashesFiltersComponent,
   ],
   templateUrl: './washes.component.html',
+  providers: [FiltersControlService],
   styleUrl: './washes.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -73,10 +79,10 @@ export class WashesComponent implements OnInit {
   systemsWashService = inject(SystemsWashService);
   energyService = inject(EnergyService);
   dialog = inject(MatDialog);
-
+  filtersControls = inject(FiltersControlService);
   cdf = inject(ChangeDetectorRef);
   destroyRef = inject(DestroyRef);
-
+  routingService = inject(RoutingService);
   activeSort = new BehaviorSubject({
     sortField: 'lastWashDate',
     sortDirection: 'desc',
@@ -104,6 +110,7 @@ export class WashesComponent implements OnInit {
     'week2',
     'week1',
     'potential',
+    'portal',
     'washRate',
 
     'KWP',
@@ -132,7 +139,45 @@ export class WashesComponent implements OnInit {
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
-  sortedRows = combineLatest([this.washesRows, this.sortParams]).pipe(
+  washesFiltered = combineLatest([
+    this.filtersControls.systemsControlStateMap,
+    this.filtersControls.clientsControlStateMap,
+    this.filtersControls.contractsControlState,
+    this.washesRows,
+  ]).pipe(
+    map(([systems, clients, contracts, data]) => {
+      const filters: Array<(item: WashRow) => boolean> = [];
+
+      if (Object.keys(systems).length) {
+        filters.push((item) => systems[item.system.id]);
+      }
+
+      if (Object.keys(clients).length) {
+        filters.push((item) =>
+          Boolean(item.system.client?.id && clients[item.system.client.id])
+        );
+      }
+
+      const contractsMap: { [key: string]: boolean } = (contracts || []).reduce(
+        (acc, item) =>
+          Object.assign(acc, { [item === 'no_contract' ? '' : item]: true }),
+        {}
+      );
+
+      if (contracts?.length) {
+        filters.push((item) => contractsMap[item.system.contract]);
+      }
+
+      return data.filter((item) => filters.every((filter) => filter(item)));
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  navigateToSystemApi(systemId: string) {
+    this.routingService.navigateToSystemApi(systemId);
+  }
+
+  sortedRows = combineLatest([this.washesFiltered, this.sortParams]).pipe(
     map(([rows, sorts]) =>
       [...rows].sort((a, b) => {
         const isAsc = sorts.sortDirection === 1;

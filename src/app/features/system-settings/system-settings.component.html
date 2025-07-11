@@ -1,0 +1,410 @@
+@if (system$ | async; as system) {
+  <form [formGroup]="form">
+    <!-- Header with system name -->
+    <div class="header-section">
+      <div class="system-name-field">
+        <label>{{ 'system_settings.system_name' | translate }}:</label>
+        <mat-form-field appearance="outline">
+          <input matInput formControlName="name" />
+          @if (isFieldInvalid('name')) {
+            <mat-error>{{ getFieldError('name') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Main content with 3-column cards layout -->
+    <div class="main-section">
+      <!-- Card 1: Location with Map (left) -->
+      <mat-card id="loc-card">
+        <mat-card-header class="card-header">
+          <mat-card-title>{{ 'system_settings.location' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="location-input">
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="location" placeholder="הזן כתובת או בחר במפה" />
+              @if (isFieldInvalid('location')) {
+                <mat-error>{{ getFieldError('location') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div #map id="map" style="height: 300px; width: 100%;"></div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 2: Client Information (center) -->
+      <mat-card id="contact-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'system_settings.client_info' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="client-info">
+            <div class="info-field">
+              <label>{{ 'system_settings.client_name' | translate }}</label>
+              <mat-form-field appearance="outline">
+                <input matInput [value]="system?.client?.name || 'אין לקוח'" disabled />
+              </mat-form-field>
+            </div>
+
+            <div class="info-field">
+              <label>{{ 'system_settings.contract' | translate }}</label>
+              <mat-form-field appearance="outline">
+                <input matInput [value]="system?.contract || 'month'" disabled />
+              </mat-form-field>
+            </div>
+
+            <div class="info-field">
+              <label>חוזה נוסף</label>
+              <mat-form-field appearance="outline">
+                <input matInput formControlName="additionalContract" />
+              </mat-form-field>
+            </div>
+
+            <div class="info-field">
+              <label>תחילת חוזה</label>
+              <mat-form-field appearance="outline">
+                <input matInput [matDatepicker]="contractStartPicker" formControlName="contractStartTime" />
+                <mat-datepicker-toggle matSuffix [for]="contractStartPicker"></mat-datepicker-toggle>
+                <mat-datepicker #contractStartPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="info-field">
+              <label>בדיקה שנתית</label>
+              <mat-form-field appearance="outline">
+                <input matInput [matDatepicker]="annualCheckPicker" formControlName="annualCheckDate" />
+                <mat-datepicker-toggle matSuffix [for]="annualCheckPicker"></mat-datepicker-toggle>
+                <mat-datepicker #annualCheckPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="info-field">
+              <label>מערכת פעילה</label>
+              <mat-checkbox formControlName="isActive">כן</mat-checkbox>
+            </div>
+
+            <div class="contract-status">
+              <p><strong>בדיקה אחרונה:</strong><br>
+                <span>{{ system?.lastConnectionTime ? (system.lastConnectionTime | date:'short') : 'לא בוצעה' }}</span>
+              </p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 3: System Details (right) -->
+      <mat-card id="det-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'system_settings.basic_info' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="system-details">
+            <div class="details-column">
+              <div class="form-field">
+                <label>{{ 'system_settings.portal_type' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="type" (selectionChange)="onTypeChange()">
+                    @for (type of systemTypes; track type) {
+                      <mat-option [value]="type">
+                        {{ systemTypeDict[type] }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  @if (isFieldInvalid('type')) {
+                    <mat-error>{{ getFieldError('type') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="KWP" />
+                  <span matSuffix>KW</span>
+                  <mat-error *ngIf="isFieldInvalid('KWP')">{{ getFieldError('KWP') }}</mat-error>
+                </mat-form-field>
+                <label>{{ 'system_settings.kwp' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="power" />
+                  <span matSuffix>KW</span>
+                  <mat-error *ngIf="isFieldInvalid('power')">{{ getFieldError('power') }}</mat-error>
+                </mat-form-field>
+                <label>{{ 'system_settings.power' | translate }}</label>
+              </div>
+
+              <div class="form-field">
+                <label>{{ 'system_settings.ac' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="AC" />
+                  <span matSuffix>KW</span>
+                  @if (isFieldInvalid('AC')) {
+                    <mat-error>{{ getFieldError('AC') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <button mat-flat-button color="primary" (click)="setApiId()">
+                  {{ 'system_settings.set_api_id' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <div class="details-column">
+              <div class="form-field">
+                <label>{{ 'system_settings.portal_url' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="portalUrl" />
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>{{ 'system_settings.start_time' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <input matInput [matDatepicker]="startPicker" formControlName="startTime" />
+                  <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startPicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>{{ 'system_settings.taoz' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="taoz">
+                    <mat-option [value]="null">{{ 'system_settings.no_taoz' | translate }}</mat-option>
+                    <mat-option value="low">{{ 'system_settings.taoz_low' | translate }}</mat-option>
+                    <mat-option value="high">{{ 'system_settings.taoz_high' | translate }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>{{ 'system_settings.exclude_from_average' | translate }}</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="excludeFromAverage" />
+                  <span matSuffix>%</span>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional system fields -->
+          <div class="additional-fields">
+            <div class="field-row">
+              <div class="form-field">
+                <label>הספק (W)</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="power" />
+                  <span matSuffix>W</span>
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>סוג פאנל</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="panelType" />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="form-field">
+                <label>כמות פאנלים</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="numOfPanels" />
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>תצורת תקשורת</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="communication" />
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="form-field">
+                <label>חברה מתקינה</label>
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="installer" />
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>מחיר לק"ו ניטור</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" step="0.01" formControlName="monitorPriceKw" />
+                  <span matSuffix>₪</span>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="form-field">
+                <label>אזימות</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="azimuth" />
+                  <span matSuffix>°</span>
+                </mat-form-field>
+              </div>
+
+              <div class="form-field">
+                <label>הטיה</label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="tilt" />
+                  <span matSuffix>°</span>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="checkboxes-row">
+              <mat-checkbox formControlName="isTracker">טרקר</mat-checkbox>
+              <mat-checkbox formControlName="washControl">חוזה שטיפות</mat-checkbox>
+              <mat-checkbox formControlName="autoWash">שטיפה אוטומטית</mat-checkbox>
+            </div>
+
+            @if (form.get('washControl')?.value) {
+              <div class="field-row">
+                <div class="form-field">
+                  <label>סוג שטיפות</label>
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="washType">
+                      @for (washType of washTypes; track washType.value) {
+                        <mat-option [value]="washType.value">{{ washType.type }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field">
+                  <label>עלות שטיפה בודדת</label>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" step="0.01" formControlName="washRate" />
+                    <span matSuffix>₪</span>
+                  </mat-form-field>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 4: Annual Predictions (spans full width) -->
+      <mat-card id="more-card">
+        <mat-card-header class="card-header">
+          <mat-card-title>{{ 'system_settings.annual_predictions' | translate }}</mat-card-title>
+          <mat-checkbox formControlName="isPvsyst">PVSYST</mat-checkbox>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="predictions-content">
+            <!-- Annual prediction field -->
+            <div class="annual-prediction-row">
+              <div class="form-field">
+                <label><strong>צפי לשנת החיבור</strong></label>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="annualPrediction" />
+                  <span matSuffix>kWh</span>
+                </mat-form-field>
+              </div>
+              <button mat-flat-button color="primary" type="button"
+                      matTooltip="ערכים הוזנו ידנית. לחץ לחזרה לערכים אוטמטיים">
+                ערכים אוטומטיים
+              </button>
+              <div class="system-age">
+                <p><strong>גיל מערכת:</strong> {{ getSystemAge() }}</p>
+              </div>
+            </div>
+
+            <!-- Monthly predictions -->
+            <p><strong>צפי שנתי בפריסה חודשית:</strong></p>
+            <div class="predictions-grid" formArrayName="annualPredictionPerMonth">
+              @for (control of getAnnualPredictionControls(); track $index) {
+                <div class="prediction-month">
+                  <label>{{ months[$index] | date:'MMM' }}</label>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" [formControlName]="$index" />
+                    <span matSuffix>kWh</span>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+
+            @if (getAnnualPredictionControls().length > 0) {
+              <div class="prediction-summary">
+                <strong>צפי שנתי עדכני: {{ productionSum() | number:'1.0-0' }} kWh</strong>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Card 5: Comments and System Status -->
+      <mat-card id="comments-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'system_settings.comments' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="comments-content">
+            <mat-form-field appearance="outline">
+              <textarea matInput formControlName="comments" rows="4" placeholder="הזן הערות כאן"></textarea>
+            </mat-form-field>
+
+            @if (system) {
+              <div class="system-status">
+                <h4>{{ 'system_settings.system_status' | translate }}</h4>
+                <div class="status-info">
+                  <div class="info-item">
+                    <span class="label">{{ 'system_settings.system_id' | translate }}:</span>
+                    <span class="value">{{ system.id }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="label">{{ 'system_settings.last_connection' | translate }}:</span>
+                    <span class="value">{{ system.lastConnectionTime | date:'short' }}</span>
+                  </div>
+                  @if (system.apiId && system.apiId.length > 0) {
+                    <div class="info-item">
+                      <span class="label">{{ 'system_settings.api_id' | translate }}:</span>
+                      <span class="value">{{ system.apiId.join(', ') }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Action Buttons at bottom -->
+    <div class="button-container">
+      <button mat-flat-button color="warn" (click)="cancel()">
+        {{ 'cancel' | translate }}
+      </button>
+      <button mat-flat-button color="primary" (click)="goToSystemDetails()" 
+              [disabled]="!system">
+        {{ 'system_settings.view_system' | translate }}
+      </button>
+      <button mat-flat-button color="accent" (click)="navigateToSystemApi()" 
+              [disabled]="!system">
+        {{ 'system_settings.open_portal' | translate }}
+      </button>
+      <button mat-flat-button color="primary" (click)="save()" 
+              [disabled]="saving$ | async">
+        @if (saving$ | async) {
+          <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        } @else {
+          {{ 'save' | translate }}
+        }
+      </button>
+    </div>
+  </form>
+} @else {
+  <div class="loading-container">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>{{ 'system_settings.loading' | translate }}</p>
+  </div>
+} 

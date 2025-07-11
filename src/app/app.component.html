@@ -45,6 +45,11 @@
               <mat-icon color="yellow">people</mat-icon>
             </button>
 
+            <button mat-button color="white" (click)="redirect('system-settings')">
+              {{ 'sidenav.system_settings' | translate }}
+              <mat-icon color="yellow">settings</mat-icon>
+            </button>
+
             @if (feature.energyPartitionDaily) {
               <button mat-button color="white" (click)="redirect('energy-update-partition')">
                 Partition Daily

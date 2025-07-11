@@ -10,6 +10,7 @@ import { malfunction } from './dictionary/malfunction';
 import { reportsTable } from './dictionary/reports-table';
 import { users } from './dictionary/users';
 import { washes } from './dictionary/washes';
+import { systemSettings } from './dictionary/system-settings';
 
 export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
   new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
@@ -26,4 +27,5 @@ export const language: Dictionary = {
   reportsTable,
   users,
   washes,
+  system_settings: systemSettings,
 };

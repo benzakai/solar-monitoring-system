@@ -153,6 +153,10 @@ export const mainLang: Dictionary = {
     en: 'Cancel',
     he: 'בטל',
   },
+  confirm: {
+    en: 'Confirm',
+    he: 'אישור',
+  },
   region_select_all: {
     en: 'Select all',
     he: 'בחר ',

@@ -1,0 +1,42 @@
+:host{
+  display: flex;
+  gap: 21px;
+}
+
+mat-form-field {
+  width: 182px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+}
+
+.range {
+  flex: 1 1 1px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  mat-icon {
+    flex: 0 0 auto;
+    color: #4585e0;
+  }
+  mat-slider {
+    flex: 1 1 1px;
+  }
+  span {
+    flex: 0 0 auto;
+    margin-right: 10px
+  }
+}
+
+.mat-mdc-slider {
+  height: 30px;
+}
+
+.botinput {
+  border-bottom: 1px solid #c3c3c3;
+}
+
+mat-form-field.input {
+  width: calc(100% - 20px);
+  margin: 2px 10px;
+}

@@ -187,7 +187,9 @@
                 {{ 'reportsTable.columns.customer' | translate }}
               </th>
               <td mat-cell *matCellDef="let m">
-                <a class="link">{{m.systems.length ? m.systems[0]?.client?.name : (m.clientName || m.name)}}</a>
+                <a class="link" href="https://solar-golan.web.app/client/{{ m.systems[0]?.client?.id }}">
+                  {{m.systems.length ? m.systems[0]?.client?.name : (m.clientName || m.name)}}
+                </a>
               </td>
             </ng-container>
 

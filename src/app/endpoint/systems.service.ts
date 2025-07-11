@@ -6,6 +6,7 @@ import {
   getDoc,
   query,
   updateDoc,
+  setDoc,
   where,
 } from '@angular/fire/firestore';
 import { forkJoin, from, map, Observable } from 'rxjs';
@@ -55,5 +56,18 @@ export class SystemsService {
   updateComment(id: string, value: string | null) {
     const docRef = doc(this.collection, id);
     return from(updateDoc(docRef, { comments: value }));
+  }
+
+  updateSystem(id: string, data: Partial<System>): Observable<void> {
+    const docRef = doc(this.collection, id);
+    return from(updateDoc(docRef, data));
+  }
+
+  createSystem(systemData: Omit<System, 'id'>): Observable<string> {
+    const docRef = doc(this.collection);
+    const systemWithId = { ...systemData, id: docRef.id };
+    return from(setDoc(docRef, systemWithId)).pipe(
+      map(() => docRef.id)
+    );
   }
 }

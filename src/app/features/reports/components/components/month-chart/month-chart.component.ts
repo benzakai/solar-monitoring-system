@@ -132,8 +132,9 @@ export class MonthChartComponent implements AfterViewInit {
           hideOverlappingLabels: false,
           style: {
             fontSize: 8,
+            textAlign: 'center',
           },
-          offsetX: -2,
+          offsetX: 1.5,
           // offsetY: 5,
         },
       },

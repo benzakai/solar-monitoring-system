@@ -3,6 +3,7 @@
   <p>{{ data.message }}</p>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onCancel()">{{ data.cancelText || 'Cancel' }}</button>
-  <button mat-button color="primary" (click)="onConfirm()">{{ data.confirmText || 'Confirm' }}</button>
+
+  <button mat-button (click)="onCancel()" *ngIf="displayCancel()">{{ data.cancelText || 'Cancel' }}</button>
+  <button mat-button color="primary" (click)="onConfirm()">{{ data.confirmText || 'confirm' | translate }}</button>
 </mat-dialog-actions>

@@ -24,6 +24,9 @@
       "dom"
     ]
   },
+  "files": [
+    "src/app/types/google-maps.d.ts"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

@@ -29,4 +29,8 @@ export const sidenav: Dictionary = {
     he: 'ניהול משתמשים',
     en: 'User Management',
   },
+  system_settings: {
+    he: 'הגדרות מערכת',
+    en: 'System Settings',
+  },
 };

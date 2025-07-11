@@ -31,6 +31,11 @@ export class FiltersControlService {
     startWith(this.portalControl.value)
   );
 
+  criteriaControl = new FormControl();
+  criteriaControlState = this.criteriaControl.valueChanges.pipe(
+    startWith(this.criteriaControl.value)
+  );
+
   contracts = ['year', 'month', 'retrofit', 'manual'];
   contractsOptions = ['no_contract', ...this.contracts];
   contractsControl = new FormControl(this.contracts);

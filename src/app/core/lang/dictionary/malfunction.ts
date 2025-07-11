@@ -20,6 +20,10 @@ export const malfunction = {
   openIssue: { en: 'Issue Open', he: 'תקלה נפתחה' },
   resolved: { en: 'Issue Resolved', he: 'תקלה נפתרה' },
   save: { en: 'Save', he: 'שמירה' },
+  dataSaved: {
+    en: 'Data saved',
+    he: 'הנתונים נשמרו',
+  },
   header: { en: 'Malfunction', he: 'תקלה' },
   severityType: {
     '1': {
