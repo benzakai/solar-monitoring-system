@@ -10,19 +10,19 @@ export class GoogleMapsLoaderService {
   private static isLoaded = false;
   private static loadingPromise: Promise<any> | null = null;
 
-  async load(): Promise<any> {
-    if (this.isLoaded && window.google) {
+  static async load(): Promise<any> {
+    if (GoogleMapsLoaderService.isLoaded && window.google) {
       return Promise.resolve(window.google);
     }
 
-    if (this.loadingPromise) {
-      return this.loadingPromise;
+    if (GoogleMapsLoaderService.loadingPromise) {
+      return GoogleMapsLoaderService.loadingPromise;
     }
 
-    this.loadingPromise = new Promise<any>((resolve, reject) => {
+    GoogleMapsLoaderService.loadingPromise = new Promise<any>((resolve, reject) => {
       // Check if already loaded
       if (window.google && window.google.maps) {
-        this.isLoaded = true;
+        GoogleMapsLoaderService.isLoaded = true;
         resolve(window.google);
         return;
       }
@@ -35,7 +35,7 @@ export class GoogleMapsLoaderService {
 
       script.onload = () => {
         if (window.google && window.google.maps) {
-          this.isLoaded = true;
+          GoogleMapsLoaderService.isLoaded = true;
           console.log('Google Maps API loaded successfully');
           resolve(window.google);
         } else {
@@ -50,6 +50,6 @@ export class GoogleMapsLoaderService {
       document.head.appendChild(script);
     });
 
-    return this.loadingPromise;
+    return GoogleMapsLoaderService.loadingPromise;
   }
 }

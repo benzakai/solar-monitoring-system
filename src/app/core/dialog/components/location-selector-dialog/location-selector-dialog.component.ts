@@ -145,7 +145,7 @@ export class LocationSelectorDialogComponent implements OnInit, AfterViewInit {
     if (!this.map) return;
 
     const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: coords }, (results: any[], status: string) => {
+    geocoder.geocode({ location: coords }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
       if (status === 'OK' && results && results[0]) {
         const address = results[0].formatted_address;
         this.location.address = address;

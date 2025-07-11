@@ -123,14 +123,14 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.system$.pipe(take(1)).subscribe(system => {
-      this.selectedLocation = system?.location;
+      this.selectedLocation = system?.location ?? undefined;
       this.initMap();
     });
   }
 
   private async initMap() {
     try {
-      await this.mapsLoader.load();
+      await GoogleMapsLoaderService.load();
       
       const initialCoords = this.selectedLocation?.coords || { lat: 32.8, lng: 35.75 }; // Default to somewhere in Israel
       const mapOptions: google.maps.MapOptions = {
@@ -172,7 +172,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.selectedLocation = { coords, address: '' };
     // Use geocoder to get address from coords
     const geocoder = new google.maps.Geocoder();
-    await geocoder.geocode({ location: coords }, (results, status) => {
+    await geocoder.geocode({ location: coords }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
       if (status === 'OK' && results?.[0]) {
         const address = results[0].formatted_address;
         this.selectedLocation!.address = address;
@@ -193,6 +193,8 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     if (system?.location) {
       this.selectedLocation = system.location;
     }
+
+    const annualPrediction = system?.annualPredictionPerMonth?.reduce((sum, current) => sum + current, 0);
 
     this.form = this.formBuilder.group({
       // Existing fields from System model
@@ -239,7 +241,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       isActive: [system?.isActive !== false], // Default to true for new systems
       
       // Prediction fields
-      annualPrediction: [system?.annualPrediction, [Validators.required, Validators.min(0)]],
+      annualPrediction: [annualPrediction, [Validators.required, Validators.min(0)]],
       isPvsyst: [system?.isPvsyst || false]
     });
 

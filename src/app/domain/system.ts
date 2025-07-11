@@ -39,6 +39,5 @@ export interface System {
   contractStartTime?: any;
   annualCheckDate?: any;
   isActive?: boolean;
-  annualPredictionPerMonth?: number;
   isPvsyst?: boolean;
 }

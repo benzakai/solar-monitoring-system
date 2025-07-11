@@ -21,7 +21,7 @@ export enum Regions {
   SOUTH = 'SOUTH',
 }
 
-export const RegionsDictionary: Dictionary = {
+export const RegionsDictionary: Record<Regions, string> = {
   [Regions.JERUSALEM]: 'ירושלים',
   [Regions.CENTER]: 'מרכז',
   [Regions.RAMIM_MT]: 'רכס רמים',
