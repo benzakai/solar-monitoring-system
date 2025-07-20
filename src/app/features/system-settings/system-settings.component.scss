@@ -12,27 +12,34 @@ form {
 }
 
 .header-section {
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  display: flex;
+
+  & > * {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    justify-content: stretch;
+
+  }
+
+  mat-form-field {
+    margin-top: 0;
+    flex: 1;
+    max-width: 400px;
+  }
 
   .system-name-field {
     display: flex;
-    align-items: center;
-    gap: 15px;
+    align-items: stretch;
 
     label {
       font-weight: 500;
       color: #1287DE;
       min-width: 120px;
+      margin: 0 20px;
     }
 
-    mat-form-field {
-      flex: 1;
-      max-width: 400px;
-    }
+
   }
 }
 
@@ -76,7 +83,7 @@ mat-card {
 
   mat-card-header {
     padding-bottom: 10px;
-    
+
     &.card-header {
       display: flex;
       justify-content: space-between;
@@ -136,7 +143,7 @@ mat-card {
   }
 }
 
-// Contact card specific styles  
+// Contact card specific styles
 #contact-card {
   mat-card-content {
     .client-info {
@@ -167,6 +174,22 @@ mat-card {
       font-style: italic;
       margin: 20px 0;
     }
+  }
+  .card-header,  {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  & > .mat-mdc-button-base {
+    flex: 0 0 auto;
+  }
+  mat-selection-list {
+    flex: 1 1 1px;
+  }
+  mat-list-option {
+    height: auto;
   }
 }
 
@@ -261,7 +284,7 @@ mat-card {
   button {
     min-width: 140px;
     height: 40px;
-    
+
     mat-progress-spinner {
       margin-right: 8px;
     }
@@ -303,7 +326,7 @@ mat-card {
 
         .system-age {
           flex: 1;
-          
+
           p {
             margin: 0;
             font-size: 14px;
@@ -343,7 +366,7 @@ mat-card {
         border-radius: 5px;
         text-align: center;
         margin-top: 15px;
-        
+
         strong {
           color: #1976d2;
           font-size: 14px;
@@ -441,7 +464,7 @@ mat-card {
       'loc-card'
       'more-card'
       'comments-card';
-    
+
     gap: 12px;
 
     mat-card {
@@ -519,17 +542,38 @@ mat-card {
   }
 }
 
-// RTL support for Hebrew
-:host-context(.lang-he) {
-  .header-section .system-name-field {
-    direction: rtl;
-  }
+#map {
+  height: calc(100% - 70px); // Adjust based on the card header and actions height
+  width: calc(100% - 40px);
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
 
-  .main-section {
-    direction: rtl;
-  }
+.taoz-group {
+  display: flex;
+}
 
-  .button-container {
-    direction: rtl;
+.form-field-with-button {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between button and form field */
+}
+
+.form-field-with-button mat-form-field {
+  flex-grow: 1;
+}
+
+.system-details-grid {
+  display: flex;
+
+  .rif {
+    border-right: 2px solid #ccc;
+    margin: 0 20px;
   }
-} 
+}
+
+.container {
+  & > * {
+    margin: 20px;
+  }
+}

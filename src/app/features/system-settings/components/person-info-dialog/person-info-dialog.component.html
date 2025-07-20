@@ -1,0 +1,68 @@
+<div *ngIf="loading" class="spinner-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<ng-container *ngIf="!loading && person">
+  <h2 mat-dialog-title>{{ viewMode ? ('personInfo.view.title' | translate) : ('personInfo.edit.title' | translate) }}</h2>
+
+  <mat-dialog-content>
+    <div *ngIf="viewMode">
+      <mat-list>
+        <mat-list-item *ngIf="person.position">
+          <span matListItemTitle>{{ 'personInfo.view.position' | translate }}</span>
+          <span matListItemLine>{{ person.position }}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-icon mat-list-icon>person</mat-icon>
+          <span matListItemTitle>{{ 'personInfo.view.name' | translate }}</span>
+          <span matListItemLine>{{ person.name }}</span>
+        </mat-list-item>
+        <mat-list-item *ngIf="person.phone">
+          <mat-icon mat-list-icon>contact_phone</mat-icon>
+          <span matListItemTitle>{{ 'personInfo.view.phone' | translate }}</span>
+          <a matListItemLine [href]="'tel:' + person.phone">{{ person.phone }}</a>
+        </mat-list-item>
+        <mat-list-item *ngIf="person.email">
+          <mat-icon mat-list-icon>contact_mail</mat-icon>
+          <span matListItemTitle>{{ 'personInfo.view.email' | translate }}</span>
+          <a matListItemLine [href]="'mailto:' + person.email">{{ person.email }}</a>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <form [formGroup]="form" *ngIf="!viewMode">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'personInfo.edit.name' | translate }}</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'personInfo.edit.phone' | translate }}</mat-label>
+        <input matInput formControlName="phone">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'personInfo.edit.email' | translate }}</mat-label>
+        <input matInput formControlName="email">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'personInfo.edit.position' | translate }}</mat-label>
+        <input matInput formControlName="position">
+      </mat-form-field>
+    </form>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <ng-container *ngIf="viewMode">
+      <button mat-button (click)="editContact()">{{ 'personInfo.view.edit' | translate }}</button>
+      <button mat-button mat-dialog-close>{{ 'personInfo.view.close' | translate }}</button>
+    </ng-container>
+    <ng-container *ngIf="!viewMode">
+      <button mat-button (click)="cancel()">{{ 'personInfo.edit.cancel' | translate }}</button>
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="form.invalid || form.pristine">{{ 'personInfo.edit.save' | translate }}</button>
+    </ng-container>
+  </mat-dialog-actions>
+
+</ng-container> 

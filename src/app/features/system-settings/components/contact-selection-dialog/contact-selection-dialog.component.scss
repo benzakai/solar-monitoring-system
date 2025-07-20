@@ -1,0 +1,21 @@
+
+
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  mat-form-field {
+    flex: 0 0 auto;
+  }
+
+  .opts {
+    flex: 1 1 1px;
+    min-height: 50vh;
+    overflow: auto;
+
+    button {
+      margin: 2px 5px;
+    }
+  }
+}

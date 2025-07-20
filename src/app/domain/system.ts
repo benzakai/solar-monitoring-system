@@ -1,9 +1,13 @@
+import { IdName } from './id-name';
+import { SystemType } from '../features/systems/system-type';
 import { SystemLocation } from './system-location';
+import { SystemWash } from './system-wash';
+import { SystemCriteria } from './system-criteria';
 
 export interface System {
   id: string;
+  type: SystemType;
   name: string;
-  type?: string;
   KWP: number;
   AC: number;
   apiId: Array<string | number | null>;
@@ -12,13 +16,14 @@ export interface System {
   annualPredictionPerMonth: number[];
   excludeFromAverage?: number;
   taoz: 'low' | 'high' | null;
+  regulation?: number;
   location: SystemLocation | null;
   client?: {
     name: string;
     id: string;
   };
   lastConnectionTime?: string;
-  comments: string | null;
+  comments: string;
   contactsIds: string[];
   contract: string;
 
@@ -39,5 +44,7 @@ export interface System {
   contractStartTime?: any;
   annualCheckDate?: any;
   isActive?: boolean;
-  isPvsyst?: boolean;
+  isPvsyst: boolean;
+  source?: 'project' | 'new';
+  criteria?: SystemCriteria;
 }

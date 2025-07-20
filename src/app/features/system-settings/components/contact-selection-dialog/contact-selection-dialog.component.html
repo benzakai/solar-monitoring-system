@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>{{ 'system_settings.add_contact' | translate }}</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="search-field">
+    <input matInput [formControl]="searchControl" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+  <div class="opts">
+    @for (client of filteredClients$ | async; track client.id) {
+      <button mat-flat-button (click)="onClientSelected(client)">{{ client.name }}</button>
+    }
+  </div>
+
+
+
+
+
+
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>{{ 'cancel' | translate }}</button>
+</mat-dialog-actions>

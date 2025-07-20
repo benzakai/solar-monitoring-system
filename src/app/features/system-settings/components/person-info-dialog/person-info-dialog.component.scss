@@ -1,0 +1,22 @@
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-dialog-content {
+  overflow: hidden;
+}
+
+mat-list-item {
+  margin-bottom: 8px;
+}
+
+.mat-mdc-list-item-icon {
+  margin-inline-end: 16px;
+} 

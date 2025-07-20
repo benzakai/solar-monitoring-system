@@ -56,6 +56,14 @@ export const systemSettings: Dictionary = {
     en: 'Start Date',
     he: 'תאריך התחלה',
   },
+  contract_start_time: {
+    en: 'Contract Start Time',
+    he: 'תחילת חוזה',
+  },
+  annual_check_date: {
+    en: 'Annual Check Date',
+    he: 'בדיקה שנתית',
+  },
   taoz: {
     en: 'TAOZ Status',
     he: 'סטטוס תעוז',
@@ -64,6 +72,10 @@ export const systemSettings: Dictionary = {
     en: 'No TAOZ',
     he: 'ללא תעוז',
   },
+  regular_tariff: {
+    en: 'Regular Tariff',
+    he: 'תעריף רגיל',
+  },
   taoz_low: {
     en: 'TAOZ Low',
     he: 'תעוז נמוך',
@@ -71,6 +83,10 @@ export const systemSettings: Dictionary = {
   taoz_high: {
     en: 'TAOZ High',
     he: 'תעוז גבוה',
+  },
+  regulation: {
+    en: 'Regulation',
+    he: 'תעריף',
   },
   exclude_from_average: {
     en: 'Exclude from Average',
@@ -137,5 +153,193 @@ export const systemSettings: Dictionary = {
   map_instructions: {
     en: 'Click on the map or drag the marker to select location',
     he: 'לחץ על המפה או גרור את הסמן לבחירת מיקום',
+  },
+  show_my_location: {
+    en: 'Show my location',
+    he: 'הצג את מיקומי',
+  },
+  connect_to_portal: {
+    en: 'Connect to Portal',
+    he: 'חיבור לפורטל',
+  },
+  enter_address_or_select_on_map: {
+    en: 'Enter address or select on map',
+    he: 'הזן כתובת או בחר במפה',
+  },
+  remove_contact: {
+    en: 'Remove contact',
+    he: 'הסר איש קשר',
+  },
+  client: {
+    en: 'Client',
+    he: 'לקוח',
+  },
+  add_contact: {
+    en: 'Add contact',
+    he: 'הוסף איש קשר',
+  },
+  add_client: {
+    en: 'Add Client',
+    he: 'הוסף לקוח',
+  },
+  client_required: {
+    en: 'Client is required',
+    he: 'נדרש לקוח',
+  },
+  power: {
+    en: 'Power',
+    he: 'הספק',
+  },
+  panel_type: {
+    en: 'Panel Type',
+    he: 'סוג פאנל',
+  },
+  num_of_panels: {
+    en: 'Number of Panels',
+    he: 'כמות פאנלים',
+  },
+  communication: {
+    en: 'Communication',
+    he: 'תצורת תקשורת',
+  },
+  installer: {
+    en: 'Installer',
+    he: 'חברה מתקינה',
+  },
+  monitor_price_kw: {
+    en: 'Monitoring Price per kW',
+    he: 'מחיר לק"ו ניטור',
+  },
+  azimuth: {
+    en: 'Azimuth',
+    he: 'אזימות',
+  },
+  tilt: {
+    en: 'Tilt',
+    he: 'הטיה',
+  },
+  is_tracker: {
+    en: 'Tracker',
+    he: 'טרקר',
+  },
+  wash_control: {
+    en: 'Washing Contract',
+    he: 'חוזה שטיפות',
+  },
+  auto_wash: {
+    en: 'Automatic Washing',
+    he: 'שטיפה אוטומטית',
+  },
+  wash_type: {
+    en: 'Wash Type',
+    he: 'סוג שטיפות',
+  },
+  wash_rate: {
+    en: 'Price per Wash',
+    he: 'עלות שטיפה בודדת',
+  },
+  is_pvsyst: {
+    en: 'PVSYST',
+    he: 'PVSYST',
+  },
+  prediction_for_connection_year: {
+    en: 'Prediction for connection year',
+    he: 'צפי לשנת החיבור',
+  },
+  manual_values_tooltip: {
+    en: 'Values entered manually. Click to revert to automatic values',
+    he: 'ערכים הוזנו ידנית. לחץ לחזרה לערכים אוטומטיים',
+  },
+  automatic_values: {
+    en: 'Automatic Values',
+    he: 'ערכים אוטומטיים',
+  },
+  system_age: {
+    en: 'System Age:',
+    he: 'גיל מערכת:',
+  },
+  annual_prediction_per_month: {
+    en: 'Annual prediction per month:',
+    he: 'צפי שנתי בפריסה חודשית:',
+  },
+  updated_annual_prediction: {
+    en: 'Updated annual prediction:',
+    he: 'צפי שנתי עדכני:',
+  },
+  enter_comments_here: {
+    en: 'Enter comments here',
+    he: 'הזן הערות כאן',
+  },
+  wash_type_none: {
+    en: 'No Washes',
+    he: 'ללא שטיפות',
+  },
+  wash_type_single: {
+    en: 'Single Washes',
+    he: 'שטיפות בודדות',
+  },
+  wash_type_3: {
+    en: '3 Washes',
+    he: '3 שטיפות',
+  },
+  wash_type_4: {
+    en: '4 Washes',
+    he: '4 שטיפות',
+  },
+  wash_type_5: {
+    en: '5 Washes',
+    he: '5 שטיפות',
+  },
+  wash_type_6: {
+    en: '6 Washes',
+    he: '6 שטיפות',
+  },
+  source: {
+    en: 'System Source',
+    he: 'מקור המערכת',
+  },
+  source_project: {
+    en: 'Project',
+    he: 'פרוייקטים',
+  },
+  source_new: {
+    en: 'New',
+    he: 'חדש',
+  },
+  roof_type: {
+    en: 'Roof Type',
+    he: 'סוג גג',
+  },
+  cowshed: {
+    en: 'Cowshed',
+    he: 'רפת',
+  },
+  factory: {
+    en: 'Factory',
+    he: 'מפעל',
+  },
+  gas_station: {
+    en: 'Gas Station',
+    he: 'תחנת דלק',
+  },
+  hencoop: {
+    en: 'Hencoop',
+    he: 'לול',
+  },
+  house: {
+    en: 'House',
+    he: 'בית',
+  },
+  school: {
+    en: 'School',
+    he: 'בית ספר',
+  },
+  reservoir: {
+    en: 'Reservoir',
+    he: 'מאגר',
+  },
+  other: {
+    en: 'Other',
+    he: 'אחר',
   },
 }; 

@@ -1,6 +1,21 @@
-import { Component, DestroyRef, inject, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, AbstractControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  AbstractControl,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
@@ -21,6 +36,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
+import { MatRadioModule } from '@angular/material/radio';
 
 // Local imports
 import { TranslatePipe } from '../../core/lang/translate.pipe';
@@ -29,9 +45,23 @@ import { System } from '../../domain/system';
 import { SystemType } from '../systems/system-type';
 import { RoutingService } from '../../core/routing/routing.service';
 import { DialogService } from '../../core/dialog/services/dialog.service';
-import { LocationSelectorDialogComponent, LocationSelectorDialogData } from '../../core/dialog/components/location-selector-dialog/location-selector-dialog.component';
+import {
+  LocationSelectorDialogComponent,
+  LocationSelectorDialogData,
+} from '../../core/dialog/components/location-selector-dialog/location-selector-dialog.component';
 import { SystemLocation } from '../../domain/system-location';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
+import { ApiIdDialogComponent } from './components/api-id-dialog/api-id-dialog.component';
+import { MonitorFacade } from '../../state/monitor/monitor.facade';
+import { ContactSelectionDialogComponent } from './components/contact-selection-dialog/contact-selection-dialog.component';
+import { PersonInfoDialogComponent } from './components/person-info-dialog/person-info-dialog.component';
+import { IdName } from '../../domain/id-name';
+import { combineLatest } from 'rxjs';
+import { SystemCriteria } from '../../domain/system-criteria';
+import { UsersFacade } from '../../state/users/users.facade';
+import { User } from '../../domain/user';
+import { PeopleService } from '../../endpoint/people.service';
+import { Person } from '../../domain/person';
 
 @Component({
   selector: 'app-system-settings',
@@ -54,10 +84,11 @@ import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.
     MatTooltipModule,
     MatCardModule,
     TranslatePipe,
+    MatRadioModule,
   ],
   providers: [DialogService, GoogleMapsLoaderService],
   templateUrl: './system-settings.component.html',
-  styleUrls: ['./system-settings.component.scss']
+  styleUrls: ['./system-settings.component.scss'],
 })
 export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private destroyRef = inject(DestroyRef);
@@ -67,83 +98,93 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private systemsService = inject(SystemsService);
   private routingService = inject(RoutingService);
   private mapsLoader = inject(GoogleMapsLoaderService);
-  
-  @ViewChild('map') mapElement!: ElementRef;
+  private dialog = inject(MatDialog);
+  private monitorFacade = inject(MonitorFacade);
+  private peopleService = inject(PeopleService);
+  dialogService = inject(DialogService);
+  translatePipe = new TranslatePipe();
+  @ViewChild('map') set mapElement(el: ElementRef) {
+    if (el && !this.map) {
+      this.initMap(el);
+    }
+  }
   private map?: google.maps.Map;
   private marker?: google.maps.Marker;
+  private system: System | null = null;
 
   // Form and data
   form!: FormGroup;
-  system$!: Observable<System | null>;
+  system$: Observable<System | null> = this.activatedRoute.params.pipe(
+    takeUntilDestroyed(this.destroyRef),
+    map((params) => params['id']),
+    switchMap((id) => {
+      if (id && id !== 'new') {
+        return this.systemsService.getById(id);
+      } else {
+        return [null];
+      }
+    })
+  );
+
   loading$ = new BehaviorSubject<boolean>(false);
   saving$ = new BehaviorSubject<boolean>(false);
   selectedLocation?: SystemLocation;
+  selectedContactId: string | null = null;
+
+  systemContacts$: Observable<Person[]> = this.system$.pipe(
+    filter(Boolean),
+    switchMap((system) => {
+      const contactIds = system?.contactsIds || [];
+      if (system?.client) {
+        contactIds.push(system.client.id);
+      }
+      return this.peopleService.getPeopleByIds(contactIds);
+    })
+  );
 
   // Constants
   readonly today = new Date();
   readonly months: Date[] = this.getMonths();
   readonly systemTypes = Object.values(SystemType);
   readonly systemTypeDict = this.getSystemTypeDict();
+  readonly criteria = Object.values(SystemCriteria);
+  readonly criteriaDict = this.getCriteriaDict();
 
   washTypes = [
-    { type: 'ללא שטיפות', value: 0 },
-    { type: 'שטיפות בודדות', value: 1 },
-    { type: '3 שטיפות', value: 3 },
-    { type: '4 שטיפות', value: 4 },
-    { type: '5 שטיפות', value: 5 },
-    { type: '6 שטיפות', value: 6 }
+    { type: 'wash_type_none', value: 0 },
+    { type: 'wash_type_single', value: 1 },
+    { type: 'wash_type_3', value: 3 },
+    { type: 'wash_type_4', value: 4 },
+    { type: 'wash_type_5', value: 5 },
+    { type: 'wash_type_6', value: 6 },
   ];
 
   externalPortals = ['GW', 'NTC', 'SLX', 'GDW', 'FSN'];
 
   ngOnInit() {
-    this.system$ = this.activatedRoute.params.pipe(
-      takeUntilDestroyed(this.destroyRef),
-      map(params => params['id']),
-      switchMap(id => {
-        if (id && id !== 'new') {
-          return this.systemsService.getById(id);
-        } else {
-          // Return null for new system
-          return [null];
-        }
-      })
-    );
-
-    this.system$.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(system => {
-      this.buildForm(system);
-      // Re-initialize map if system data changes
-      if (this.map) {
-        this.initMap();
-      }
-    });
+    this.system$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((system) => {
+        this.system = system;
+        this.buildForm(system);
+      });
   }
 
   ngAfterViewInit() {
-    this.system$.pipe(take(1)).subscribe(system => {
-      this.selectedLocation = system?.location ?? undefined;
-      this.initMap();
-    });
+    // Map is now initialized in the ViewChild setter
   }
 
-  private async initMap() {
+  private async initMap(mapElement: ElementRef) {
     try {
       await GoogleMapsLoaderService.load();
-      
-      const initialCoords = this.selectedLocation?.coords || { lat: 32.8, lng: 35.75 }; // Default to somewhere in Israel
+
       const mapOptions: google.maps.MapOptions = {
-        center: initialCoords,
+        center: { lat: 32.8, lng: 35.75 }, // Default to somewhere in Israel
         zoom: 8,
-        mapTypeId: 'roadmap'
+        mapTypeId: 'roadmap',
       };
 
-      this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-
-      if (this.selectedLocation?.coords) {
-        this.placeMarker(this.selectedLocation.coords);
-      }
+      this.map = new google.maps.Map(mapElement.nativeElement, mapOptions);
 
       this.map.addListener('click', (e: google.maps.MapMouseEvent) => {
         if (e.latLng) {
@@ -152,6 +193,13 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
           this.updateLocationFromCoords(coords);
         }
       });
+
+      if (this.system?.location?.coords) {
+        const coords = this.system.location.coords;
+        this.map?.setCenter(coords);
+        this.map?.setZoom(15);
+        this.placeMarker(coords);
+      }
     } catch (error) {
       console.error('Error loading Google Maps', error);
     }
@@ -172,89 +220,110 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.selectedLocation = { coords, address: '' };
     // Use geocoder to get address from coords
     const geocoder = new google.maps.Geocoder();
-    await geocoder.geocode({ location: coords }, (results: google.maps.GeocoderResult[] | null, status: google.maps.GeocoderStatus) => {
-      if (status === 'OK' && results?.[0]) {
-        const address = results[0].formatted_address;
-        this.selectedLocation!.address = address;
-        this.form.controls['location'].setValue(address);
+    await geocoder.geocode(
+      { location: coords },
+      (
+        results: google.maps.GeocoderResult[] | null,
+        status: google.maps.GeocoderStatus
+      ) => {
+        if (status === 'OK' && results?.[0]) {
+          const address = results[0].formatted_address;
+          this.selectedLocation!.address = address;
+        } else {
+          const latLngString = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(
+            6
+          )}`;
+          this.selectedLocation!.address = latLngString;
+        }
         this.form.markAsDirty();
-      } else {
-        // Fallback to coordinates if geocoding fails
-        const latLngString = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
-        this.form.controls['location'].setValue(latLngString);
-        this.selectedLocation!.address = latLngString;
-        this.form.markAsDirty();
+      }
+    );
+  }
+
+  personInfo(personId: string) {
+    const dialogRef = this.dialog.open(PersonInfoDialogComponent, {
+      width: '500px',
+      data: { personId: personId },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Person data was updated, refresh the contacts list
+        this.system$
+          .pipe(take(1))
+          .subscribe((system) => (this.system = system));
       }
     });
   }
 
   private buildForm(system: System | null) {
-    // Store the full location data if available
-    if (system?.location) {
-      this.selectedLocation = system.location;
-    }
+    this.selectedLocation = system?.location ?? undefined;
 
-    const annualPrediction = system?.annualPredictionPerMonth?.reduce((sum, current) => sum + current, 0);
+    const annualPrediction = system?.annualPredictionPerMonth?.reduce(
+      (sum, current) => sum + current,
+      0
+    );
 
     this.form = this.formBuilder.group({
-      // Existing fields from System model
       name: [system?.name, Validators.required],
       type: [system?.type, Validators.required],
-      KWP: [system?.KWP, [Validators.required, Validators.min(1)]],
-      AC: [system?.AC, Validators.min(0)],
-      apiId: [system?.apiId || []],
       portalUrl: [system?.portalUrl],
+      client: [system?.client, Validators.required],
+      // location is handled via selectedLocation
+      contactsIds: [system?.contactsIds],
       startTime: [system?.startTime],
-      annualPredictionPerMonth: this.formBuilder.array(
-        this.months.map(m => [
-          system?.annualPredictionPerMonth?.[m.getMonth()] || 0,
-          [Validators.min(0), Validators.required]
-        ])
-      ),
-      excludeFromAverage: [system?.excludeFromAverage],
-      taoz: [system?.taoz],
-      location: [system?.location?.address || '', Validators.required],
-      client: [system?.client],
-      comments: [system?.comments],
-      contactsIds: [system?.contactsIds || []],
-      contract: [system?.contract],
-      
-      // Additional fields from original component
-      power: [system?.power, Validators.min(0)],
-      panelType: [system?.panelType],
-      numOfPanels: [system?.numOfPanels, Validators.min(1)],
-      communication: [system?.communication],
-      installer: [system?.installer],
-      monitorPriceKw: [system?.monitorPriceKw, Validators.min(0)],
-      azimuth: [system?.azimuth, [Validators.min(-90), Validators.max(90)]],
-      tilt: [system?.tilt, [Validators.min(0), Validators.max(90)]],
-      isTracker: [system?.isTracker || false],
-      washControl: [system?.washControl || false],
-      autoWash: [system?.autoWash || false],
-      washType: [system?.washType],
-      washRate: [system?.washRate, Validators.min(0)],
-      
-      // Additional client and contract fields
-      additionalContract: [system?.additionalContract],
       contractStartTime: [system?.contractStartTime],
       annualCheckDate: [system?.annualCheckDate],
-      isActive: [system?.isActive !== false], // Default to true for new systems
-      
-      // Prediction fields
-      annualPrediction: [annualPrediction, [Validators.required, Validators.min(0)]],
-      isPvsyst: [system?.isPvsyst || false]
+      taoz: [system?.taoz],
+      regulation: [system?.regulation],
+      excludeFromAverage: [system?.excludeFromAverage],
+      communication: [system?.communication],
+      installer: [system?.installer],
+      monitorPriceKw: [system?.monitorPriceKw],
+      source: [system?.source],
+      AC: [system?.AC],
+      KWP: [system?.KWP],
+      power: [system?.power],
+      criteria: [system?.criteria],
+      panelType: [system?.panelType],
+      numOfPanels: [system?.numOfPanels],
+      annualPrediction: [annualPrediction],
+      annualPredictionPerMonth: this.formBuilder.array(
+        system?.annualPredictionPerMonth || []
+      ),
+      isPvsyst: [system?.isPvsyst || false],
+      azimuth: [system?.azimuth],
+      tilt: [system?.tilt],
+      isTracker: [system?.isTracker],
+      washControl: [system?.washControl],
+      autoWash: [system?.autoWash],
+      washType: [system?.washType],
+      washRate: [system?.washRate],
+      comments: [system?.comments],
     });
 
-    // If no system exists, disable most fields
-    if (!system) {
-      this.form.disable();
-      this.form.controls['name'].enable();
-      this.form.controls['type'].enable();
-    }
+    this.form
+      .get('taoz')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((taoz) => {
+        const regulationControl = this.form.get('regulation');
+        if (taoz !== null) {
+          regulationControl?.disable();
+          regulationControl?.setValue(null);
+          regulationControl?.clearValidators();
+        } else {
+          regulationControl?.enable();
+          regulationControl?.setValidators(Validators.required);
+        }
+        regulationControl?.updateValueAndValidity();
+      });
+
+    // Manually trigger the value change to set the initial state
+    this.form.get('taoz')?.updateValueAndValidity();
   }
 
   private getMonths(): Date[] {
-    const months = [];
+    const months: Date[] = [];
     for (let i = 0; i < 12; i++) {
       months.push(new Date(2024, i, 1));
     }
@@ -276,90 +345,114 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       [SystemType.SOLAX]: 'Solax',
       [SystemType.GOODWE]: 'GoodWe',
       [SystemType.FUSION]: 'Fusion',
-      [SystemType.UNDEFINED]: 'לא מוגדר'
+      [SystemType.UNDEFINED]: 'לא מוגדר',
+    };
+  }
+
+  private getCriteriaDict(): Record<string, string> {
+    return {
+      [SystemCriteria.COWSHED]: 'cowshed',
+      [SystemCriteria.FACTORY]: 'factory',
+      [SystemCriteria.GAS_STATION]: 'gas_station',
+      [SystemCriteria.HENCOOP]: 'hencoop',
+      [SystemCriteria.HOUSE]: 'house',
+      [SystemCriteria.RESERVOIR]: 'reservoir',
+      [SystemCriteria.SCHOOL]: 'school',
+      [SystemCriteria.OTHER]: 'other',
     };
   }
 
   getAnnualPredictionControls(): AbstractControl[] {
-    return (this.form.controls['annualPredictionPerMonth'] as FormArray).controls;
+    return (this.form.get('annualPredictionPerMonth') as FormArray).controls;
   }
 
   getAnnualPredictionFormArray(): FormArray {
-    return this.form.controls['annualPredictionPerMonth'] as FormArray;
+    return this.form.get('annualPredictionPerMonth') as FormArray;
   }
 
   onTypeChange() {
-    // Handle portal type change
-    const type = this.form.get('type')?.value;
-    if (type) {
-      // Reset API ID when type changes
-      this.form.get('apiId')?.setValue([]);
-    }
+    this.setApiId();
   }
 
-  async setApiId() {
-    const type = this.form.get('type')?.value;
-    if (!type) {
-      alert('יש לבחור סוג פורטל תחילה');
-      return;
-    }
+  setApiId() {
+    this.system$.pipe(take(1)).subscribe((system) => {
+      const type = this.form.get('type')?.value;
+      if (!type) {
+        return;
+      }
 
-    // For now, just show a simple prompt - this can be enhanced with a dialog
-    const apiIdInput = prompt('הזן מזהה API:');
-    if (apiIdInput) {
-      this.form.get('apiId')?.setValue([apiIdInput]);
-      this.form.markAsDirty();
-    }
+      const dialogRef = this.dialog.open(ApiIdDialogComponent, {
+        data: {
+          type: type,
+          apiId: system?.type === type ? system?.apiId : [],
+        },
+        width: '600px',
+      });
+
+      dialogRef.afterClosed().subscribe((apiId) => {
+        if (apiId) {
+          this.form.get('apiId')?.setValue(apiId);
+          this.form.markAsDirty();
+        }
+      });
+    });
+  }
+
+  iso(dt: Date | number): string | null {
+    return dt ? new Date(dt).toISOString() : null;
   }
 
   async save() {
-    if (!this.form.valid) {
-      alert('יש לוודא תקינות כל השדות');
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    this.saving$.next(true);
+    const dial = this.dialogService;
+    const loader = this.dialogService.loader();
     try {
-      const formValue = this.form.value;
-      
-      // If we have selected location data, use it instead of just the text
+      const rawFormVelue = this.form.value;
+
+      const formValue = {
+        ...rawFormVelue,
+        startTime: this.iso(rawFormVelue.startTime),
+        contractStartTime: this.iso(rawFormVelue.contractStartTime),
+        annualCheckDate: this.iso(rawFormVelue.annualCheckDate),
+      };
+
       if (this.selectedLocation) {
         formValue.location = this.selectedLocation;
       } else if (formValue.location) {
-        // Convert text location to SystemLocation object
         formValue.location = { address: formValue.location };
       }
-      
+
       const systemId = this.activatedRoute.snapshot.params['id'];
-      
+
       if (systemId && systemId !== 'new') {
-        // Update existing system
         await new Promise<void>((resolve, reject) => {
           this.systemsService.updateSystem(systemId, formValue).subscribe({
             next: () => resolve(),
-            error: (error) => reject(error)
+            error: (error) => reject(error),
           });
         });
       } else {
-        // Create new system
         const newSystemId = await new Promise<string>((resolve, reject) => {
           this.systemsService.createSystem(formValue).subscribe({
             next: (id) => resolve(id),
-            error: (error) => reject(error)
+            error: (error) => reject(error),
           });
         });
-        // Navigate to the new system's edit page
+
         this.router.navigate(['/system-settings', newSystemId]);
       }
-      
-      alert('מערכת נשמרה בהצלחה!');
+
+      dial.confirm({
+        message: this.translatePipe.transform('malfunction.dataSaved'),
+        displayCancel: false,
+      });
+
       this.form.markAsPristine();
     } catch (error) {
       alert('שגיאה בשמירת המערכת');
       console.error('Error saving system:', error);
     } finally {
       this.saving$.next(false);
+      loader.close();
     }
   }
 
@@ -391,6 +484,62 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     }
   }
 
+  openContactSelection() {
+    const dialogRef = this.dialog.open(ContactSelectionDialogComponent, {
+      width: '600px',
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((result) => !!result),
+        take(1)
+      )
+      .subscribe((selectedClient) => {
+        this.system$.pipe(take(1)).subscribe((system) => {
+          if (system?.client) {
+            // It's a contact
+            const currentContacts = this.form.get('contactsIds')?.value || [];
+            if (!currentContacts.includes(selectedClient.id)) {
+              this.form
+                .get('contactsIds')
+                ?.setValue([...currentContacts, selectedClient.id]);
+              this.form.markAsDirty();
+            }
+          } else {
+            // It's a client
+            this.form.get('client')?.setValue(selectedClient);
+            this.form.markAsDirty();
+          }
+        });
+      });
+  }
+
+  removeContact() {
+    if (!this.selectedContactId) return;
+
+    const currentContacts = this.form.get('contactsIds')?.value || [];
+    const client = this.form.get('client')?.value;
+
+    if (this.selectedContactId === client?.id) {
+      this.form.get('client')?.setValue(null);
+    } else {
+      this.form
+        .get('contactsIds')
+        ?.setValue(
+          currentContacts.filter((id: string) => id !== this.selectedContactId)
+        );
+    }
+
+    this.selectedContactId = null;
+    this.form.markAsDirty();
+  }
+
+  isClient(contactId: string): boolean {
+    const client = this.form.get('client')?.value;
+    return client?.id === contactId;
+  }
+
   // Helper methods for form validation
   isFieldInvalid(fieldName: string): boolean {
     const field = this.form.get(fieldName);
@@ -410,9 +559,12 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   productionSum(): number {
     const formArray = this.form.get('annualPredictionPerMonth') as FormArray;
     if (!formArray) return 0;
-    
+
     const annualPredictions = formArray.value || [];
-    return annualPredictions.reduce((sum: number, value: number) => sum + (value || 0), 0);
+    return annualPredictions.reduce(
+      (sum: number, value: number) => sum + (value || 0),
+      0
+    );
   }
 
   getSystemAge(): string {
@@ -423,4 +575,26 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     const ageInYears = ageInMs / (1000 * 60 * 60 * 24 * 365.25);
     return `${ageInYears.toFixed(1)} שנים`;
   }
-} 
+
+  private getCleanedSystemData(): System {
+    const formValue = this.form.value;
+
+    const systemData: System = {
+      id: this.activatedRoute.snapshot.params['id'],
+      ...formValue,
+      location: this.selectedLocation,
+      annualPredictionPerMonth: formValue.annualPredictionPerMonth.map(
+        (val: string | number) => +val
+      ),
+    };
+    // Clean null/undefined values to avoid issues with Firestore
+    Object.keys(systemData).forEach((key) => {
+      const K = key as keyof System;
+      if (systemData[K] === undefined) {
+        (systemData as any)[K] = null;
+      }
+    });
+
+    return systemData;
+  }
+}
