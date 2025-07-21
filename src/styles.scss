@@ -49,6 +49,16 @@ body {
   --mat-standard-button-toggle-divider-color: #c3c3c3;
   //--mat-form-field-container-text-size: 40px;
 }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+// Dla przeglądarki Firefox
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
 .cdk-overlay-container mat-form-field {
   width: calc(100% - 20px);

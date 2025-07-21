@@ -32,6 +32,14 @@ form {
     display: flex;
     align-items: stretch;
 
+    &.activity {
+      margin-left: auto;
+      height: 63px;
+      flex-direction: row;
+      gap: 5px;
+      align-items: center;
+    }
+
     label {
       font-weight: 500;
       color: #1287DE;
@@ -43,7 +51,6 @@ form {
   }
 }
 
-// Cards grid layout similar to golan-solar
 .main-section {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -53,7 +60,7 @@ form {
   // Position cards using grid areas (similar to original)
   grid-template-areas:
     'loc-card loc-card contact-card contact-card det-card det-card det-card det-card'
-    'more-card more-card more-card more-card more-card comments-card comments-card comments-card';
+    'more-card more-card more-card more-card more-card more-card more-card more-card';
 
   #loc-card {
     grid-area: loc-card;
@@ -69,6 +76,13 @@ form {
 
   #more-card {
     grid-area: more-card;
+
+    .card-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 
   #comments-card {
@@ -269,6 +283,17 @@ mat-card {
       }
     }
   }
+}
+
+.additional-fields-group {
+    margin-top: 30px;
+    display: flex;
+    .desc {
+      border-right: 1px solid #eee;
+      margin-right: 25px;
+      padding-right: 25px;
+      flex: 1 1 1px;
+    }
 }
 
 // Action buttons at bottom
@@ -497,21 +522,23 @@ mat-card {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  #more-card .annual-prediction-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-
-    .form-field {
-      flex: none;
-    }
-
-    button {
-      width: 100%;
-    }
-  }
 }
 
+
+.allual-pred-row {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+
+  & > div {
+    flex: 1 1 1px;
+  }
+
+  .desc {
+    display: flex;
+    flex-direction: column;
+  }
+}
 @media (max-width: 768px) {
   .header-section .system-name-field {
     flex-direction: column;
@@ -576,4 +603,8 @@ mat-card {
   & > * {
     margin: 20px;
   }
+}
+
+.edit-button {
+  color: #2196F3;
 }

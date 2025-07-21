@@ -31,25 +31,44 @@
     </div>
 
     <form [formGroup]="form" *ngIf="!viewMode">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'personInfo.edit.name' | translate }}</mat-label>
-        <input matInput formControlName="name">
-      </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'personInfo.edit.phone' | translate }}</mat-label>
-        <input matInput formControlName="phone">
-      </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'personInfo.edit.email' | translate }}</mat-label>
-        <input matInput formControlName="email">
-      </mat-form-field>
+      <div class="form-line">
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="name">
+        </mat-form-field>
+        <label>{{ 'personInfo.edit.name' | translate }}</label>
+      </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'personInfo.edit.position' | translate }}</mat-label>
-        <input matInput formControlName="position">
-      </mat-form-field>
+      <div class="form-line">
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="phone">
+        </mat-form-field>
+        <label>{{ 'personInfo.edit.phone' | translate }}</label>
+      </div>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="email">
+        </mat-form-field>
+        <label>{{ 'personInfo.edit.email' | translate }}</label>
+      </div>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="position">
+        </mat-form-field>
+        <label>{{ 'personInfo.edit.position' | translate }}</label>
+      </div>
+
+
+
+
+
+
+
+
+
     </form>
 
   </mat-dialog-content>
@@ -65,4 +84,4 @@
     </ng-container>
   </mat-dialog-actions>
 
-</ng-container> 
+</ng-container>

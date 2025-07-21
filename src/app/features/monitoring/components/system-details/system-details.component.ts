@@ -577,6 +577,10 @@ export class SystemDetailsComponent implements AfterViewInit {
       });
   }
 
+  gotoEdit(id: string) {
+    this.router.navigate(['/system-settings', id]);
+  }
+
   onSort(sortState: Sort) {
     this.activeSort.next({
       sortDirection: sortState.direction,

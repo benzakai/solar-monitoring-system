@@ -1,0 +1,10 @@
+<div id="months-grid">
+  <div class="form-line" *ngFor="let monthKey of monthKeys; let i = index">
+    <p>{{ 'months_inputs.' + monthKey | translate }}</p>
+    <mat-form-field appearance="outline">
+      <input matInput type="number" step="1" class="no-arrows ion-text-center"
+             [formControl]="getFormControl(i)">
+      <mat-error></mat-error>
+    </mat-form-field>
+  </div>
+</div>

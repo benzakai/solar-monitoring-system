@@ -30,8 +30,18 @@
         <mat-form-field appearance="outline">
           <input matInput formControlName="portalUrl" />
         </mat-form-field>
-
       </div>
+
+
+
+      <div class="system-name-field activity">
+        <button mat-icon-button class="edit-button" (click)="gotoSystem(system.id)">
+          <mat-icon color="primary">bar_chart_4_bars</mat-icon>
+        </button>
+        <label>{{ 'system_settings.active_system' | translate }}</label>
+        <mat-slide-toggle formControlName="isActive" />
+      </div>
+
     </div>
 
     <!-- Main content with 3-column cards layout -->
@@ -71,36 +81,41 @@
             </button>
           </div>
         </div>
-        <mat-selection-list
-          [multiple]="false"
-          (selectionChange)="selectedContactId = $event.options[0].value"
-        >
-          @for (contact of systemContacts$ | async; track contact._id) {
-          <mat-list-option [value]="contact._id">
-            <div>{{ contact.name }}</div>
-            <div class="ion-text-center">
-              {{
-              isClient(contact._id)
-              ? ('system_settings.client' | translate)
-              : ''
-              }}
-            </div>
-          </mat-list-option>
-          }
-        </mat-selection-list>
-        <button
-          mat-flat-button
-          class="app-icon-text-button"
-          type="button"
-          (click)="openContactSelection()"
-        >
-          <mat-icon color="primary">add_box</mat-icon>
-          <span>{{
-            (system$ | async)?.client
-            ? ('system_settings.add_contact' | translate)
-            : ('system_settings.add_client' | translate)
-            }}</span>
-        </button>
+        @if (systemContacts$ | async; as contacts) {
+          <mat-selection-list
+            [multiple]="false"
+            (selectionChange)="selectedContactId = $event.options[0].value"
+          >
+            @for (contact of contacts; track contact._id) {
+              <mat-list-option [value]="contact._id">
+                <div>{{ contact.name }}</div>
+                <div class="ion-text-center">
+                  {{
+                    isClient(contact._id)
+                      ? ('system_settings.client' | translate)
+                      : ''
+                  }}
+                </div>
+              </mat-list-option>
+            }
+          </mat-selection-list>
+
+          <button
+            mat-flat-button
+            class="app-icon-text-button"
+            type="button"
+            (click)="openContactSelection()"
+          >
+            <mat-icon color="primary">add_box</mat-icon>
+            <span>{{
+                (system$ | async)?.client
+                  ? ('system_settings.add_contact' | translate)
+                  : ('system_settings.add_client' | translate)
+              }}</span>
+          </button>
+        }
+
+
         @if (isFieldInvalid('client')) {
         <mat-error>{{
               'system_settings.client_required' | translate
@@ -342,27 +357,21 @@
             'system_settings.is_pvsyst' | translate
           }}</mat-checkbox>
         </div>
+
         <div class="predictions-content">
           <!-- Annual prediction field -->
-          <div class="annual-prediction-row">
-            <div class="form-field">
-              <label
-                ><strong>{{
-                  'system_settings.prediction_for_connection_year' | translate
-                }}</strong></label
-              >
-              <mat-form-field appearance="outline">
-                <input
-                  matInput
-                  type="number"
-                  formControlName="annualPrediction"
-                />
-                <span matSuffix>kWh</span>
+          <div class="allual-pred-row">
+
+            <div class="form-line">
+              <mat-form-field class="inline-form" appearance="outline">
+                <input matInput type="number" formControlName="annualPrediction" />
               </mat-form-field>
+              <label>{{ 'system_settings.prediction_for_connection_year' | translate }}</label>
             </div>
             <button
               mat-flat-button
               color="primary"
+              (click)="setEnergyPrediction()"
               type="button"
               [matTooltip]="
                 'system_settings.manual_values_tooltip' | translate
@@ -370,7 +379,13 @@
             >
               {{ 'system_settings.automatic_values' | translate }}
             </button>
-            <div class="system-age">
+            <div class="desc">
+              <p>
+                <strong>{{
+                    'system_settings.updated_annual_prediction' | translate
+                  }}</strong>
+                {{ productionSum() }}
+              </p>
               <p>
                 <strong>{{
                   'system_settings.system_age' | translate
@@ -386,113 +401,56 @@
               'system_settings.annual_prediction_per_month' | translate
             }}</strong>
           </p>
-          <div
-            class="predictions-grid"
-            formArrayName="annualPredictionPerMonth"
-          >
-            @for (control of getAnnualPredictionControls(); track $index) {
-              <div class="prediction-month">
-                <label>{{ months[$index] | date: 'MMM' }}</label>
+
+
+          @if(form) {
+            <app-months-inputs
+              [formArray]="getAnnualPredictionFormArray()"
+            ></app-months-inputs>
+          }
+
+          <div class="additional-fields additional-fields-group">
+            <div class="desc">
+              <div class="form-line area">
                 <mat-form-field appearance="outline">
-                  <input matInput type="number" [formControlName]="$index" />
-                  <span matSuffix>kWh</span>
+              <textarea
+                matInput
+                formControlName="comments"
+                rows="4"
+                [placeholder]="
+                    'system_settings.enter_comments_here' | translate
+                  "
+              ></textarea>
                 </mat-form-field>
               </div>
-            }
-          </div>
-
-          @if (getAnnualPredictionControls().length > 0) {
-            <div class="prediction-summary">
-              <strong
-                >{{
-                  'system_settings.updated_annual_prediction' | translate
-                }}
-                {{ productionSum() | number: '1.0-0' }} kWh</strong
-              >
             </div>
-          }
-        </div>
-
-        <div class="additional-fields">
-          <div class="field-row">
-            <div class="form-field">
-              <label>{{ 'system_settings.azimuth' | translate }}</label>
-              <mat-form-field appearance="outline">
-                <input matInput type="number" formControlName="azimuth" />
-                <span matSuffix>°</span>
-              </mat-form-field>
-            </div>
-            <div class="form-field">
-              <label>{{ 'system_settings.tilt' | translate }}</label>
-              <mat-form-field appearance="outline">
-                <input matInput type="number" formControlName="tilt" />
-                <span matSuffix>°</span>
-              </mat-form-field>
-            </div>
-          </div>
-
-          <div class="checkboxes-row">
-            <mat-checkbox formControlName="isTracker">{{
-                'system_settings.is_tracker' | translate
-              }}</mat-checkbox>
-
-
-          </div>
-
-
-        </div>
-      </div>
-
-      <!-- Card 5: Comments and System Status -->
-      <div class="container" id="comments-card">
-        <h1>{{
-            'system_settings.comments' | translate
-          }}</h1>
-        <div class="comments-content">
-          <mat-form-field appearance="outline">
-            <textarea
-              matInput
-              formControlName="comments"
-              rows="4"
-              [placeholder]="
-                  'system_settings.enter_comments_here' | translate
-                "
-            ></textarea>
-          </mat-form-field>
-
-          @if (system) {
-            <div class="system-status">
-              <h4>{{ 'system_settings.system_status' | translate }}</h4>
-              <div class="status-info">
-                <div class="info-item">
-                  <span class="label"
-                    >{{ 'system_settings.system_id' | translate }}:</span
-                  >
-                  <span class="value">{{ system.id }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label"
-                    >{{
-                      'system_settings.last_connection' | translate
-                    }}:</span
-                  >
-                  <span class="value">{{
-                    system.lastConnectionTime | date: 'short'
-                  }}</span>
-                </div>
-                @if (system.apiId && system.apiId.length > 0) {
-                  <div class="info-item">
-                    <span class="label"
-                      >{{ 'system_settings.api_id' | translate }}:</span
-                    >
-                    <span class="value">{{ system.apiId.join(', ') }}</span>
-                  </div>
-                }
+            <div>
+              <div class="checkboxes-row">
+                <mat-checkbox formControlName="isTracker">{{
+                    'system_settings.is_tracker' | translate
+                  }}</mat-checkbox>
+              </div>
+              <div class="form-line">
+                <mat-form-field class="inline-form" appearance="outline">
+                  <input matInput type="number" formControlName="azimuth" />
+                  <span matSuffix>°</span>
+                </mat-form-field>
+                <label>{{ 'system_settings.azimuth' | translate }}</label>
+              </div>
+              <div class="form-line">
+                <mat-form-field class="inline-form" appearance="outline">
+                  <input matInput type="number" formControlName="tilt" />
+                  <span matSuffix>°</span>
+                </mat-form-field>
+                <label>{{ 'system_settings.tilt' | translate }}</label>
               </div>
             </div>
-          }
+
+          </div>
         </div>
       </div>
+      <!-- Card 5: Comments and System Status -->
+
     </div>
 
     <!-- Action Buttons at bottom -->
@@ -500,22 +458,7 @@
       <button mat-flat-button color="warn" (click)="cancel()">
         {{ 'cancel' | translate }}
       </button>
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="goToSystemDetails()"
-        [disabled]="!system"
-      >
-        {{ 'system_settings.view_system' | translate }}
-      </button>
-      <button
-        mat-flat-button
-        color="accent"
-        (click)="navigateToSystemApi()"
-        [disabled]="!system"
-      >
-        {{ 'system_settings.open_portal' | translate }}
-      </button>
+
       <button
         mat-flat-button
         color="primary"
@@ -539,3 +482,5 @@
     <p>{{ 'system_settings.loading' | translate }}</p>
   </div>
 }
+
+

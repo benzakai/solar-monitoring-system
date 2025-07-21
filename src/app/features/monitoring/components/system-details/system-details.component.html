@@ -1,11 +1,17 @@
 <div class="container">
   <div class="settings title">
-    <h1>
+
       @if (system | async; as s) {
-        <span>שם מערכת: {{s.name}}</span>
-        <span class="mat-body"> [לקוח: >{{s.client?.name}}]</span>
+        <button mat-icon-button class="edit-button" (click)="gotoEdit(s.id)">
+          <mat-icon color="primary">edit</mat-icon>
+        </button>
+        <h1 >
+
+          <span>שם מערכת: {{s.name}}</span>
+          <span class="mat-body"> [לקוח: >{{s.client?.name}}]</span>
+        </h1>
       }
-    </h1>
+
 
   </div>
   <div class="settings">

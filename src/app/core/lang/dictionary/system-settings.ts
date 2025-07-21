@@ -342,4 +342,8 @@ export const systemSettings: Dictionary = {
     en: 'Other',
     he: 'אחר',
   },
-}; 
+  active_system: {
+    en: 'Active system',
+    he: 'מערכת פעילה',
+  },
+};

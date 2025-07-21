@@ -18,7 +18,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Subject, Observable, BehaviorSubject, startWith } from 'rxjs';
 import { map, switchMap, filter, take } from 'rxjs/operators';
 
 // Angular Material imports
@@ -62,6 +62,16 @@ import { UsersFacade } from '../../state/users/users.facade';
 import { User } from '../../domain/user';
 import { PeopleService } from '../../endpoint/people.service';
 import { Person } from '../../domain/person';
+import { MonthsInputsComponent } from './components/months-inputs/months-inputs.component';
+import {
+  MatSlideToggle,
+  MatSlideToggleModule,
+} from '@angular/material/slide-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { AppEndpointService } from '../../endpoint/app-endpoint.service';
+import { AppPrediction } from '../../domain/app';
+import { PredictionCalculator } from '../../core/energy/prediction-calculator';
+import { EnergyCalc } from '../../core/energy/energy-calculator';
 
 @Component({
   selector: 'app-system-settings',
@@ -85,6 +95,8 @@ import { Person } from '../../domain/person';
     MatCardModule,
     TranslatePipe,
     MatRadioModule,
+    MonthsInputsComponent,
+    MatSlideToggleModule,
   ],
   providers: [DialogService, GoogleMapsLoaderService],
   templateUrl: './system-settings.component.html',
@@ -100,6 +112,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private mapsLoader = inject(GoogleMapsLoaderService);
   private dialog = inject(MatDialog);
   private monitorFacade = inject(MonitorFacade);
+  private appService = inject(AppEndpointService);
   private peopleService = inject(PeopleService);
   dialogService = inject(DialogService);
   translatePipe = new TranslatePipe();
@@ -111,6 +124,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private map?: google.maps.Map;
   private marker?: google.maps.Marker;
   private system: System | null = null;
+  private prediction: AppPrediction | undefined;
+  public predictionsCalc: any = { isDefaultPrediction: false };
+
+  public lastDefault = '';
 
   // Form and data
   form!: FormGroup;
@@ -131,16 +148,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   selectedLocation?: SystemLocation;
   selectedContactId: string | null = null;
 
-  systemContacts$: Observable<Person[]> = this.system$.pipe(
-    filter(Boolean),
-    switchMap((system) => {
-      const contactIds = system?.contactsIds || [];
-      if (system?.client) {
-        contactIds.push(system.client.id);
-      }
-      return this.peopleService.getPeopleByIds(contactIds);
-    })
-  );
+  systemContacts$: Observable<Person[]> | null = null;
 
   // Constants
   readonly today = new Date();
@@ -162,10 +170,14 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   externalPortals = ['GW', 'NTC', 'SLX', 'GDW', 'FSN'];
 
   ngOnInit() {
-    this.system$
+    combineLatest([
+      this.system$,
+      this.appService.get('prediction').pipe(filter(Boolean)),
+    ])
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((system) => {
+      .subscribe(([system, prediction]) => {
         this.system = system;
+        this.prediction = prediction;
         this.buildForm(system);
       });
   }
@@ -259,17 +271,12 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private buildForm(system: System | null) {
     this.selectedLocation = system?.location ?? undefined;
 
-    const annualPrediction = system?.annualPredictionPerMonth?.reduce(
-      (sum, current) => sum + current,
-      0
-    );
-
     this.form = this.formBuilder.group({
       name: [system?.name, Validators.required],
       type: [system?.type, Validators.required],
+      isActive: [system?.isActive || false],
       portalUrl: [system?.portalUrl],
       client: [system?.client, Validators.required],
-      // location is handled via selectedLocation
       contactsIds: [system?.contactsIds],
       startTime: [system?.startTime],
       contractStartTime: [system?.contractStartTime],
@@ -287,9 +294,13 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       criteria: [system?.criteria],
       panelType: [system?.panelType],
       numOfPanels: [system?.numOfPanels],
-      annualPrediction: [annualPrediction],
+      annualPrediction: [null],
       annualPredictionPerMonth: this.formBuilder.array(
-        system?.annualPredictionPerMonth || []
+        (system?.annualPredictionPerMonth &&
+        system.annualPredictionPerMonth.length === 12
+          ? system.annualPredictionPerMonth
+          : Array(12).fill(null)
+        ).map((v) => this.formBuilder.control(v))
       ),
       isPvsyst: [system?.isPvsyst || false],
       azimuth: [system?.azimuth],
@@ -301,6 +312,21 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       washRate: [system?.washRate],
       comments: [system?.comments],
     });
+
+    if (!system?.annualPredictionPerMonth.length) {
+      this.setEnergyPrediction();
+    }
+
+    this.systemContacts$ = this.form.valueChanges.pipe(
+      startWith(this.form.value),
+      switchMap((system) => {
+        const contactIds = system?.contactsIds || [];
+        if (system?.client) {
+          contactIds.push(system.client.id);
+        }
+        return this.peopleService.getPeopleByIds(contactIds);
+      })
+    );
 
     this.form
       .get('taoz')
@@ -318,8 +344,111 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         regulationControl?.updateValueAndValidity();
       });
 
+    this.form
+      .get('annualPredictionPerMonth')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        const energy = EnergyCalc.Sum(value);
+        this.form.get('annualPrediction')?.setValue(energy, {
+          emitEvent: false,
+        });
+      });
+
+    this.form
+      .get('annualPrediction')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        this.setEnergyPrediction(value || 0);
+      });
+
+    this.form
+      .get('annualPredictionPerMonth')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        const energy = EnergyCalc.Sum(value);
+        this.form.get('annualPrediction')?.setValue(energy, {
+          emitEvent: false,
+        });
+      });
+
+    this.form
+      .get('isPvsyst')
+      ?.valueChanges.pipe(
+        startWith(this.form.get('isPvsyst')?.value),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((is) => {
+        try {
+          (
+            this.form.get('annualPredictionPerMonth') as FormArray
+          ).controls.forEach((field) => {
+            if (is) {
+              field.enable();
+            } else {
+              field.disable();
+            }
+          });
+
+          const annualPrediction = this.form.get('annualPrediction');
+          if (is) {
+            annualPrediction?.disable();
+          } else {
+            annualPrediction?.enable();
+          }
+        } catch (e) {}
+      });
+
     // Manually trigger the value change to set the initial state
     this.form.get('taoz')?.updateValueAndValidity();
+  }
+
+  setEnergyPrediction(energy: number = -1) {
+    const annual = this.form.get('annualPrediction');
+    const taoz = this.form.get('taoz');
+    const autoWash = this.form.get('autoWash');
+    const perMonth = this.form.get('annualPredictionPerMonth');
+
+    if (this.prediction && annual && taoz && autoWash && autoWash && perMonth) {
+      let initialEnergy = energy;
+
+      if (energy < 0) {
+        const defaultValue = PredictionCalculator.calcDefaultValue(
+          this.form.value,
+          this.prediction
+        );
+
+        initialEnergy = defaultValue;
+
+        annual.setValue(defaultValue, {
+          emitEvent: false,
+        });
+      }
+
+      const years = this.getSystemAgeNum();
+      const production = PredictionCalculator.calcProductionByAge(
+        initialEnergy,
+        years,
+        this.prediction
+      );
+      const productionByAge = Math.round(production);
+
+      const annualDis = PredictionCalculator.calcMonthsDistribution(
+        productionByAge,
+        !!taoz.value,
+        this.prediction,
+        this.form.value,
+        autoWash.value
+      );
+
+      this.lastDefault = annualDis.join(',');
+
+      annualDis.forEach((v, i) => {
+        const field = (perMonth as FormArray).at(i);
+        field.setValue(v, {
+          emitEvent: false,
+        });
+      });
+    }
   }
 
   private getMonths(): Date[] {
@@ -349,6 +478,14 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     };
   }
 
+  checkPvsyst(event: boolean) {
+    //TODO implement
+  }
+
+  checkTracker(event: boolean) {
+    //TODO implement
+  }
+
   private getCriteriaDict(): Record<string, string> {
     return {
       [SystemCriteria.COWSHED]: 'cowshed',
@@ -360,10 +497,6 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       [SystemCriteria.SCHOOL]: 'school',
       [SystemCriteria.OTHER]: 'other',
     };
-  }
-
-  getAnnualPredictionControls(): AbstractControl[] {
-    return (this.form.get('annualPredictionPerMonth') as FormArray).controls;
   }
 
   getAnnualPredictionFormArray(): FormArray {
@@ -413,7 +546,16 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         startTime: this.iso(rawFormVelue.startTime),
         contractStartTime: this.iso(rawFormVelue.contractStartTime),
         annualCheckDate: this.iso(rawFormVelue.annualCheckDate),
+        newSys: true,
       };
+
+      const annualPredictionPerMonthSerial =
+        formValue.annualPredictionPerMonth.join(',');
+      if (this.lastDefault === annualPredictionPerMonthSerial) {
+        delete formValue.annualPredictionPerMonth;
+      }
+
+      delete formValue.annualPrediction;
 
       if (this.selectedLocation) {
         formValue.location = this.selectedLocation;
@@ -464,6 +606,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     } else {
       this.goBack();
     }
+  }
+
+  gotoSystem(id: string) {
+    this.router.navigate(['/system', id]);
   }
 
   private goBack() {
@@ -523,13 +669,13 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
     if (this.selectedContactId === client?.id) {
       this.form.get('client')?.setValue(null);
-    } else {
-      this.form
-        .get('contactsIds')
-        ?.setValue(
-          currentContacts.filter((id: string) => id !== this.selectedContactId)
-        );
     }
+
+    this.form
+      .get('contactsIds')
+      ?.setValue(
+        currentContacts.filter((id: string) => id !== this.selectedContactId)
+      );
 
     this.selectedContactId = null;
     this.form.markAsDirty();
@@ -567,34 +713,17 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  getSystemAge(): string {
-    if (!this.form.value.startTime) return 'N/A';
+  getSystemAgeNum(): number {
+    if (!this.form.value.startTime) return 0;
     const startDate = new Date(this.form.value.startTime);
     const now = new Date();
     const ageInMs = now.getTime() - startDate.getTime();
     const ageInYears = ageInMs / (1000 * 60 * 60 * 24 * 365.25);
-    return `${ageInYears.toFixed(1)} שנים`;
+    return Math.floor(ageInYears);
   }
 
-  private getCleanedSystemData(): System {
-    const formValue = this.form.value;
-
-    const systemData: System = {
-      id: this.activatedRoute.snapshot.params['id'],
-      ...formValue,
-      location: this.selectedLocation,
-      annualPredictionPerMonth: formValue.annualPredictionPerMonth.map(
-        (val: string | number) => +val
-      ),
-    };
-    // Clean null/undefined values to avoid issues with Firestore
-    Object.keys(systemData).forEach((key) => {
-      const K = key as keyof System;
-      if (systemData[K] === undefined) {
-        (systemData as any)[K] = null;
-      }
-    });
-
-    return systemData;
+  getSystemAge(): string {
+    if (!this.form.value.startTime) return 'N/A';
+    return `${this.getSystemAgeNum()} שנים `;
   }
 }

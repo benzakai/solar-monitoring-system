@@ -43,16 +43,18 @@ export class ContactSelectionDialogComponent {
   constructor() {
     this.filteredClients$ = combineLatest([
       this.clients$,
-      this.searchControl.valueChanges.pipe(startWith(''))
+      this.searchControl.valueChanges.pipe(startWith('')),
     ]).pipe(
       map(([clients, searchTerm]) => {
         const filterValue = (searchTerm || '').toLowerCase();
-        return clients.filter(client => client.name.toLowerCase().includes(filterValue));
+        return clients.filter((client) =>
+          client.name.toLowerCase().includes(filterValue)
+        );
       })
     );
   }
-  
-  onClientSelected(client: IdName): void {
-    this.dialogRef.close(client);
+
+  onClientSelected({ id, name }: IdName): void {
+    this.dialogRef.close({ id, name });
   }
-} 
+}
