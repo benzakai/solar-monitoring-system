@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, Firestore, query, where } from '@angular/fire/firestore';
+import {
+  collection,
+  doc,
+  Firestore,
+  query,
+  setDoc,
+  where,
+} from '@angular/fire/firestore';
 import { forkJoin, from, map, Observable, of } from 'rxjs';
 import { chunkArray } from './chunk-array.function';
 import { getDocs } from 'firebase/firestore';
@@ -45,5 +52,23 @@ export class PeopleService {
         snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
       )
     );
+  }
+
+  addClient(props: {
+    clientName: string;
+    email: string;
+    phone: string;
+  }): Observable<any> {
+    const docRef = doc(this.collection);
+    const newClient = {
+      name: props.clientName,
+      email: props.email,
+      phone: props.phone,
+      isClient: true,
+      isActive: true,
+      clientType: 'private',
+      id: docRef.id,
+    };
+    return from(setDoc(docRef, newClient)).pipe(map(() => newClient));
   }
 }

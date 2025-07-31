@@ -1,252 +1,218 @@
 @if (system$ | async; as system) {
-  <form [formGroup]="form">
-    <!-- Header with system name -->
-    <div class="header-section">
-      <div class="system-name-field">
-        <label>{{ 'system_settings.system_name' | translate }}</label>
-        <mat-form-field appearance="outline">
-          <input matInput formControlName="name" />
-          @if (isFieldInvalid('name')) {
-            <mat-error>{{ getFieldError('name') }}</mat-error>
-          }
-        </mat-form-field>
-      </div>
-
-      <div class="system-name-field">
-        <label>Api</label>
-        <mat-form-field appearance="outline">
-          <mat-select formControlName="type" (selectionChange)="setApiId()">
-            @for (type of systemTypes; track type) {
-              <mat-option [value]="type">
-                {{ systemTypeDict[type] }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="system-name-field">
-        <label>{{ 'system_settings.portal_url' | translate }}</label>
-        <mat-form-field appearance="outline">
-          <input matInput formControlName="portalUrl" />
-        </mat-form-field>
-      </div>
-
-
-
-      <div class="system-name-field activity">
-        <button mat-icon-button class="edit-button" (click)="gotoSystem(system.id)">
-          <mat-icon color="primary">bar_chart_4_bars</mat-icon>
-        </button>
-        <label>{{ 'system_settings.active_system' | translate }}</label>
-        <mat-slide-toggle formControlName="isActive" />
-      </div>
-
-    </div>
-
-    <!-- Main content with 3-column cards layout -->
-    <div class="main-section">
-      <!-- Card 1: Location with Map (left) -->
-      <div class="container" id="loc-card">
-        <h1>{{
-            'system_settings.location' | translate
-          }}</h1>
-
-        <div #map id="map"></div>
-      </div>
-
-      <!-- Card 2: Client Information (center) -->
-      <div class="container" id="contact-card">
-        <div class="card-header">
-          <h1>{{
-            'system_settings.client' | translate
-          }}</h1>
-          <div>
-            <button
-              mat-icon-button
-              color="warn"
-              type="button"
-              [matTooltip]="'system_settings.remove_contact' | translate"
-              (click)="removeContact()"
-              *ngIf="selectedContactId"
-            >
-              <mat-icon>person_remove</mat-icon>
+  @if (form) {
+    <form [formGroup]="form">
+      <!-- Header with system name -->
+      <div class="header-section">
+        <div class="system-name-field">
+          <label>Api </label>
+          <div style="display: flex;">
+            <button mat-icon-button type="button" *ngIf="system?.type" (click)="setApiId()" class="edit-button" matTooltip="חיבור לפורטל">
+              <mat-icon>build</mat-icon>
             </button>
-            <button
-              mat-icon-button
-              (click)="personInfo(selectedContactId)"
-              *ngIf="selectedContactId"
-            >
-              <mat-icon>info</mat-icon>
-            </button>
+            <mat-form-field appearance="outline">
+              <mat-select formControlName="type" (selectionChange)="setApiId()">
+                @for (type of systemTypes; track type) {
+                  <mat-option [value]="type">
+                    {{ systemTypeDict[type] }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
         </div>
-        @if (systemContacts$ | async; as contacts) {
-          <mat-selection-list
-            [multiple]="false"
-            (selectionChange)="selectedContactId = $event.options[0].value"
-          >
-            @for (contact of contacts; track contact._id) {
-              <mat-list-option [value]="contact._id">
-                <div>{{ contact.name }}</div>
-                <div class="ion-text-center">
-                  {{
-                    isClient(contact._id)
-                      ? ('system_settings.client' | translate)
-                      : ''
-                  }}
-                </div>
-              </mat-list-option>
+
+        <div class="system-name-field">
+          <label>{{ 'system_settings.system_name' | translate }}</label>
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="name" />
+            @if (isFieldInvalid('name')) {
+              <mat-error>{{ getFieldError('name') }}</mat-error>
             }
-          </mat-selection-list>
+          </mat-form-field>
+        </div>
 
-          <button
-            mat-flat-button
-            class="app-icon-text-button"
-            type="button"
-            (click)="openContactSelection()"
-          >
-            <mat-icon color="primary">add_box</mat-icon>
-            <span>{{
-                (system$ | async)?.client
-                  ? ('system_settings.add_contact' | translate)
-                  : ('system_settings.add_client' | translate)
-              }}</span>
+        <div class="system-name-field">
+          <label>{{ 'system_settings.portal_url' | translate }}</label>
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="portalUrl" />
+          </mat-form-field>
+        </div>
+
+        <div class="system-name-field activity">
+          <button mat-icon-button class="edit-button" [disabled]="noId | async">
+            <mat-icon color="primary">bar_chart_4_bars</mat-icon>
           </button>
-        }
+          <label>{{ 'system_settings.active_system' | translate }}</label>
+          <mat-slide-toggle formControlName="isActive" />
+        </div>
 
-
-        @if (isFieldInvalid('client')) {
-        <mat-error>{{
-              'system_settings.client_required' | translate
-            }}</mat-error>
-        }
       </div>
 
-      <!-- Card 3: System Details (right) -->
-      <div class="container" id="det-card">
-        <h1>{{
-            'system_settings.basic_info' | translate
-          }}</h1>
-        <div class="system-details-grid">
-          <div class="details-column basic-info-column-1">
+      <!-- Main content with 3-column cards layout -->
+      <div class="main-section">
+        <!-- Card 1: Location with Map (left) -->
+        <div class="container" id="loc-card">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <h1>{{
+                'system_settings.location' | translate
+              }}</h1>
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput formControlName="communication" />
-              </mat-form-field>
-              <label>{{ 'system_settings.communication' | translate }}</label>
+            <button
+              class="edit-button"
+              mat-icon-button
+              type="button"
+              color="primary"
+              [matTooltip]="'edit_location' | translate"
+              [disabled]="!system"
+              (click)="openRegionMap()"
+            >
+              <mat-icon>map</mat-icon>
+            </button>
+          </div>
+
+          <div #map id="map"></div>
+        </div>
+
+        <!-- Card 2: Client Information (center) -->
+        <div class="container" id="contact-card">
+          <div class="card-header">
+            <h1>{{
+                'system_settings.client' | translate
+              }}</h1>
+            <div>
+              <button
+                mat-icon-button
+                color="warn"
+                type="button"
+                [matTooltip]="'system_settings.remove_contact' | translate"
+                (click)="removeContact()"
+                *ngIf="selectedContactId"
+              >
+                <mat-icon>person_remove</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                (click)="personInfo(selectedContactId)"
+                *ngIf="selectedContactId"
+              >
+                <mat-icon>info</mat-icon>
+              </button>
             </div>
+          </div>
+          @if (systemContacts$ | async; as contacts) {
+            <mat-selection-list
+              [multiple]="false"
+              (selectionChange)="selectedContactId = $event.options[0].value"
+            >
+              @for (contact of contacts; track contact._id) {
+                <mat-list-option [value]="contact._id">
+                  <div style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center">
+                    {{ contact.name }}
+                    <a class="link" href="tel:{{contact.email}}">{{contact.email}}</a>
+                    <a class="link" href="tel:{{contact.phone}}">{{contact.phone}}</a>
+                  </div>
+                  <div class="ion-text-center">
+                    {{
+                      isClient(contact._id)
+                        ? ('system_settings.client' | translate)
+                        : ''
+                    }}
+                  </div>
+                </mat-list-option>
+              }
+            </mat-selection-list>
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input
-                  matInput
-                  [matDatepicker]="startPicker"
-                  formControlName="startTime"
-                />
-                <mat-datepicker-toggle
-                  matSuffix
-                  [for]="startPicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #startPicker></mat-datepicker>
-              </mat-form-field>
-              <label>{{ 'system_settings.start_time' | translate }}</label>
-            </div>
+            <button
+              mat-flat-button
+              class="app-icon-text-button"
+              type="button"
+              (click)="openContactSelection()"
+            >
+              <mat-icon color="primary">add_box</mat-icon>
+              <span>{{
+                  (system$ | async)?.client
+                    ? ('system_settings.add_contact' | translate)
+                    : ('system_settings.add_client' | translate)
+                }}</span>
+            </button>
+          }
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input
-                        matInput
-                        [matDatepicker]="contractStartPicker"
-                        formControlName="contractStartTime"
-                />
-                <mat-datepicker-toggle
-                        matSuffix
-                        [for]="contractStartPicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #contractStartPicker></mat-datepicker>
-              </mat-form-field>
-              <label>{{ 'system_settings.contract_start_time' | translate }}</label>
-            </div>
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input
-                        matInput
-                        [matDatepicker]="annualCheckPicker"
-                        formControlName="annualCheckDate"
-                />
-                <mat-datepicker-toggle
-                        matSuffix
-                        [for]="annualCheckPicker"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #annualCheckPicker></mat-datepicker>
-              </mat-form-field>
-              <label>{{ 'system_settings.annual_check_date' | translate }}</label>
-            </div>
+          @if (isFieldInvalid('client')) {
+            <mat-error>{{
+                'system_settings.client_required' | translate
+              }}</mat-error>
+          }
+        </div>
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput formControlName="installer" />
-              </mat-form-field>
-              <label>{{ 'system_settings.installer' | translate }}</label>
-            </div>
+        <!-- Card 3: System Details (right) -->
+        <div class="container" id="det-card">
+          <h1>{{
+              'system_settings.basic_info' | translate
+            }}</h1>
+          <div class="system-details-grid">
+            <div class="details-column basic-info-column-1">
 
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input
-                  matInput
-                  type="number"
-                  step="0.01"
-                  formControlName="monitorPriceKw"
-                />
-                <span matSuffix>₪</span>
-              </mat-form-field>
-              <label>{{
-                  'system_settings.monitor_price_kw' | translate
-                }}</label>
-            </div>
-
-            <mat-radio-group formControlName="taoz" class="taoz-group">
-              <div class="radio-buttons">
-                <mat-radio-button [value]="null">{{ 'system_settings.regular_tariff' | translate }}</mat-radio-button>
-                <mat-radio-button value="low">{{ 'system_settings.taoz_low' | translate }}</mat-radio-button>
-                <mat-radio-button value="high">{{ 'system_settings.taoz_high' | translate }}</mat-radio-button>
-              </div>
-            </mat-radio-group>
-
-            @if (form.get('taoz')?.value === null) {
               <div class="form-line">
                 <mat-form-field appearance="outline">
-                  <input matInput type="number" formControlName="regulation" />
-                  <span matSuffix>₪</span>
+                  <input matInput formControlName="communication" />
                 </mat-form-field>
-                <label>{{ 'system_settings.regulation' | translate }}</label>
+                <label>{{ 'system_settings.communication' | translate }}</label>
               </div>
-            }
 
-            <mat-checkbox formControlName="autoWash">{{
-                'system_settings.auto_wash' | translate
-              }}</mat-checkbox>
-
-            <mat-checkbox formControlName="washControl">{{
-                'system_settings.wash_control' | translate
-              }}</mat-checkbox>
-
-
-            @if (form.get('washControl')?.value) {
               <div class="form-line">
                 <mat-form-field appearance="outline">
-                  <mat-select formControlName="washType">
-                    @for (washType of washTypes; track washType.value) {
-                      <mat-option [value]="washType.value">{{
-                          washType.type | translate
-                        }}</mat-option>
-                    }
-                  </mat-select>
+                  <input
+                    matInput
+                    [matDatepicker]="startPicker"
+                    formControlName="startTime"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="startPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #startPicker></mat-datepicker>
                 </mat-form-field>
-                <label>{{ 'system_settings.wash_type' | translate }}</label>
+                <label>{{ 'system_settings.start_time' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input
+                    matInput
+                    [matDatepicker]="contractStartPicker"
+                    formControlName="contractStartTime"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="contractStartPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #contractStartPicker></mat-datepicker>
+                </mat-form-field>
+                <label>{{ 'system_settings.contract_start_time' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input
+                    matInput
+                    [matDatepicker]="annualCheckPicker"
+                    formControlName="annualCheckDate"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="annualCheckPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #annualCheckPicker></mat-datepicker>
+                </mat-form-field>
+                <label>{{ 'system_settings.annual_check_date' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="installer" />
+                </mat-form-field>
+                <label>{{ 'system_settings.installer' | translate }}</label>
               </div>
 
               <div class="form-line">
@@ -255,164 +221,248 @@
                     matInput
                     type="number"
                     step="0.01"
-                    formControlName="washRate"
+                    formControlName="monitorPriceKw"
                   />
                   <span matSuffix>₪</span>
                 </mat-form-field>
-                <label>{{ 'system_settings.wash_rate' | translate }}</label>
+                <label>{{
+                    'system_settings.monitor_price_kw' | translate
+                  }}</label>
               </div>
-            }
+
+              <mat-radio-group formControlName="taoz" class="taoz-group">
+                <div class="radio-buttons">
+                  <mat-radio-button [value]="null">{{ 'system_settings.regular_tariff' | translate }}</mat-radio-button>
+                  <mat-radio-button value="low">{{ 'system_settings.taoz_low' | translate }}</mat-radio-button>
+                  <mat-radio-button value="high">{{ 'system_settings.taoz_high' | translate }}</mat-radio-button>
+                </div>
+              </mat-radio-group>
+
+              @if (form.get('taoz')?.value === null) {
+                <div class="form-line">
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" formControlName="regulation" />
+                    <span matSuffix>₪</span>
+                  </mat-form-field>
+                  <label>{{ 'system_settings.regulation' | translate }}</label>
+                </div>
+              }
+
+              <mat-checkbox formControlName="autoWash">{{
+                  'system_settings.auto_wash' | translate
+                }}</mat-checkbox>
+
+              <mat-checkbox formControlName="washControl">{{
+                  'system_settings.wash_control' | translate
+                }}</mat-checkbox>
+
+
+              @if (form.get('washControl')?.value) {
+                <div class="form-line">
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="washType">
+                      @for (washType of washTypes; track washType.value) {
+                        <mat-option [value]="washType.value">{{
+                            washType.type | translate
+                          }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <label>{{ 'system_settings.wash_type' | translate }}</label>
+                </div>
+
+                <div class="form-line">
+                  <mat-form-field appearance="outline">
+                    <input
+                      matInput
+                      type="number"
+                      step="0.01"
+                      formControlName="washRate"
+                    />
+                    <span matSuffix>₪</span>
+                  </mat-form-field>
+                  <label>{{ 'system_settings.wash_rate' | translate }}</label>
+                </div>
+              }
 
 
 
 
-          </div>
-          <div class="rif"></div>
-          <div class="details-column">
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <mat-select formControlName="source">
-                  <mat-option value="project">{{
-                    'system_settings.source_project' | translate
-                  }}</mat-option>
-                  <mat-option value="new">{{
-                    'system_settings.source_new' | translate
-                  }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-              <label>{{ 'system_settings.source' | translate }}</label>
+            </div>
+            <div class="rif"></div>
+            <div class="details-column">
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="source">
+                    <mat-option value="project">{{
+                        'system_settings.source_project' | translate
+                      }}</mat-option>
+                    <mat-option value="new">{{
+                        'system_settings.source_new' | translate
+                      }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <label>{{ 'system_settings.source' | translate }}</label>
+              </div>
+
+              <!--              <div class="form-line">-->
+              <!--                <mat-form-field class="inline-form" appearance="outline">-->
+
+              <!--                </mat-form-field>-->
+              <!--                <label></label>-->
+              <!--              </div>-->
+
+              <div class="form-line">
+                <mat-form-field class="inline-form" appearance="outline">
+                  <input matInput type="number" formControlName="AC" />
+                </mat-form-field>
+                <label>{{ 'system_settings.ac' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="KWP" />
+                  <span matSuffix>KW</span>
+                </mat-form-field>
+                <label>{{ 'system_settings.kwp' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="power" />
+                  <span matSuffix>W</span>
+                </mat-form-field>
+                <label>{{ 'system_settings.power' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="criteria">
+                    @for (c of criteria; track c) {
+                      <mat-option [value]="c">{{
+                          'system_settings.' + criteriaDict[c] | translate
+                        }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <label>{{ 'system_settings.roof_type' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="panelType" />
+                </mat-form-field>
+                <label>{{ 'system_settings.panel_type' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" formControlName="numOfPanels" />
+                </mat-form-field>
+                <label>{{ 'system_settings.num_of_panels' | translate }}</label>
+              </div>
+
+
+              <p>{{ 'system_settings.converters' | translate }}</p>
+              <ng-container formArrayName="converters">
+                <div class="form-line" style="width: 250px;display: flex;" *ngFor="let con of getConvertersFormGroup(); let i = index" [formGroupName]="i">
+                  <mat-form-field appearance="outline" color="accent" style="flex: 0 0 50px;">
+                    <input matInput placeholder="כמות" type="number" formControlName="amount">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" color="accent" style="flex: 0 0 150px">
+                    <input matInput placeholder="דגם" formControlName="model">
+                  </mat-form-field>
+
+                </div>
+              </ng-container>
+              <button mat-icon-button type="button" color="primary"
+                      (click)="addConverter()"
+                      [disabled]="!system || form.get('converters')?.invalid"
+              >
+                <mat-icon>add_box</mat-icon>
+              </button>
+              <button mat-icon-button type="button" color="warn"
+                      (click)="removeConverter()"
+                      [disabled]="!system || !this.getConvertersFormGroup().length"
+              >
+                <mat-icon>disabled_by_default</mat-icon>
+              </button>
+
+
             </div>
 
-            <!--              <div class="form-line">-->
-            <!--                <mat-form-field class="inline-form" appearance="outline">-->
 
-            <!--                </mat-form-field>-->
-            <!--                <label></label>-->
-            <!--              </div>-->
-
-            <div class="form-line">
-              <mat-form-field class="inline-form" appearance="outline">
-                <input matInput type="number" formControlName="AC" />
-              </mat-form-field>
-              <label>{{ 'system_settings.ac' | translate }}</label>
-            </div>
-
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput type="number" formControlName="KWP" />
-                <span matSuffix>KW</span>
-              </mat-form-field>
-              <label>{{ 'system_settings.kwp' | translate }}</label>
-            </div>
-
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput type="number" formControlName="power" />
-                <span matSuffix>W</span>
-              </mat-form-field>
-              <label>{{ 'system_settings.power' | translate }}</label>
-            </div>
-
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <mat-select formControlName="criteria">
-                  @for (c of criteria; track c) {
-                    <mat-option [value]="c">{{
-                      'system_settings.' + criteriaDict[c] | translate
-                    }}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              <label>{{ 'system_settings.roof_type' | translate }}</label>
-            </div>
-
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput formControlName="panelType" />
-              </mat-form-field>
-              <label>{{ 'system_settings.panel_type' | translate }}</label>
-            </div>
-
-            <div class="form-line">
-              <mat-form-field appearance="outline">
-                <input matInput type="number" formControlName="numOfPanels" />
-              </mat-form-field>
-              <label>{{ 'system_settings.num_of_panels' | translate }}</label>
-            </div>
           </div>
 
 
         </div>
 
+        <!-- Card 4: Annual Predictions (spans full width) -->
+        <div class="container" id="more-card">
+          <div class="card-header">
+            <h1>{{
+                'system_settings.annual_predictions' | translate
+              }}</h1>
+            <mat-checkbox formControlName="isPvsyst">{{
+                'system_settings.is_pvsyst' | translate
+              }}</mat-checkbox>
+          </div>
 
-      </div>
+          <div class="predictions-content">
+            <!-- Annual prediction field -->
+            <div class="allual-pred-row">
 
-      <!-- Card 4: Annual Predictions (spans full width) -->
-      <div class="container" id="more-card">
-        <div class="card-header">
-          <h1>{{
-            'system_settings.annual_predictions' | translate
-          }}</h1>
-          <mat-checkbox formControlName="isPvsyst">{{
-            'system_settings.is_pvsyst' | translate
-          }}</mat-checkbox>
-        </div>
-
-        <div class="predictions-content">
-          <!-- Annual prediction field -->
-          <div class="allual-pred-row">
-
-            <div class="form-line">
-              <mat-form-field class="inline-form" appearance="outline">
-                <input matInput type="number" formControlName="annualPrediction" />
-              </mat-form-field>
-              <label>{{ 'system_settings.prediction_for_connection_year' | translate }}</label>
-            </div>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="setEnergyPrediction()"
-              type="button"
-              [matTooltip]="
+              <div class="form-line">
+                <mat-form-field class="inline-form" appearance="outline">
+                  <input matInput type="number" formControlName="annualPrediction" />
+                </mat-form-field>
+                <label>{{ 'system_settings.prediction_for_connection_year' | translate }}</label>
+              </div>
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="setEnergyPrediction()"
+                type="button"
+                [matTooltip]="
                 'system_settings.manual_values_tooltip' | translate
               "
-            >
-              {{ 'system_settings.automatic_values' | translate }}
-            </button>
-            <div class="desc">
-              <p>
-                <strong>{{
-                    'system_settings.updated_annual_prediction' | translate
-                  }}</strong>
-                {{ productionSum() }}
-              </p>
-              <p>
-                <strong>{{
-                  'system_settings.system_age' | translate
-                }}</strong>
-                {{ getSystemAge() }}
-              </p>
+              >
+                {{ 'system_settings.automatic_values' | translate }}
+              </button>
+              <div class="desc">
+                <p>
+                  <strong>{{
+                      'system_settings.updated_annual_prediction' | translate
+                    }}</strong>
+                  {{ productionSum() }}
+                </p>
+                <p>
+                  <strong>{{
+                      'system_settings.system_age' | translate
+                    }}</strong>
+                  {{ getSystemAge() }}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <!-- Monthly predictions -->
-          <p>
-            <strong>{{
-              'system_settings.annual_prediction_per_month' | translate
-            }}</strong>
-          </p>
+            <!-- Monthly predictions -->
+            <p>
+              <strong>{{
+                  'system_settings.annual_prediction_per_month' | translate
+                }}</strong>
+            </p>
 
 
-          @if(form) {
-            <app-months-inputs
-              [formArray]="getAnnualPredictionFormArray()"
-            ></app-months-inputs>
-          }
+            @if(form) {
+              <app-months-inputs
+                [formArray]="getAnnualPredictionFormArray()"
+              ></app-months-inputs>
+            }
 
-          <div class="additional-fields additional-fields-group">
-            <div class="desc">
-              <div class="form-line area">
-                <mat-form-field appearance="outline">
+            <div class="additional-fields additional-fields-group">
+              <div class="desc">
+                <div class="form-line area">
+                  <mat-form-field appearance="outline">
               <textarea
                 matInput
                 formControlName="comments"
@@ -421,61 +471,63 @@
                     'system_settings.enter_comments_here' | translate
                   "
               ></textarea>
-                </mat-form-field>
+                  </mat-form-field>
+                </div>
               </div>
-            </div>
-            <div>
-              <div class="checkboxes-row">
-                <mat-checkbox formControlName="isTracker">{{
-                    'system_settings.is_tracker' | translate
-                  }}</mat-checkbox>
+              <div>
+                <div class="checkboxes-row">
+                  <mat-checkbox formControlName="isTracker">{{
+                      'system_settings.is_tracker' | translate
+                    }}</mat-checkbox>
+                </div>
+                <div class="form-line">
+                  <mat-form-field class="inline-form" appearance="outline">
+                    <input matInput type="number" formControlName="azimuth" />
+                    <span matSuffix>°</span>
+                  </mat-form-field>
+                  <label>{{ 'system_settings.azimuth' | translate }}</label>
+                </div>
+                <div class="form-line">
+                  <mat-form-field class="inline-form" appearance="outline">
+                    <input matInput type="number" formControlName="tilt" />
+                    <span matSuffix>°</span>
+                  </mat-form-field>
+                  <label>{{ 'system_settings.tilt' | translate }}</label>
+                </div>
               </div>
-              <div class="form-line">
-                <mat-form-field class="inline-form" appearance="outline">
-                  <input matInput type="number" formControlName="azimuth" />
-                  <span matSuffix>°</span>
-                </mat-form-field>
-                <label>{{ 'system_settings.azimuth' | translate }}</label>
-              </div>
-              <div class="form-line">
-                <mat-form-field class="inline-form" appearance="outline">
-                  <input matInput type="number" formControlName="tilt" />
-                  <span matSuffix>°</span>
-                </mat-form-field>
-                <label>{{ 'system_settings.tilt' | translate }}</label>
-              </div>
-            </div>
 
+            </div>
           </div>
         </div>
+        <!-- Card 5: Comments and System Status -->
+
       </div>
-      <!-- Card 5: Comments and System Status -->
 
-    </div>
+      <!-- Action Buttons at bottom -->
+      <div class="button-container">
+        <button mat-flat-button color="warn" (click)="cancel()">
+          {{ 'cancel' | translate }}
+        </button>
 
-    <!-- Action Buttons at bottom -->
-    <div class="button-container">
-      <button mat-flat-button color="warn" (click)="cancel()">
-        {{ 'cancel' | translate }}
-      </button>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="save()"
+          [disabled]="saving$ | async"
+        >
+          @if (saving$ | async) {
+            <mat-progress-spinner
+              diameter="20"
+              mode="indeterminate"
+            ></mat-progress-spinner>
+          } @else {
+            {{ 'save' | translate }}
+          }
+        </button>
+      </div>
+    </form>
+  }
 
-      <button
-        mat-flat-button
-        color="primary"
-        (click)="save()"
-        [disabled]="saving$ | async"
-      >
-        @if (saving$ | async) {
-          <mat-progress-spinner
-            diameter="20"
-            mode="indeterminate"
-          ></mat-progress-spinner>
-        } @else {
-          {{ 'save' | translate }}
-        }
-      </button>
-    </div>
-  </form>
 } @else {
   <div class="loading-container">
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>

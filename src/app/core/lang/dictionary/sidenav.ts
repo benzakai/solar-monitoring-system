@@ -33,4 +33,8 @@ export const sidenav: Dictionary = {
     he: 'הגדרות מערכת',
     en: 'System Settings',
   },
+  create_system: {
+    he: 'יצירת מערכת חדשה',
+    en: 'Create system',
+  },
 };

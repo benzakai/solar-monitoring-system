@@ -107,6 +107,11 @@ export class AppComponent implements AfterViewInit {
     this.router.navigate([to]);
   }
 
+  creteSystem() {
+    this.toggle.next(null);
+    this.router.navigate(['system-settings', 'new']);
+  }
+
   logout() {
     this.toggle.next(null);
     this.auth.signOut().then(() => {

@@ -178,6 +178,38 @@ export const systemSettings: Dictionary = {
     en: 'Add contact',
     he: 'הוסף איש קשר',
   },
+  list: {
+    en: 'List',
+    he: 'רשימה',
+  },
+  new: {
+    en: 'New',
+    he: 'חדש'
+  },
+  save_and_add_user: {
+    en: 'Save and add user',
+    he: 'שמור והוסף משתמש'
+  },
+  name: {
+    en: 'Name',
+    he: 'שם'
+  },
+  email: {
+    en: 'Email',
+    he: 'אימייל'
+  },
+  phone: {
+    en: 'Phone',
+    he: 'טלפון'
+  },
+  field_required: {
+    en: 'This field is required',
+    he: 'שדה חובה'
+  },
+  invalid_email: {
+    en: 'Invalid email format',
+    he: 'כתובת אימייל לא תקינה'
+  },
   add_client: {
     en: 'Add Client',
     he: 'הוסף לקוח',
@@ -345,5 +377,79 @@ export const systemSettings: Dictionary = {
   active_system: {
     en: 'Active system',
     he: 'מערכת פעילה',
+  },
+  converters: {
+    en: 'Converters',
+    he: 'ממירים',
+  },
+
+  // Region Group Dialog
+  region_group_dialog_title: {
+    en: 'System Location',
+    he: 'מיקום מערכת',
+  },
+  region: {
+    en: 'Region',
+    he: 'אזור',
+  },
+  regional_comparison_systems: {
+    en: 'Number of systems for regional comparison',
+    he: 'מספר מערכות להשוואה אזורית',
+  },
+  reset_systems_in_range: {
+    en: 'Reset systems in range',
+    he: 'איפוס מערכות בטווח',
+  },
+  km: {
+    en: 'km',
+    he: 'ק"מ',
+  },
+  save: {
+    en: 'Save',
+    he: 'שמירה',
+  },
+  cancel: {
+    en: 'Cancel',
+    he: 'ביטול',
+  },
+  edit_location: {
+    en: 'Edit Location',
+    he: 'עריכת מיקום',
+  },
+  controls: {
+    name: { en: 'Name', he: 'שם' },
+    type: { en: 'Type', he: 'סוג' },
+    isActive: { en: 'Active', he: 'פעיל' },
+    portalUrl: { en: 'Portal URL', he: 'כתובת פורטל' },
+    client: { en: 'Client', he: 'לקוח' },
+    contactsIds: { en: 'Contacts', he: 'אנשי קשר' },
+    startTime: { en: 'Start Time', he: 'תאריך התחלה' },
+    contractStartTime: { en: 'Contract Start', he: 'תחילת חוזה' },
+    annualCheckDate: { en: 'Annual Check Date', he: 'תאריך בדיקה שנתית' },
+    taoz: { en: 'Taoz', he: 'תעוז' },
+    regulation: { en: 'Regulation', he: 'רגולציה' },
+    excludeFromAverage: { en: 'Exclude From Average', he: 'אל תכלול בממוצע' },
+    communication: { en: 'Communication', he: 'תקשורת' },
+    installer: { en: 'Installer', he: 'מתקין' },
+    monitorPriceKw: { en: 'Monitor Price per kW', he: 'מחיר ניטור לקוט' },
+    source: { en: 'Source', he: 'מקור' },
+    AC: { en: 'AC', he: 'זרם חילופין' },
+    KWP: { en: 'KWP', he: 'קילוואט פיק' },
+    power: { en: 'Power', he: 'הספק' },
+    criteria: { en: 'Criteria', he: 'קריטריונים' },
+    panelType: { en: 'Panel Type', he: 'סוג פאנל' },
+    numOfPanels: { en: 'Number of Panels', he: 'מספר פאנלים' },
+    annualPrediction: { en: 'Annual Prediction', he: 'תחזית שנתית' },
+    converters: { en: 'Converters', he: 'ממירים' },
+    annualPredictionPerMonth: { en: 'Monthly Prediction', he: 'תחזית חודשית' },
+    isPvsyst: { en: 'Is PVSyst', he: 'PVSyst' },
+    azimuth: { en: 'Azimuth', he: 'אזימוט' },
+    tilt: { en: 'Tilt', he: 'זווית הטייה' },
+    isTracker: { en: 'Tracker', he: 'עוקב שמש' },
+    washControl: { en: 'Wash Control', he: 'בקרת שטיפה' },
+    autoWash: { en: 'Auto Wash', he: 'שטיפה אוטומטית' },
+    washType: { en: 'Wash Type', he: 'סוג שטיפה' },
+    washRate: { en: 'Wash Rate', he: 'תדירות שטיפה' },
+    comments: { en: 'Comments', he: 'הערות' },
   },
 };

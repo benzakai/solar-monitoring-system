@@ -1,6 +1,7 @@
 import { MonitorItem } from '../../domain/monitor-item';
 import { DateUtil } from '../../core/date/DateUtil';
 import { SystemWash, Wash } from '../../domain/system-wash';
+import { Timestamp } from 'firebase/firestore';
 
 export class WashRow {
   id: string;
@@ -9,8 +10,8 @@ export class WashRow {
   KWP: number;
   washType?: string;
   washRate: number;
-  lastWashDate?: number;
-  nextWash?: number;
+  lastWashDate?: Date;
+  nextWash?: Date;
   supplier?: string;
   numOfWashes?: number;
   sinceLastWash?: number;
@@ -44,14 +45,33 @@ export class WashRow {
       this.numOfWashes = systemWash.washes?.length ?? 0;
       if (systemWash?.washes?.length) {
         this.lastWash = systemWash?.washes.sort((a, b) => b.date - a.date)[0];
-        this.lastWashDate = (this.lastWash as any).date;
+        this.lastWashDate = this.dateParse((this.lastWash as any).date);
         this.washDone = Boolean((this.lastWash as any).done);
         this.supplier = this.lastWash.supplier;
-        this.nextWash = this.lastWash?.nextWash;
+        this.nextWash = this.dateParse(this.lastWash?.nextWash);
         if (this.lastWashDate) {
           this.daysFromLast = DateUtil.DaysFromToday(this.lastWashDate);
         }
       }
     }
+  }
+
+  dateParse(velue: unknown): Date | undefined {
+    const number = this.parseDatesToSimple(velue);
+    const localDate = number ? new Date(number) : null;
+    return localDate
+      ? new Date(
+          localDate.getUTCFullYear(),
+          localDate.getUTCMonth(),
+          localDate.getDate()
+        )
+      : undefined;
+  }
+
+  parseDatesToSimple(value: unknown): number | undefined {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value === 'number') return value;
+    if (value instanceof Timestamp) return value.toMillis();
+    return undefined;
   }
 }

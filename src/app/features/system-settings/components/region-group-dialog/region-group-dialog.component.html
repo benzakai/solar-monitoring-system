@@ -1,0 +1,66 @@
+<h1 mat-dialog-title>{{ 'system_settings.region_group_dialog_title' | translate }}</h1>
+<div mat-dialog-content class="contemt">
+  <div id="side-data">
+    <div id="region-inputs" *ngIf="location.region">
+      <mat-form-field appearance="outline" dir="rtl">
+        <mat-select [placeholder]="'system_settings.region' | translate" [(ngModel)]="location.region[0]">
+          <mat-option *ngFor="let region of regions" [value]="region">{{
+            region | dictionary: regionsDictionary
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <p
+      class="mat-body-strong"
+      [class.alert-3]="relatedSystemsData.length < MIN_ALERT"
+    >
+      <span>{{ 'system_settings.regional_comparison_systems' | translate }}: </span>
+      <span>{{ relatedSystemsData.length }}</span>
+      <button
+        mat-icon-button
+        (click)="mapComp.scanSystemsInRange()"
+        color="primary"
+        [matTooltip]="'system_settings.reset_systems_in_range' | translate"
+        style="margin-inline-start: 1em"
+      >
+        <mat-icon>radar</mat-icon>
+      </button>
+    </p>
+
+    <div id="systems-list">
+      <div *ngFor="let system of relatedSystemsData" class="app-flex" style="display: flex; justify-content: space-between; margin: 2px 10px;">
+        <span class="ion-padding-end ion-text-start">
+          <mat-icon
+            color="warn"
+            class="clickable"
+            (click)="mapComp.removeRelatedSystem(system.id)"
+            >close</mat-icon
+          >
+          {{ system.name }}v
+        </span>
+        <span style="margin: 0 20px;">{{ (system.dist / 1000) | number: '1.2-2' }} {{ 'system_settings.km' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <app-system-location
+    #mapComp
+    [initialLocation]="initialLocation"
+    [mySystemId]="mySystem"
+    (onChange)="onChange($event)"
+  ></app-system-location>
+</div>
+
+<div class="dons" mat-dialog-actions>
+  <button
+    mat-flat-button
+    class="app-main-button"
+    color="primary"
+    (click)="save()"
+    [disabled]="!hasChanges()"
+  >
+    {{ 'system_settings.save' | translate }}
+  </button>
+  <button mat-button (click)="close()">{{ 'system_settings.cancel' | translate }}</button>
+</div>

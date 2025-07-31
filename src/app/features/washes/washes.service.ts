@@ -81,10 +81,6 @@ export class WashesService {
 
         const newWash = {
           ...wash,
-          date: Timestamp.fromDate(new Date(wash.date)),
-          nextWash: wash.nextWash
-            ? Timestamp.fromDate(new Date(wash.nextWash))
-            : null,
         };
 
         const newWashes = washes.slice(0, washes.length - 1);

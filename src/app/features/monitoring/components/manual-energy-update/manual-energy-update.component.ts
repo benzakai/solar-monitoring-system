@@ -64,7 +64,7 @@ export class ManualEnergyUpdateComponent {
 
     let addEmpty = true;
 
-    this.data.energy.annual.forEach((energy: EnergySample) => {
+    (this.data?.energy?.annual || []).forEach((energy: EnergySample) => {
       if (energy.apiValue) {
         addEmpty = false;
         this.addEnergyData(
@@ -102,7 +102,7 @@ export class ManualEnergyUpdateComponent {
   dataChanged(i: number, event: any) {
     const date = event.value;
     const selectedDate = new Date(date).toDateString();
-    this.data.energy.annual.forEach((energy: EnergySample) => {
+    (this.data?.energy?.annual || []).forEach((energy: EnergySample) => {
       const dateOfSample = new Date(energy.time).toDateString();
       if (dateOfSample === selectedDate) {
         this.energyData
@@ -124,7 +124,7 @@ export class ManualEnergyUpdateComponent {
       {}
     );
 
-    const updatedAnnual: EnergySample[] = this.data.energy.annual.map(
+    const updatedAnnual: EnergySample[] = (this.data?.energy?.annual || []).map(
       (energy: EnergySample) => {
         const dateOfSample = new Date(energy.time).toDateString();
         if (energyDataMap[dateOfSample]) {

@@ -1,0 +1,16 @@
+<div #map id="map"></div>
+
+<div #search class="map-controller" *ngIf="map" [hidden]="hideSearchBar">
+  <mat-form-field appearance="outline" id="search-input" class="mat-body" dir="rtl">
+    <input matInput name="place-search" #searchInput placeholder="חיפוש מקום" />
+    <button
+      mat-icon-button
+      type="button"
+      matSuffix
+      matTooltip="ביטול שינויים"
+      (click)="resetLocation()"
+    >
+      <mat-icon>restore</mat-icon>
+    </button>
+  </mat-form-field>
+</div>

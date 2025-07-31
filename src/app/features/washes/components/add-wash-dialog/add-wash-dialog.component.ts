@@ -83,9 +83,17 @@ export class AddWashDialogComponent implements OnInit {
     }
 
     const { date, supplier, price } = this.form.getRawValue();
+
+    const dateA = new Date(date);
+    const utcDate = Date.UTC(
+      dateA.getFullYear(),
+      dateA.getMonth(),
+      dateA.getDate()
+    );
+
     this.washesService
       .addWash(this.data.washRow.system.id, {
-        date: date.getTime(),
+        date: utcDate,
         supplier,
         price,
       })

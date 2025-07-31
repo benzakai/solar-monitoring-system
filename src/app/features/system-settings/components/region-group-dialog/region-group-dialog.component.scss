@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  direction: rtl;
+
+  height: 100%;
+  padding:  0;
+  overflow: hidden;
+
+  & > * {
+    flex: 0 0 auto;
+  }
+
+  .contemt {
+    display: flex;
+    flex: 1;
+
+    & > * {
+      flex: 1 1 1px;
+    }
+  }
+
+}
+
+.dons {
+  justify-content: flex-start;
+  gap: 10px;
+
+}

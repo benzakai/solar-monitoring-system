@@ -26,7 +26,7 @@ export interface System {
   comments: string;
   contactsIds: string[];
   contract: string;
-
+  converters: { model: string; amount: number }[];
   power?: number;
   panelType?: string;
   numOfPanels?: number;

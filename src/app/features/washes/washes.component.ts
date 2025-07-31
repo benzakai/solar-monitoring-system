@@ -121,9 +121,20 @@ export class WashesComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort | null = null;
 
+  startOfYear = Date.UTC(new Date().getFullYear());
+
   washesRows = combineLatest([
     this.monitorFacade.monitorItems,
-    this.washesService.getWashes(),
+    this.washesService
+      .getWashes()
+      .pipe(
+        map((washes) =>
+          washes.map((w) => ({
+            ...w,
+            washes: w.washes.filter(({ date }) => date > this.startOfYear),
+          }))
+        )
+      ),
   ]).pipe(
     takeUntilDestroyed(this.destroyRef),
     filter(([monitorItems, washes]) => Boolean(monitorItems && washes)),

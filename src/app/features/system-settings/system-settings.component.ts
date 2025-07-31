@@ -1,77 +1,66 @@
-import {
-  Component,
-  DestroyRef,
-  inject,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  FormArray,
   FormBuilder,
   FormGroup,
-  FormArray,
-  AbstractControl,
-  Validators,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, Observable, BehaviorSubject, startWith } from 'rxjs';
-import { map, switchMap, filter, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, shareReplay, startWith } from 'rxjs';
+import { filter, map, switchMap, take } from 'rxjs/operators';
 
 // Angular Material imports
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatListModule } from '@angular/material/list';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Local imports
-import { TranslatePipe } from '../../core/lang/translate.pipe';
-import { SystemsService } from '../../endpoint/systems.service';
-import { System } from '../../domain/system';
-import { SystemType } from '../systems/system-type';
-import { RoutingService } from '../../core/routing/routing.service';
-import { DialogService } from '../../core/dialog/services/dialog.service';
-import {
-  LocationSelectorDialogComponent,
-  LocationSelectorDialogData,
-} from '../../core/dialog/components/location-selector-dialog/location-selector-dialog.component';
-import { SystemLocation } from '../../domain/system-location';
-import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
-import { ApiIdDialogComponent } from './components/api-id-dialog/api-id-dialog.component';
-import { MonitorFacade } from '../../state/monitor/monitor.facade';
-import { ContactSelectionDialogComponent } from './components/contact-selection-dialog/contact-selection-dialog.component';
-import { PersonInfoDialogComponent } from './components/person-info-dialog/person-info-dialog.component';
-import { IdName } from '../../domain/id-name';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { combineLatest } from 'rxjs';
-import { SystemCriteria } from '../../domain/system-criteria';
-import { UsersFacade } from '../../state/users/users.facade';
-import { User } from '../../domain/user';
-import { PeopleService } from '../../endpoint/people.service';
-import { Person } from '../../domain/person';
-import { MonthsInputsComponent } from './components/months-inputs/months-inputs.component';
-import {
-  MatSlideToggle,
-  MatSlideToggleModule,
-} from '@angular/material/slide-toggle';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { AppEndpointService } from '../../endpoint/app-endpoint.service';
-import { AppPrediction } from '../../domain/app';
-import { PredictionCalculator } from '../../core/energy/prediction-calculator';
+import { DialogService } from '../../core/dialog/services/dialog.service';
 import { EnergyCalc } from '../../core/energy/energy-calculator';
+import { PredictionCalculator } from '../../core/energy/prediction-calculator';
+import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { RoutingService } from '../../core/routing/routing.service';
+import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
+import { AppPrediction } from '../../domain/app';
+import { Person } from '../../domain/person';
+import { System } from '../../domain/system';
+import { SystemCriteria } from '../../domain/system-criteria';
+import { SystemLocation } from '../../domain/system-location';
+import { AppEndpointService } from '../../endpoint/app-endpoint.service';
+import { PeopleService } from '../../endpoint/people.service';
+import { SystemsService } from '../../endpoint/systems.service';
+import { MonitorFacade } from '../../state/monitor/monitor.facade';
+import { SystemType } from '../systems/system-type';
+import { ApiIdDialogComponent } from './components/api-id-dialog/api-id-dialog.component';
+import { ContactSelectionDialogComponent } from './components/contact-selection-dialog/contact-selection-dialog.component';
+import { MonthsInputsComponent } from './components/months-inputs/months-inputs.component';
+import { PersonInfoDialogComponent } from './components/person-info-dialog/person-info-dialog.component';
+import { RegionGroupDialogComponent } from './components/region-group-dialog/region-group-dialog.component';
 
 @Component({
   selector: 'app-system-settings',
@@ -138,10 +127,14 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       if (id && id !== 'new') {
         return this.systemsService.getById(id);
       } else {
-        return [null];
+        return of({} as System);
       }
-    })
+    }),
+    shareReplay({ refCount: true, bufferSize: 1 })
   );
+
+  hasId = this.system$.pipe(map((sys) => Boolean(sys?.id)));
+  noId = this.system$.pipe(map((sys) => !Boolean(sys?.id)));
 
   loading$ = new BehaviorSubject<boolean>(false);
   saving$ = new BehaviorSubject<boolean>(false);
@@ -272,6 +265,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.selectedLocation = system?.location ?? undefined;
 
     this.form = this.formBuilder.group({
+      apiId: [system?.apiId || [], Validators.required],
       name: [system?.name, Validators.required],
       type: [system?.type, Validators.required],
       isActive: [system?.isActive || false],
@@ -282,19 +276,29 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       contractStartTime: [system?.contractStartTime],
       annualCheckDate: [system?.annualCheckDate],
       taoz: [system?.taoz],
-      regulation: [system?.regulation],
+      regulation: [system?.regulation, Validators.required],
       excludeFromAverage: [system?.excludeFromAverage],
       communication: [system?.communication],
       installer: [system?.installer],
       monitorPriceKw: [system?.monitorPriceKw],
-      source: [system?.source],
-      AC: [system?.AC],
-      KWP: [system?.KWP],
-      power: [system?.power],
+      source: [system?.source, Validators.required],
+      AC: [system?.AC, Validators.min(0)],
+      KWP: [system?.KWP, Validators.required],
+      power: [system?.power, Validators.required],
       criteria: [system?.criteria],
       panelType: [system?.panelType],
-      numOfPanels: [system?.numOfPanels],
-      annualPrediction: [null],
+      numOfPanels: [system?.numOfPanels, Validators.required],
+      annualPrediction: [null, [Validators.required, Validators.min(0)]],
+      converters: this.formBuilder.array(
+        system?.converters?.length
+          ? system?.converters.map(({ model, amount }) =>
+              this.formBuilder.group({
+                model: [model, Validators.required],
+                amount: [amount, [Validators.required, Validators.min(1)]],
+              })
+            )
+          : []
+      ),
       annualPredictionPerMonth: this.formBuilder.array(
         (system?.annualPredictionPerMonth &&
         system.annualPredictionPerMonth.length === 12
@@ -313,7 +317,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       comments: [system?.comments],
     });
 
-    if (!system?.annualPredictionPerMonth.length) {
+    if (!system?.annualPredictionPerMonth?.length) {
       this.setEnergyPrediction();
     }
 
@@ -400,6 +404,27 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
     // Manually trigger the value change to set the initial state
     this.form.get('taoz')?.updateValueAndValidity();
+  }
+
+  openRegionMap() {
+    if (!this.system) return;
+
+    this.dialog
+      .open(RegionGroupDialogComponent, {
+        data: {
+          mySystem: this.system.id,
+          location: this.selectedLocation,
+        },
+        width: '80vh',
+        height: '80vh',
+      })
+      .afterClosed()
+      .subscribe((location) => {
+        if (location) {
+          this.selectedLocation = location;
+          this.form.markAsDirty();
+        }
+      });
   }
 
   setEnergyPrediction(energy: number = -1) {
@@ -508,26 +533,25 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   }
 
   setApiId() {
-    this.system$.pipe(take(1)).subscribe((system) => {
-      const type = this.form.get('type')?.value;
-      if (!type) {
-        return;
+    const apiId = this.form.get('apiId')?.value;
+    const type = this.form.get('type')?.value;
+    if (!type) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ApiIdDialogComponent, {
+      data: {
+        type,
+        apiId,
+      },
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe((apiId) => {
+      if (apiId) {
+        this.form.get('apiId')?.setValue(apiId);
+        this.form.markAsDirty();
       }
-
-      const dialogRef = this.dialog.open(ApiIdDialogComponent, {
-        data: {
-          type: type,
-          apiId: system?.type === type ? system?.apiId : [],
-        },
-        width: '600px',
-      });
-
-      dialogRef.afterClosed().subscribe((apiId) => {
-        if (apiId) {
-          this.form.get('apiId')?.setValue(apiId);
-          this.form.markAsDirty();
-        }
-      });
     });
   }
 
@@ -537,7 +561,27 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   async save() {
     const dial = this.dialogService;
+    this.form.updateValueAndValidity();
+    if (this.form.invalid || !this.selectedLocation) {
+      const errorsIn = Object.keys(this.form?.controls || {})
+        .map((k) => [k, this.form.get(k)?.invalid])
+        .filter(([s, i]) => i)
+        .map(([k]) => k);
+
+      if (!this.selectedLocation) {
+        errorsIn.push('location');
+      }
+
+      dial.confirm({
+        message: 'Invalid Fields: ' + errorsIn.join(', '),
+        title: 'Fix fields',
+      });
+
+      return;
+    }
+
     const loader = this.dialogService.loader();
+
     try {
       const rawFormVelue = this.form.value;
 
@@ -550,8 +594,11 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       };
 
       const annualPredictionPerMonthSerial =
-        formValue.annualPredictionPerMonth.join(',');
-      if (this.lastDefault === annualPredictionPerMonthSerial) {
+        formValue.annualPredictionPerMonth?.join(',');
+      if (
+        annualPredictionPerMonthSerial &&
+        this.lastDefault === annualPredictionPerMonthSerial
+      ) {
         delete formValue.annualPredictionPerMonth;
       }
 
@@ -567,17 +614,22 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
       if (systemId && systemId !== 'new') {
         await new Promise<void>((resolve, reject) => {
-          this.systemsService.updateSystem(systemId, formValue).subscribe({
-            next: () => resolve(),
-            error: (error) => reject(error),
-          });
+          this.systemsService
+            .updateSystem(systemId, { ...formValue, nu: true })
+            .subscribe({
+              next: () => resolve(),
+              error: (error) => reject(error),
+            });
         });
       } else {
         const newSystemId = await new Promise<string>((resolve, reject) => {
-          this.systemsService.createSystem(formValue).subscribe({
-            next: (id) => resolve(id),
-            error: (error) => reject(error),
-          });
+          console.log(formValue);
+          this.systemsService
+            .createSystem({ ...formValue, nc: true })
+            .subscribe({
+              next: (id) => resolve(id),
+              error: (error) => reject(error),
+            });
         });
 
         this.router.navigate(['/system-settings', newSystemId]);
@@ -688,7 +740,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   // Helper methods for form validation
   isFieldInvalid(fieldName: string): boolean {
-    const field = this.form.get(fieldName);
+    const field = this.form?.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
@@ -725,5 +777,24 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   getSystemAge(): string {
     if (!this.form.value.startTime) return 'N/A';
     return `${this.getSystemAgeNum()} שנים `;
+  }
+
+  getConvertersFormGroup() {
+    return (this.form.get('converters') as FormArray).controls;
+  }
+
+  addConverter(model: string = '', amount: number = 1) {
+    (this.form.get('converters') as FormArray).push(
+      this.formBuilder.group({
+        model: [model, Validators.required],
+        amount: [amount, [Validators.required, Validators.min(1)]],
+      })
+    );
+  }
+
+  removeConverter() {
+    const array = this.form.get('converters') as FormArray;
+    const lastIdx = array.length - 1;
+    array.removeAt(lastIdx);
   }
 }

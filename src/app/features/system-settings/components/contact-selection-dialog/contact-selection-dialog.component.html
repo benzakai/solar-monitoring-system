@@ -1,24 +1,85 @@
 <h2 mat-dialog-title>{{ 'system_settings.add_contact' | translate }}</h2>
 
-<mat-dialog-content>
-  <mat-form-field appearance="outline" class="search-field">
-    <input matInput [formControl]="searchControl" />
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
-  <div class="opts">
-    @for (client of filteredClients$ | async; track client.id) {
-      <button mat-flat-button (click)="onClientSelected(client)">{{ client.name }}</button>
-    }
-  </div>
+<mat-tab-group animationDuration="0ms" [(selectedIndex)]="selectedTabIndex">
+  <mat-tab label="{{ 'system_settings.list' | translate }}">
+    <mat-dialog-content>
+      <mat-form-field appearance="outline" class="search-field">
+        <input matInput [formControl]="searchControl" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <div class="opts">
+        @for (client of filteredClients$ | async; track client.id) {
+          <div class="listitem" (click)="onClientSelected(client)">
+            <span>{{ client.name }}</span>
+          </div>
+        }
+      </div>
+    </mat-dialog-content>
+  </mat-tab>
+  <mat-tab label="{{ 'system_settings.new' | translate }}">
+    <mat-dialog-content class="new-contact-form">
+      <form [formGroup]="newContactForm" style="margin: 24px;">
+        <div class="form-line">
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="name">
+            <mat-error *ngIf="newContactForm.get('name')?.hasError('required')">
+              {{ 'system_settings.field_required' | translate }}
+            </mat-error>
+          </mat-form-field>
+          <label>{{
+              'system_settings.name' | translate
+            }}</label>
+        </div>
 
+        <div class="form-line">
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="email">
+            <mat-error *ngIf="newContactForm.get('email')?.hasError('required')">
+              {{ 'system_settings.field_required' | translate }}
+            </mat-error>
+            <mat-error *ngIf="newContactForm.get('email')?.hasError('email')">
+              {{ 'system_settings.invalid_email' | translate }}
+            </mat-error>
+          </mat-form-field>
+          <label>{{
+              'system_settings.email' | translate
+            }}</label>
+        </div>
 
+        <div class="form-line">
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="phone">
+            <mat-error *ngIf="newContactForm.get('phone')?.hasError('required')">
+              {{ 'system_settings.field_required' | translate }}
+            </mat-error>
+          </mat-form-field>
+          <label>{{
+              'system_settings.phone' | translate
+            }}</label>
+        </div>
 
+      </form>
+    </mat-dialog-content>
+  </mat-tab>
+</mat-tab-group>
 
-
-
-
-</mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>{{ 'cancel' | translate }}</button>
+  <button
+    mat-flat-button
+    *ngIf="selectedTabIndex === 1"
+    (click)="onSaveNewContact()"
+    color="primary"
+    [disabled]="isSaving || newContactForm.invalid"
+  >
+    <span *ngIf="!isSaving">{{
+      'system_settings.save_and_add_user' | translate
+    }}</span>
+    <mat-progress-spinner
+      *ngIf="isSaving"
+      diameter="24"
+      mode="indeterminate"
+    ></mat-progress-spinner>
+  </button>
 </mat-dialog-actions>

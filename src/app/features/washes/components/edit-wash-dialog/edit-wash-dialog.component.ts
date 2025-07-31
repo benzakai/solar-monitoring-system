@@ -51,9 +51,10 @@ export class EditWashDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const lastWash: Wash | undefined = this.data.washRow.lastWash;
+    const { lastWashDate, nextWash } = this.data.washRow;
     this.form = this.fb.group({
-      date: [lastWash?.date ? new Date(lastWash.date) : null],
-      nextWash: [lastWash?.nextWash ? new Date(lastWash.nextWash) : null],
+      date: [lastWashDate ? new Date(lastWashDate) : null],
+      nextWash: [nextWash ? new Date(nextWash) : null],
       supplier: [lastWash?.supplier || ''],
       price: [lastWash?.price || null],
     });
@@ -65,10 +66,23 @@ export class EditWashDialogComponent implements OnInit {
     }
 
     const { date, nextWash, supplier, price } = this.form.getRawValue();
+
+    const dateA = new Date(date);
+    const utcDate = Date.UTC(
+      dateA.getFullYear(),
+      dateA.getMonth(),
+      dateA.getDate()
+    );
+
+    const dateB = nextWash ? new Date(nextWash) : null;
+    const utcNext = dateB
+      ? Date.UTC(dateB.getFullYear(), dateB.getMonth(), dateB.getDate())
+      : null;
+
     const updatedWash = {
       ...this.data.washRow.lastWash,
-      date: date.getTime(),
-      nextWash: nextWash ? nextWash.getTime() : null,
+      date: utcDate,
+      nextWash: utcNext,
       supplier,
       price,
     };

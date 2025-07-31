@@ -34,6 +34,15 @@ export class SystemsService {
     );
   }
 
+  getSystems(): Observable<System[]> {
+    const q = query(this.collection);
+    return from(getDocs(q)).pipe(
+      map((snapshot) =>
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as System)
+      )
+    );
+  }
+
   getSystemsByIds(systemIds: string[]): Observable<System[]> {
     if (systemIds.length === 0) {
       return from([[]]);

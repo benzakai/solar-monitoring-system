@@ -1,0 +1,17 @@
+#map {
+  height: 100%;
+  width: 100%;
+  border-radius: 1em;
+}
+
+#search-input {
+  background-color: white;
+  border-radius: 0.5em;
+  width: 20em;
+  margin: 1em;
+}
+
+.map-controller {
+  display: flex;
+  justify-content: flex-end;
+} 
