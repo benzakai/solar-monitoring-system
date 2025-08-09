@@ -28,9 +28,7 @@ export class CoordinatorsService {
 
   coordinators: Observable<User[]> = this.currentUser.user.pipe(
     switchMap((user) =>
-      user.role === UserRole.ADMIN
-        ? this.usersService.getCoordinators()
-        : of(user.role === UserRole.COORDINATOR ? [user] : [])
+      this.usersService.getCoordinators().pipe(tap((a) => console.log(a)))
     ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
@@ -79,8 +77,16 @@ export class CoordinatorsService {
   );
 
   constructor() {
-    this.coordinators.subscribe((users) => {
-      this.coordinatorsSelectedSource.next(users.map((u) => u.uid));
-    });
+    combineLatest([this.currentUser.user, this.coordinators]).subscribe(
+      ([currentUser, users]) => {
+        if (currentUser.role === UserRole.ADMIN) {
+          this.coordinatorsSelectedSource.next(users.map((u) => u.uid));
+        } else {
+          this.coordinatorsSelectedSource.next(
+            users.filter((u) => u.uid === currentUser.uid).map((u) => u.uid)
+          );
+        }
+      }
+    );
   }
 }

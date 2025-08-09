@@ -101,7 +101,7 @@
             <section>
               <p class="title">שטיפות</p>
               <div id="washes">
-                @for( wash of systemData?.washesDates; let idx = $index; track idx) {
+                @for( wash of systemData?.washDatesRev; let idx = $index; track idx) {
                   <p>
                     <span>#{{idx + 1}}</span><br>
                     <span>{{wash | date: 'dd/MM/yy' }}</span>

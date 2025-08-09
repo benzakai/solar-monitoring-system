@@ -62,6 +62,7 @@ export interface SystemReportData {
   malfunctionsStartDates: number[];
   malfunctionsEndDates: number[];
   washesDates: number[];
+  washDatesRev: number[];
   comment: string;
 }
 
