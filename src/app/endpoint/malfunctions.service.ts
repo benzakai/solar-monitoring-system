@@ -17,6 +17,7 @@ import { filter, from, map, Observable, switchMap } from 'rxjs';
 import { Malfunction, MalfunctionActionType } from '../domain/malfunction';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { DateUtil } from '../core/date/DateUtil';
+import { RoutineCheckService } from './routine-check.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +25,7 @@ import { DateUtil } from '../core/date/DateUtil';
 export class MalfunctionsService {
   private firestore = inject(Firestore);
   private auth = inject(AngularFireAuth);
+  private routineCheckService = inject(RoutineCheckService);
 
   private collection = collection(this.firestore, 'malfunctions');
 
@@ -39,6 +41,11 @@ export class MalfunctionsService {
             ...malfunction,
             ...logEntry,
           })
+        ).pipe(
+          switchMap(() =>
+            this.routineCheckService.addCheck(malfunction.systemId)
+          ),
+          map(() => void 0)
         );
       })
     );
