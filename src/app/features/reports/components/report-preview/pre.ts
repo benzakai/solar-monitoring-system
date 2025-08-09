@@ -118,7 +118,7 @@ export function createSystemReportData(json: SystemReportDoc) {
     malfunctionsStartDates: malfunctions.map((m) => +new Date(m.openTime!)),
     malfunctionsEndDates: malfunctions.map((m) => +new Date(m.closeTime!)),
     washesDates: json.washDates,
-    washDatesRev: json.washDates?.length ? json.washDates.reverse() : [],
+    washDatesRev: (json.washDates ?? []).slice().reverse(),
     comment: json.reportComment,
   };
 }

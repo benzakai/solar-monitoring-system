@@ -64,7 +64,14 @@ export class ManualEnergyUpdateComponent {
 
     let addEmpty = true;
 
-    (this.data?.energy?.annual || []).forEach((energy: EnergySample) => {
+    const annualSamples: EnergySample[] = [
+      ...(this.data?.energy?.annual || []),
+    ].sort(
+      (a: EnergySample, b: EnergySample) =>
+        new Date(a.time).getTime() - new Date(b.time).getTime()
+    );
+
+    annualSamples.forEach((energy: EnergySample) => {
       if (energy.apiValue) {
         addEmpty = false;
         this.addEnergyData(
