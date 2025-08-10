@@ -30,9 +30,21 @@ table {
   position: relative;
 }
 .icon-right {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  gap: 5px;
-  width: 18px; /* Adjust the size as needed */
+.icon-left {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 th {
   position: relative;

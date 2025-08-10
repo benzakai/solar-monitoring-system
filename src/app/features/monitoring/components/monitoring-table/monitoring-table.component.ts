@@ -302,6 +302,7 @@ export class MonitoringTableComponent {
   waitingOpenedIssues: { [key: string]: any } = {};
   waitingComments: { [key: string]: any } = {};
   waitingChecks: { [key: string]: any } = {};
+  waitingSync: { [key: string]: any } = {};
 
   testedByMeTodayCount = this.monitorFiltered.pipe(
     map((data) => data.filter((item) => item.checkedByMeToday).length)
@@ -365,6 +366,17 @@ export class MonitoringTableComponent {
     if (this.waitingChecks[id] !== undefined) {
       if (this.waitingChecks[id] === currentValue) {
         delete this.waitingChecks[id];
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isWaitingSync(id: string, currentValue: any) {
+    if (this.waitingSync[id] !== undefined) {
+      if (this.waitingSync[id] !== currentValue) {
+        delete this.waitingSync[id];
       } else {
         return true;
       }
@@ -512,5 +524,12 @@ export class MonitoringTableComponent {
           }
         });
     }
+  }
+
+  refreshData(item: MonitorItem) {
+    this.waitingSync[item.id] = item.lastSync;
+    this.systemsService
+      .updateSystem(item.id, { forceRefreshed: Date.now() } as any)
+      .subscribe();
   }
 }
