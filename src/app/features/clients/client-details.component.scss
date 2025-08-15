@@ -1,0 +1,84 @@
+// RTL only for form fields
+.details-form mat-form-field,
+.form-line mat-form-field {
+  direction: rtl;
+}
+
+.header-section {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(200px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.container-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.form-line {
+  align-items: center;
+
+  a {
+    margin: 0 16px;
+  }
+}
+
+.container {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  direction: rtl;
+}
+
+.link-field {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+.details-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 12px 16px;
+}
+
+.dailyReportDiv {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-flex {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+
+.system-name-field {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}

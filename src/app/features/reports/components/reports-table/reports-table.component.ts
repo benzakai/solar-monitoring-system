@@ -75,6 +75,7 @@ import { FiltersControlService } from '../../../monitoring/services/filters-cont
 import { MatInput } from '@angular/material/input';
 import { MatSlider, MatSliderRangeThumb } from '@angular/material/slider';
 import { MatChipListbox, MatChipOption } from '@angular/material/chips';
+import { RouterModule } from '@angular/router';
 
 const ZERO_TIME_EMAIL = {
   delivery: {
@@ -121,6 +122,7 @@ type See = {
     MalfunctionsFiltersComponent,
     MatChipListbox,
     MatChipOption,
+    RouterModule,
   ],
   providers: [FiltersControlService],
   templateUrl: './reports-table.component.html',

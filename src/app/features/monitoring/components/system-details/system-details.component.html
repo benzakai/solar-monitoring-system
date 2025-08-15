@@ -171,18 +171,18 @@
           <th mat-header-cell *matHeaderCellDef>
             <app-sort-header [active]="sortParams | async" column="tracingDate" (onSort)="onSort($event)"></app-sort-header>
             {{ 'תאריך מעקב' }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.status === 'open' ? (element.tracingTime | date) : '' }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.status === 'open' && element.tracingTime ? (DateUtil.FromUtcMidnightIso(element.tracingTime) | date) : '' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="closeDate">
           <th mat-header-cell *matHeaderCellDef>
             <app-sort-header [active]="sortParams | async" column="closeDate" (onSort)="onSort($event)"></app-sort-header>{{ 'תאריך סגירה' }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.closeTime | date }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.closeTime ? (DateUtil.FromUtcMidnightIso(element.closeTime) | date) : '' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="openDate">
           <th mat-header-cell *matHeaderCellDef><app-sort-header [active]="sortParams | async" column="openDate" (onSort)="onSort($event)"></app-sort-header>{{ 'תאריך פתיחה' }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.openTime | date }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.openTime ? (DateUtil.FromUtcMidnightIso(element.openTime) | date) : '' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="reportStatus">

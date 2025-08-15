@@ -31,6 +31,7 @@ import {
   shareReplay,
   switchMap,
   take,
+  firstValueFrom,
 } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '../../../core/lang/translate.pipe';
@@ -57,6 +58,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { DialogService } from '../../../core/dialog/services/dialog.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../core/dialog/components/confirmation-dialog/confirmation-dialog.component';
+import { DateUtil } from '../../../core/date/DateUtil';
+import { RoutineCheckService } from '../../../endpoint/routine-check.service';
 
 @Component({
   selector: 'app-malfunciton-edit',
@@ -87,6 +90,7 @@ import { ConfirmationDialogComponent } from '../../../core/dialog/components/con
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MalfuncitonEditComponent {
+  private routineCheckService = inject(RoutineCheckService);
   fb = inject(FormBuilder);
   routingService = inject(RoutingService);
   activatedRoute = inject(ActivatedRoute);
@@ -209,6 +213,9 @@ export class MalfuncitonEditComponent {
         const type = data?.type ? data?.type[0] : '';
         this.form.patchValue({
           ...data,
+          openTime: DateUtil.FromUtcMidnightIso(data.openTime) ?? null,
+          closeTime: DateUtil.FromUtcMidnightIso(data.closeTime) ?? null,
+          tracingTime: DateUtil.FromUtcMidnightIso(data.tracingTime) ?? null,
           type,
         });
       }
@@ -256,16 +263,30 @@ export class MalfuncitonEditComponent {
           const type = malfunction.type || ['', ''];
           type[0] = this.form.value.type;
 
-          const trackingDate = this.form.value.tracingTime
-            ? new Date(this.form.value.tracingTime)
-            : null;
-
           let result: Malfunction = {
             ...malfunction,
             ...this.form.value,
-            tracingTime: trackingDate ? trackingDate.toISOString() : null,
+            // Normalize dates to UTC midnight ISO
+            tracingTime:
+              DateUtil.ToUtcMidnightIso(this.form.value.tracingTime) ?? null,
             type,
           };
+
+          // Ensure openTime is saved as ISO string at UTC midnight (keep previous if not provided)
+          const normalizedOpen = DateUtil.ToUtcMidnightIso(
+            this.form.value.openTime
+          );
+          if (normalizedOpen) {
+            result = { ...result, openTime: normalizedOpen };
+          }
+
+          // Normalize closeTime from form to UTC midnight ISO string
+          if (this.form.value.closeTime) {
+            result = {
+              ...result,
+              closeTime: DateUtil.ToUtcMidnightIso(this.form.value.closeTime),
+            };
+          }
 
           if (options?.reopen) {
             result = {
@@ -276,10 +297,22 @@ export class MalfuncitonEditComponent {
           }
 
           if (options?.close) {
+            const maybeDate: any = options.close as any;
+            const selectedDate: Date | null =
+              maybeDate instanceof Date
+                ? maybeDate
+                : maybeDate?.value instanceof Date
+                  ? (maybeDate.value as Date)
+                  : null;
+
+            const closeUtcMidnightIso = DateUtil.ToUtcMidnightIso(
+              selectedDate || undefined
+            );
+
             result = {
               ...result,
               status: MalfunctionStatus.CLOSED,
-              closeTime: options.close.toString(),
+              closeTime: closeUtcMidnightIso,
               log: closedEntry.log,
             };
           }
@@ -288,8 +321,9 @@ export class MalfuncitonEditComponent {
             .collection('malfunctions')
             .doc(this.activatedRoute.snapshot.params['id'])
             .update(result)
-            .then(() => {
+            .then(async () => {
               loader.close();
+              await firstValueFrom(this.routineCheckService.addCheck(malfunction.systemId));
               dial.confirm({
                 message: this.translatePipe.transform('malfunction.dataSaved'),
                 displayCancel: false,

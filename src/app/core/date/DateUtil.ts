@@ -148,4 +148,58 @@ export class DateUtil {
       d1.getUTCMonth() === d2.getUTCMonth()
     );
   }
+
+  /**
+   * Convert a date-like value to an ISO string at UTC midnight (00:00:00.000Z)
+   * using the local year/month/day components of the provided date.
+   * Useful when a date is chosen without time and must be stored in UTC at 00:00.
+   */
+  static ToUtcMidnightIso(
+    date: ValidDate | null | undefined
+  ): string | undefined {
+    if (!date && date !== 0) {
+      return undefined;
+    }
+    const d = new Date(date as ValidDate);
+    const utcMidnight = new Date(
+      Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0)
+    );
+    return utcMidnight.toISOString();
+  }
+
+  /**
+   * Build a local Date from a UTC-midnight ISO string by reading its UTC Y/M/D.
+   * This avoids date shifting when binding to local date pickers.
+   */
+  static FromUtcMidnightIso(
+    date: ValidDate | { toDate: () => Date } | null | undefined
+  ): Date | null {
+    if (date === null || date === undefined) {
+      return null;
+    }
+
+    let baseDate: Date;
+    const maybeTimestamp: any = date as any;
+    if (maybeTimestamp && typeof maybeTimestamp.toDate === 'function') {
+      // Firebase Timestamp detected
+      baseDate = maybeTimestamp.toDate();
+    } else {
+      baseDate = new Date(date as ValidDate);
+    }
+
+    if (Number.isNaN(baseDate.getTime())) {
+      return null;
+    }
+
+    const ret = new Date(
+      baseDate.getUTCFullYear(),
+      baseDate.getUTCMonth(),
+      baseDate.getUTCDate(),
+      0,
+      0,
+      0,
+      0
+    );
+    return ret;
+  }
 }

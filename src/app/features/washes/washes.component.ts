@@ -36,6 +36,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddWashDialogComponent } from './components/add-wash-dialog/add-wash-dialog.component';
 import { EditWashDialogComponent } from './components/edit-wash-dialog/edit-wash-dialog.component';
 import { CommentWashDialogComponent } from './components/comment-wash-dialog/comment-wash-dialog.component';
+import { WashesListDialogComponent } from './components/washes-list-dialog/washes-list-dialog.component';
 import { WashesFiltersComponent } from './components/washes-filters/washes-filters.component';
 import { FiltersControlService } from '../monitoring/services/filters-control.service';
 import { MonitorItem } from '../../domain/monitor-item';
@@ -66,6 +67,7 @@ import { RoutingService } from '../../core/routing/routing.service';
     AddWashDialogComponent,
     EditWashDialogComponent,
     CommentWashDialogComponent,
+    WashesListDialogComponent,
     WashesFiltersComponent,
   ],
   templateUrl: './washes.component.html',
@@ -298,6 +300,14 @@ export class WashesComponent implements OnInit {
       },
       width: '800px',
       panelClass: 'ytong',
+      maxWidth: '90vw',
+    });
+  }
+
+  openWashesList(washRow: WashRow) {
+    this.dialog.open(WashesListDialogComponent, {
+      data: { washRow },
+      width: '800px',
       maxWidth: '90vw',
     });
   }

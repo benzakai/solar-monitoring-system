@@ -72,8 +72,8 @@ export class AddWashDialogComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       date: [new Date(), Validators.required],
-      supplier: ['', Validators.required],
-      price: [null, [Validators.required, Validators.min(0)]],
+      supplier: [''],
+      price: [null],
     });
   }
 
@@ -94,8 +94,8 @@ export class AddWashDialogComponent implements OnInit {
     this.washesService
       .addWash(this.data.washRow.system.id, {
         date: utcDate,
-        supplier,
-        price,
+        supplier: supplier || null,
+        price: price || null,
       })
       .subscribe(() => {
         this.dialogRef.close();

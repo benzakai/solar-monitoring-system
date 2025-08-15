@@ -6,6 +6,8 @@ import {
   query,
   setDoc,
   where,
+  getDoc,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { forkJoin, from, map, Observable, of } from 'rxjs';
 import { chunkArray } from './chunk-array.function';
@@ -18,6 +20,23 @@ import { Person } from '../domain/person';
 export class PeopleService {
   private firestore = inject(Firestore);
   private collection = collection(this.firestore, 'people');
+
+  getById(id: string): Observable<Person | null> {
+    const ref = doc(this.collection, id);
+    return from(getDoc(ref)).pipe(
+      map((snapshot) => {
+        if (!snapshot.exists()) return null;
+        const data = snapshot.data() as any;
+        // ensure both id and _id are available for consumers
+        return { _id: snapshot.id, id: snapshot.id, ...data } as unknown as Person;
+      })
+    );
+  }
+
+  updatePerson(id: string, data: Partial<Person> & Record<string, any>): Observable<void> {
+    const ref = doc(this.collection, id);
+    return from(updateDoc(ref, data));
+  }
 
   getPeopleByIds(ids: string[]): Observable<Person[]> {
     if (ids.length === 0) {

@@ -30,6 +30,7 @@ import {
   MalfunctionStatus,
   malfunctionTypesMap,
 } from '../../../../domain/malfunction';
+import { DateUtil } from '../../../../core/date/DateUtil';
 
 export const DATE_FORMATS: MatDateFormats = {
   parse: {
@@ -121,13 +122,13 @@ export class CreateAlertDialogComponent {
         handler: null,
         kwhKwpSnapshot: null,
         notToReport: false,
-        openTime: openDate.toISOString(),
+        openTime: DateUtil.ToUtcMidnightIso(openDate) || '',
         reportText: '',
         severity: 2,
         status: MalfunctionStatus.OPEN,
         serial: 0,
         tracingTime: followUpDate?.toISOString
-          ? followUpDate.toISOString()
+          ? DateUtil.ToUtcMidnightIso(followUpDate) || ''
           : null,
         systemId: this.data.id,
         type: [String(this.alertForm.get('issueType')?.value), ''] as [

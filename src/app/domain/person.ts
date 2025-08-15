@@ -8,4 +8,5 @@ export interface Person {
   email: string;
   coordinatorUid?: string;
   isActive?: boolean;
+  clientType?: 'private' | 'business';
 }

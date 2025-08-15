@@ -1,0 +1,233 @@
+@if (client$ | async; as client) {
+  @if (form) {
+    <form [formGroup]="form">
+
+    <div class="main-section">
+      <div class="container">
+        <div class="container-header">
+          <h1>{{ 'client.details' | translate }}</h1>
+          <div class="system-name-field activity">
+            <label>{{ 'client.active' | translate }}</label>
+            <mat-slide-toggle formControlName="isActive" />
+          </div>
+          <div class="system-name-field activity">
+            <label>{{ 'client.daily_report' | translate }}</label>
+            <mat-slide-toggle formControlName="isDailyReport"></mat-slide-toggle>
+          </div>
+        </div>
+
+        <div class="details-form">
+          <div class="form-line">
+            <label>{{ 'client.name' | translate }}</label>
+            <a class="link" href="#" (click)="openClientInfo()">{{ form.get('name')?.value }}</a>
+          </div>
+
+          <div class="form-line aligned">
+            <label>{{ 'client.email' | translate }}</label>
+            <a class="link" [href]="'mailto:' + form.get('email')?.value">{{ form.get('email')?.value }}</a>
+
+          </div>
+
+          <div class="form-line">
+            <label>{{ 'client.phone' | translate }}</label>
+            <a class="link" [href]="'tel:' + sanitizePhone(form.get('phone')?.value)">{{ form.get('phone')?.value }}</a>
+          </div>
+
+          <div class="form-line">
+            <label>{{ 'client.type' | translate }}</label>
+            <mat-form-field appearance="outline" dir="rtl">
+              <mat-select formControlName="clientType">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let type of clientTypes$ | async" [value]="type">
+                  {{ (clientTypesDict$ | async)![type] }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-line">
+            <label>{{ 'client.start_date' | translate }}</label>
+            <mat-form-field appearance="outline" dir="rtl">
+              <input matInput [matDatepicker]="startDatepicker" readonly formControlName="startDate" (click)="startDatepicker.open()">
+              <mat-datepicker #startDatepicker></mat-datepicker>
+              <mat-datepicker-toggle matSuffix [for]="startDatepicker"></mat-datepicker-toggle>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-line">
+            <label>{{ 'client.coordinator' | translate }}</label>
+            <mat-form-field appearance="outline" dir="rtl">
+              <mat-select formControlName="coordinatorUid">
+                <mat-option></mat-option>
+                @if (coordinators$ | async; as coord) {
+                  @for (c of coord; track c.uid) {
+                    <mat-option [value]="c.uid" [disabled]="!c.isActive">{{ c.displayName }}</mat-option>
+                  }
+                }
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+        </div>
+
+        <div class="details-form">
+          <div class="form-line">
+            <label>{{ 'client.charge_period' | translate }}</label>
+            <mat-form-field appearance="outline" dir="rtl">
+              <mat-select formControlName="chargePeriod">
+                <mat-option *ngFor="let p of chargePeriods" [value]="p">
+                  {{ p === 1 ? ('client.charge_period_year' | translate) : p === 2 ? ('client.charge_period_half' | translate) : ('client.charge_period_quarter' | translate) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-line">
+            <label>{{ 'client.charge_month' | translate }}</label>
+            <mat-form-field appearance="outline" dir="rtl">
+              <mat-select formControlName="chargeMonth">
+                @for (m of months; track m.value) {
+                  <mat-option [value]="m.value">{{ m.label | date: 'MMMM' }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="app-flex" style="display:flex; flex-direction: column; align-items: flex-start">
+          <p>
+            <span class="mat-body-strong">{{ 'client.monitor_price_total' | translate }}: </span>
+            {{ (totalPrice$ | async) | number : '1.2-2' }}₪
+          </p>
+          <button mat-flat-button color="primary" [disabled]="form.pristine" (click)="save(client._id)">{{ 'save' | translate }}</button>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="card-header app-flex">
+          <h1>{{ 'client.production_by_systems' | translate }}</h1>
+          <div class="form-line" style="width: 24em">
+            <div style="flex:1; min-width: 250px">
+              <mat-form-field appearance="outline" dir="rtl" style="width: 100%">
+                <mat-date-range-input [rangePicker]="rangePicker" [max]="today">
+                  <input matStartDate [formControl]="chartStartCtrl" readonly (click)="rangePicker.open()">
+                  <input matEndDate [formControl]="chartEndCtrl" readonly (click)="rangePicker.open()">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                <mat-date-range-picker #rangePicker (closed)="onRangeClosed()"></mat-date-range-picker>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <app-client-systems-chart [systems]="clientSystems$ | async" [start]="chartStartCtrl.value" [end]="chartEndCtrl.value"></app-client-systems-chart>
+      </div>
+
+      <div class="container">
+        <div class="card-header">
+          <h1>{{ 'client.contacts_title' | translate }}</h1>
+        </div>
+        <app-client-contacts-table [systems]="clientSystems$ | async"></app-client-contacts-table>
+      </div>
+
+      <div class="container">
+        <div class="card-header">
+          <h1>{{ 'client.systems' | translate }}</h1>
+        </div>
+        @if (enrichedClientSystems$ | async; as systems) {
+          @if (systems?.length) {
+            <table mat-table [dataSource]="dataSource" matSort>
+
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'system Name' | translate }}</th>
+                <td mat-cell *matCellDef="let s" class="link">
+                  <a class="link" [routerLink]="['/system', s.id]">{{ s.system_name }}</a>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="portal">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="portal">פורטל</th>
+                <td mat-cell *matCellDef="let s">{{ s.portal }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="kwp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="kwp">kWp</th>
+                <td mat-cell *matCellDef="let s">{{ s.kwp | number: '1.0-2' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="active">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="active">{{ 'active' | translate }}</th>
+                <td mat-cell *matCellDef="let s">
+                  {{ s.system_active ? ('active' | translate) : ('inactive' | translate) }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="pricePerKw">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="pricePerKw">{{ 'system_settings.monitor_price_kw' | translate }}</th>
+                <td mat-cell *matCellDef="let s">{{ (s._monitorPriceKw ?? 0) | number : '1.2-2' }}₪</td>
+              </ng-container>
+
+              <ng-container matColumnDef="priceTotal">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="priceTotal">{{ 'client.monitor_price_total' | translate }}</th>
+                <td mat-cell *matCellDef="let s">{{ (s._priceTotal ?? 0) | number : '1.2-2' }}₪</td>
+              </ng-container>
+
+              <ng-container matColumnDef="issuesYear">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="issuesYear">{{ 'open_alerts' | translate }}</th>
+                <td mat-cell *matCellDef="let s">{{ s.open_issues }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tariff">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="tariff">{{ 'system_settings.regulation' | translate }}</th>
+                <td mat-cell *matCellDef="let s">
+                  @if (s._taoz) {
+                    {{ s._taoz === 'high' ? 'תעו"ז גבוה' : 'תעו"ז נמוך' }}
+                  } @else {
+                    {{ s._regulation !== undefined ? (s._regulation | number : '1.2-2') + '₪' : '-' }}
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['name','portal','kwp','active','issuesYear','tariff','pricePerKw','priceTotal']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['name','portal','kwp','active','issuesYear','tariff','pricePerKw','priceTotal']"></tr>
+            </table>
+          } @else {
+            <p>{{ 'loading' | translate }}</p>
+          }
+        } @else {
+          <div class="loading-container">
+            <p>{{ 'loading' | translate }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="container">
+        <div class="card-header">
+          <h1>{{ 'client.sending_list_title' | translate }}</h1>
+        </div>
+        @if (client$ | async; as client) {
+          <app-client-sending-list [client]="client"></app-client-sending-list>
+        }
+      </div>
+
+      <div class="container">
+        <div class="card-header">
+          <h1>דוחות אחרונים</h1>
+        </div>
+        @if (client$ | async; as client) {
+          <app-recent-client-reports [client]="client"></app-recent-client-reports>
+        }
+      </div>
+
+    </div>
+    </form>
+  } @else {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      <p>{{ 'loading' | translate }}</p>
+    </div>
+  }
+}
+
+

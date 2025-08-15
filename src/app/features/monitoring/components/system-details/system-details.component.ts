@@ -100,6 +100,7 @@ import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-e
 })
 export class SystemDetailsComponent implements AfterViewInit {
   translator = new TranslatePipe();
+  protected readonly DateUtil = DateUtil;
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
     sortDirection: 'desc',
@@ -404,9 +405,10 @@ export class SystemDetailsComponent implements AfterViewInit {
 
     //this.chartBaseOptions.annotations.xaxis[0].x = systemStartTime;
 
-    let energyPath;
-    let meanEnergyPath: any[];
-    const predictionPath = [];
+    type ChartPoint = { x: number; y: number };
+    let energyPath: ChartPoint[];
+    let meanEnergyPath: ChartPoint[];
+    const predictionPath: ChartPoint[] = [];
 
     if (this.todayView) {
       const start = new Date().setHours(0, 0, 0, 0);

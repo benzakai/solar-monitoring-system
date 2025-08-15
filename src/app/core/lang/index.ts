@@ -13,6 +13,7 @@ import { washes } from './dictionary/washes';
 import { systemSettings } from './dictionary/system-settings';
 import { personInfo } from './dictionary/person-info-dialog.lang';
 import { monthsInputsLang } from './dictionary/months-inputs.lang';
+import { client as clientLang } from './dictionary/client';
 
 export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
   new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
@@ -32,4 +33,5 @@ export const language: Dictionary = {
   system_settings: systemSettings,
   personInfo,
   months_inputs: monthsInputsLang,
+  client: clientLang,
 };

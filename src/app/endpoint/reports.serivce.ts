@@ -82,6 +82,50 @@ export class ReportsService {
     return this.getSnap(q);
   }
 
+  public getForClientFromYearStart(
+    clientId: string,
+    year: number = new Date().getUTCFullYear(),
+    isAnnual: boolean = false
+  ): Observable<ReportData[]> {
+    const startDate = alignDateToReport(new Date(Date.UTC(year, 0, 1)));
+    const endDate = alignDateToReport(new Date(Date.UTC(year + 1, 0, 1)));
+    endDate.setHours(endDate.getUTCHours() - 1);
+
+    const q = query(
+      this.collection,
+      where('isAnnual', '==', isAnnual),
+      where('client.id', '==', clientId),
+      where('date', '>=', startDate.getTime()),
+      where('date', '<=', endDate.getTime())
+    );
+
+    return this.getSnap(q).pipe(
+      switchMap((snapshot) => {
+        let state = (snapshot || []).reduce(
+          (acc, report) => Object.assign(acc, { [report.id]: report }),
+          {} as Record<string, ReportData>
+        );
+        return this.getChanges(q).pipe(
+          map((changes) => {
+            (changes.added || []).forEach(
+              (report: ReportData) => (state[report.id] = report)
+            );
+            (changes.modified || []).forEach(
+              (report: ReportData) => (state[report.id] = report)
+            );
+            (changes.removed || []).forEach(
+              (report: ReportData) => delete state[report.id]
+            );
+
+            return Object.keys(state)
+              .map((id) => state[id])
+              .sort((a, b) => (b.date as number) - (a.date as number));
+          })
+        );
+      })
+    );
+  }
+
   public setDocument(id: string, data: any) {
     const docRef = doc(this.collection, id);
     return from(setDoc(docRef, data));

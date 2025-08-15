@@ -53,13 +53,9 @@ export class WashesService {
         }
 
         const washes = (washDoc.data() as any).washes || [];
-        const newWash = {
-          ...wash,
-          date: Timestamp.fromDate(new Date(wash.date)),
-        };
 
         transaction.update(washRef, {
-          washes: [...washes, newWash],
+          washes: [...washes, wash],
         });
       })
     );

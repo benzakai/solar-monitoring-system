@@ -12,6 +12,7 @@ import { ReportPreviewComponent } from './features/reports/components/report-pre
 import { USERS_ROUTES } from './features/users/users.routes';
 import { SYSTEM_SETTINGS_ROUTES } from './features/system-settings/system-settings.routes';
 import { WashesComponent } from './features/washes/washes.component';
+import { ClientDetailsComponent } from './features/clients/client-details.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -31,6 +32,7 @@ export const routes: Routes = [
   { path: 'report-preview', component: ReportPreviewComponent },
   { path: 'users', children: USERS_ROUTES },
   { path: 'system-settings', children: SYSTEM_SETTINGS_ROUTES },
+  { path: 'client/:id', component: ClientDetailsComponent },
   { path: 'washes', component: WashesComponent },
   { path: '**', redirectTo: 'systems' },
 ];

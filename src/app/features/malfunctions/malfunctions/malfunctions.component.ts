@@ -104,6 +104,7 @@ import { MalfunctionsFiltersControlService } from '../../monitoring/services/mal
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MalfunctionsComponent {
+  protected readonly DateUtil = DateUtil;
   routingService = inject(RoutingService);
   store = inject(Store);
   router = inject(Router);

@@ -7,7 +7,7 @@ export interface Malfunction {
   severity?: MalfunctionSeverity;
   description?: string;
   code: string | null;
-  tracingTime?: string;
+  tracingTime?: string | null;
   handler: MalfunctionHandler | string | null;
   notToReport: boolean;
   reportText?: string;
