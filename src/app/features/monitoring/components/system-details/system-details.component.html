@@ -8,7 +8,7 @@
         <h1 >
 
           <span>שם מערכת: {{s.name}}</span>
-          <span class="mat-body"> [לקוח: >{{s.client?.name}}]</span>
+          <span class="mat-body">[לקוח:  <a class="link" [routerLink]="['/client', s?.client?.id]">{{s.client?.name}}</a>]</span>
         </h1>
       }
 

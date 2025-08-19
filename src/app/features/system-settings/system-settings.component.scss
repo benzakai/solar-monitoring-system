@@ -85,6 +85,11 @@ form {
     }
   }
 
+  /* Images card spans full width */
+  #pic-card {
+    grid-column: 1 / -1;
+  }
+
   #comments-card {
     grid-area: comments-card;
   }
@@ -602,6 +607,55 @@ mat-card {
 .container {
   & > * {
     margin: 20px;
+  }
+}
+
+/* Images grid */
+#pic-card {
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h1 {
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+    }
+  }
+  .images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+  .image {
+    position: relative;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fafafa;
+
+    img {
+      cursor: pointer;
+      transition: transform 120ms ease;
+    }
+
+    img:hover {
+      transform: scale(1.01);
+    }
+  }
+  .del-btn {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 1;
+    background: rgba(255,255,255,0.8);
   }
 }
 

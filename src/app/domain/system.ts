@@ -47,4 +47,5 @@ export interface System {
   isPvsyst: boolean;
   source?: 'project' | 'new';
   criteria?: SystemCriteria;
+  images?: string[];
 }

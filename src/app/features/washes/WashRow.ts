@@ -7,6 +7,7 @@ export class WashRow {
   id: string;
   name: string;
   clientName: string;
+  clientId: string;
   KWP: number;
   washType?: string;
   washRate: number;
@@ -31,6 +32,7 @@ export class WashRow {
     this.id = system.id;
     this.name = system.system_name;
     this.clientName = system.client?.name ?? '';
+    this.clientId = system.client?.id ?? '';
     this.KWP = system.kwp;
     this.washRate = system.washRate;
 

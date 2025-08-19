@@ -32,6 +32,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
@@ -54,6 +55,7 @@ import { SystemLocation } from '../../domain/system-location';
 import { AppEndpointService } from '../../endpoint/app-endpoint.service';
 import { PeopleService } from '../../endpoint/people.service';
 import { SystemsService } from '../../endpoint/systems.service';
+import { Storage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from '@angular/fire/storage';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { SystemType } from '../systems/system-type';
 import { ApiIdDialogComponent } from './components/api-id-dialog/api-id-dialog.component';
@@ -61,6 +63,7 @@ import { ContactSelectionDialogComponent } from './components/contact-selection-
 import { MonthsInputsComponent } from './components/months-inputs/months-inputs.component';
 import { PersonInfoDialogComponent } from './components/person-info-dialog/person-info-dialog.component';
 import { RegionGroupDialogComponent } from './components/region-group-dialog/region-group-dialog.component';
+import { ImagePreviewDialogComponent } from './components/image-preview-dialog/image-preview-dialog.component';
 
 @Component({
   selector: 'app-system-settings',
@@ -82,6 +85,7 @@ import { RegionGroupDialogComponent } from './components/region-group-dialog/reg
     MatListModule,
     MatTooltipModule,
     MatCardModule,
+    MatProgressBarModule,
     TranslatePipe,
     MatRadioModule,
     MonthsInputsComponent,
@@ -103,6 +107,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private monitorFacade = inject(MonitorFacade);
   private appService = inject(AppEndpointService);
   private peopleService = inject(PeopleService);
+  private storage = inject(Storage);
   dialogService = inject(DialogService);
   translatePipe = new TranslatePipe();
   @ViewChild('map') set mapElement(el: ElementRef) {
@@ -140,6 +145,15 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   saving$ = new BehaviorSubject<boolean>(false);
   selectedLocation?: SystemLocation;
   selectedContactId: string | null = null;
+  private currentUploadTask?: ReturnType<typeof uploadBytesResumable>;
+  private currentUploadProgress = 0;
+  get images(): string[] {
+    try {
+      return (this.form?.get('images')?.value as string[]) || [];
+    } catch {
+      return [];
+    }
+  }
 
   systemContacts$: Observable<Person[]> | null = null;
 
@@ -288,6 +302,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       criteria: [system?.criteria],
       panelType: [system?.panelType],
       numOfPanels: [system?.numOfPanels, Validators.required],
+      images: [system?.images || []],
       annualPrediction: [null, [Validators.required, Validators.min(0)]],
       converters: this.formBuilder.array(
         system?.converters?.length
@@ -680,6 +695,93 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     if (systemId && systemId !== 'new') {
       this.routingService.navigateToSystemApi(systemId);
     }
+  }
+
+  // Images handling
+  onImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    this.addImage(file);
+    // reset input so selecting same file again will trigger change
+    input.value = '';
+  }
+
+  private async addImage(file: File) {
+    const systemId = this.activatedRoute.snapshot.params['id'];
+    if (!systemId || systemId === 'new') return;
+
+    const path = `systems/${systemId}/${Date.now()}_${file.name}`;
+    const storageRef = ref(this.storage, path);
+    const task = uploadBytesResumable(storageRef, file);
+    this.currentUploadTask = task;
+    task.on('state_changed', (snapshot) => {
+      this.currentUploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    });
+
+    const snapshot = await task;
+    const url = await getDownloadURL(snapshot.ref);
+
+    const images: string[] = [...(this.form.get('images')?.value || [])];
+    images.push(url);
+    this.form.get('images')?.setValue(images);
+    this.form.markAsDirty();
+
+    // persist immediately
+    await new Promise<void>((resolve, reject) => {
+      this.systemsService.updateSystem(systemId, { images }).subscribe({ next: () => resolve(), error: reject });
+    });
+
+    this.currentUploadTask = undefined;
+    this.currentUploadProgress = 0;
+  }
+
+  async removeImage(url: string, idx: number) {
+    const systemId = this.activatedRoute.snapshot.params['id'];
+    if (!systemId || systemId === 'new') return;
+
+    try {
+      // Attempt to delete storage object by deriving storage path from download URL
+      const path = this.extractStoragePath(url);
+      if (path) {
+        const storageRef = ref(this.storage, path);
+        await deleteObject(storageRef).catch(() => {});
+      }
+    } catch {}
+
+    const images: string[] = [...(this.form.get('images')?.value || [])];
+    images.splice(idx, 1);
+    this.form.get('images')?.setValue(images);
+    this.form.markAsDirty();
+
+    await new Promise<void>((resolve, reject) => {
+      this.systemsService.updateSystem(systemId, { images }).subscribe({ next: () => resolve(), error: reject });
+    });
+  }
+
+  imageProgress(): number {
+    return this.currentUploadTask ? Math.round(this.currentUploadProgress) : 0;
+  }
+
+  private extractStoragePath(downloadUrl: string): string | null {
+    try {
+      const url = new URL(downloadUrl);
+      const parts = url.pathname.split('/o/');
+      if (parts.length < 2) return null;
+      const encodedPath = parts[1].split('?')[0];
+      return decodeURIComponent(encodedPath);
+    } catch {
+      return null;
+    }
+  }
+
+  previewImage(url: string) {
+    this.dialog.open(ImagePreviewDialogComponent, {
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      panelClass: 'image-preview-dialog',
+      data: { url },
+    });
   }
 
   openContactSelection() {

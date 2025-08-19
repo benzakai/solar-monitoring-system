@@ -22,6 +22,10 @@ export const systemSettings: Dictionary = {
     en: 'System Status',
     he: 'סטטוס מערכת',
   },
+  images: {
+    en: 'Images',
+    he: 'תמונות',
+  },
 
   // Form Fields
   system_name: {
@@ -133,6 +137,14 @@ export const systemSettings: Dictionary = {
   open_portal: {
     en: 'Open Portal',
     he: 'פתח פורטל',
+  },
+  add_image: {
+    en: 'Add Image',
+    he: 'הוסף תמונה',
+  },
+  remove_image: {
+    en: 'Remove Image',
+    he: 'הסר תמונה',
   },
   loading: {
     en: 'Loading system data...',

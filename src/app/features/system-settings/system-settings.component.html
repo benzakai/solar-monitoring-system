@@ -499,6 +499,32 @@
             </div>
           </div>
         </div>
+        <!-- Card 5: Images -->
+        <div class="container" id="pic-card">
+          <div class="card-header">
+            <h1>{{ 'system_settings.images' | translate }}</h1>
+            <div class="header-actions">
+              <mat-progress-bar [value]="imageProgress()" *ngIf="imageProgress()"></mat-progress-bar>
+              <button mat-icon-button class="edit-button" type="button" [disabled]="noId | async" (click)="fileInput.click()" matTooltip="{{ 'system_settings.add_image' | translate }}">
+                <mat-icon>add_photo_alternate</mat-icon>
+              </button>
+              <input hidden type="file" accept="image/*" #fileInput (change)="onImageSelected($event)" />
+            </div>
+          </div>
+          <div class="images-grid">
+            @if (images?.length) {
+              @for (image of images; let idx = $index; track image) {
+                <div class="image">
+                  <button mat-icon-button class="del-btn" color="warn" matTooltip="{{ 'system_settings.remove_image' | translate }}" type="button"
+                          (click)="removeImage(image, idx)">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <img [src]="image" (click)="previewImage(image)" style="width: 100%; max-height: 180px; object-fit: cover;" />
+                </div>
+              }
+            }
+          </div>
+        </div>
         <!-- Card 5: Comments and System Status -->
 
       </div>

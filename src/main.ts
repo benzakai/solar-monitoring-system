@@ -20,6 +20,7 @@ import { registerLocaleData } from '@angular/common';
 import { TranslatePipe } from './app/core/lang/translate.pipe';
 import { provideHttpClient } from '@angular/common/http';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 
 registerLocaleData(localeHe);
 
@@ -30,6 +31,7 @@ bootstrapApplication(AppComponent, {
     provideFirebaseApp(() => app),
     provideFirestore(() => getFirestore(app)),
     provideAuth(() => getAuth()),
+    provideStorage(() => getStorage(app)),
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
     provideFunctions(() => getFunctions(app)),

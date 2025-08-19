@@ -19,7 +19,7 @@ import {
 } from '@angular/forms';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { twoDecimalNumber } from '../../../../core/math/two-decimal-number';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   BehaviorSubject,
   combineLatest,
@@ -92,6 +92,7 @@ import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-e
     MatButtonToggleModule,
     MatSortModule,
     SortHeaderComponent,
+    RouterModule,
   ],
   providers: [MatNativeDateModule],
   templateUrl: './system-details.component.html',
