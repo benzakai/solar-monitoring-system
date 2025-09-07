@@ -63,7 +63,7 @@ export const washes: Dictionary = {
   },
   addWash: {
     en: 'First Round',
-    he: 'סבב ראשון',
+    he: 'הוספה',
   },
   comment: {
     en: 'Comments',

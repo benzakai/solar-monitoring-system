@@ -5,6 +5,7 @@ export type Wash = {
   comment?: string;
   nextWash?: number;
   supplier?: string;
+  washDone?: boolean;
 };
 
 export type SystemWash = {

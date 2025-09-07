@@ -208,7 +208,7 @@ export class MalfuncitonEditComponent {
   ];
 
   constructor(private afs: AngularFirestore) {
-    this.malfunction.subscribe((data) => {
+    this.malfunction.pipe(take(1), takeUntilDestroyed()).subscribe((data) => {
       if (data) {
         const type = data?.type ? data?.type[0] : '';
         this.form.patchValue({
@@ -323,7 +323,9 @@ export class MalfuncitonEditComponent {
             .update(result)
             .then(async () => {
               loader.close();
-              await firstValueFrom(this.routineCheckService.addCheck(malfunction.systemId));
+              await firstValueFrom(
+                this.routineCheckService.addCheck(malfunction.systemId)
+              );
               dial.confirm({
                 message: this.translatePipe.transform('malfunction.dataSaved'),
                 displayCancel: false,

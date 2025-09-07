@@ -111,7 +111,7 @@ export const createReport = (
 
   const washDates =
     systemWash?.washes
-      .filter((w) => w.done)
+      .filter((w) => w.done || w.washDone)
       .reverse()
       .map((w) => w.date)
       .filter((d) => DateUtil.IsSameYear(d, date)) || [];

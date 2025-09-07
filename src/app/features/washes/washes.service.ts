@@ -139,4 +139,23 @@ export class WashesService {
       })
     );
   }
+
+  deleteWash(systemId: string, predicate: (w: WashData, index: number) => boolean) {
+    const washRef = doc(this.firestore, 'washes', systemId);
+    return from(
+      runTransaction(this.firestore, async (transaction) => {
+        const washDoc = await transaction.get(washRef);
+        if (!washDoc.exists()) {
+          return;
+        }
+
+        const washes: WashData[] = (washDoc.data() as any).washes || [];
+        const idx = washes.findIndex((w, i) => predicate(w, i));
+        if (idx === -1) return;
+
+        const newWashes = washes.slice(0, idx).concat(washes.slice(idx + 1));
+        transaction.update(washRef, { washes: newWashes });
+      })
+    );
+  }
 }

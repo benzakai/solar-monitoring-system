@@ -91,7 +91,7 @@ export class HeaderComponent {
       debounceTime(200),
       map((search) => (search?.length ? search.toLowerCase() : '')),
       withLatestFrom(
-        combineLatest([this.facade.fulltext, this.facade.clients])
+        combineLatest([this.facade.fulltextAll, this.facade.clientsAll])
       ),
       map(([phrase, [systems, clients]]) =>
         phrase ? this.searchForSystems(phrase, systems, clients) : []

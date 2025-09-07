@@ -26,6 +26,7 @@ import { MatInputModule } from '@angular/material/input';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { DATE_FORMATS } from '../create-alert-dialog/create-alert-dialog.component';
 import { EnergyService } from '../../../../endpoint/energy.service';
+import { DateUtil } from '../../../../core/date/DateUtil';
 
 @Component({
   selector: 'app-manual-energy-update',
@@ -72,7 +73,7 @@ export class ManualEnergyUpdateComponent {
     );
 
     annualSamples.forEach((energy: EnergySample) => {
-      if (energy.apiValue) {
+      if (energy.apiValue || energy.apiValue === 0) {
         addEmpty = false;
         this.addEnergyData(
           energy.apiValue,
@@ -125,31 +126,48 @@ export class ManualEnergyUpdateComponent {
     this.action.next(true);
 
     const energyData: any[] = this.form.getRawValue().energyData;
+
     const energyDataMap = energyData.reduce(
       (acc, curr) =>
-        Object.assign(acc, { [new Date(curr.date).toDateString()]: curr }),
+        Object.assign(acc, {
+          [DateUtil.ToUtcMidnightIso(curr.date) || '']: curr,
+        }),
       {}
     );
 
     const updatedAnnual: EnergySample[] = (this.data?.energy?.annual || []).map(
       (energy: EnergySample) => {
-        const dateOfSample = new Date(energy.time).toDateString();
+        const dateOfSample =
+          DateUtil.ToUtcMidnightIso(new Date(energy.time)) || '';
+
         if (energyDataMap[dateOfSample]) {
-          return {
+          const sample = {
             ...energy,
-            valueKwh: energyDataMap[dateOfSample].manual,
-            apiValue: energyDataMap[dateOfSample].api,
+            valueKwh: Number(energyDataMap[dateOfSample].manual) || 0,
+            apiValue: Number(energyDataMap[dateOfSample].api) || 0,
           };
-        } else if (energy.apiValue) {
+          delete energyDataMap[dateOfSample];
+          return sample;
+        } else if (energy.apiValue !== undefined) {
           const { apiValue, ...rest } = energy;
           return {
             ...rest,
-            valueKwh: apiValue,
+            valueKwh: Number(apiValue) || 0,
           };
         }
         return energy;
       }
     );
+
+    (Object.keys(energyDataMap) || []).map((k) => {
+      updatedAnnual.push({
+        time: new Date(k).getTime(),
+        valueKwh: Number(energyDataMap[k].manual) || 0,
+        apiValue: Number(energyDataMap[k].api) || 0,
+      });
+    });
+
+    console.log(updatedAnnual);
 
     this.energyService
       .updateAnnualEnergy(this.data.energy.id, updatedAnnual)

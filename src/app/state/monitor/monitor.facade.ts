@@ -81,6 +81,16 @@ export class MonitorFacade {
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
+  public readonly fulltextAll = this.monitorAll.pipe(
+    map((data) =>
+      data.map((item) => ({
+        ...item,
+        system_name_idx: item.system_name.toLowerCase(),
+      }))
+    ),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
   public readonly clients = this.monitor.pipe(
     map((data) => {
       const clients: Record<string, IdName> = {};

@@ -450,10 +450,12 @@ export class SystemDetailsComponent implements AfterViewInit {
 
       energyPath = (energy.annual || [])
         .filter((e) => e.time >= start && e.time <= end)
-        .map((e) => ({
-          x: e.time,
-          y: e.valueKwh / system.KWP,
-        }))
+        .map((e) => {
+          return {
+            x: e.time,
+            y: e.valueKwh / system.KWP,
+          };
+        })
         .sort((a, b) => +a.x - +b.x);
 
       meanEnergyPath = EnergyCalc.GetMeanCalculation(
