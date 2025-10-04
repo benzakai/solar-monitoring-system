@@ -135,12 +135,16 @@ export class ManualEnergyUpdateComponent {
       {}
     );
 
-    const updatedAnnual: EnergySample[] = (this.data?.energy?.annual || []).map(
-      (energy: EnergySample) => {
-        const dateOfSample =
-          DateUtil.ToUtcMidnightIso(new Date(energy.time)) || '';
+    const updatedAnnual: EnergySample[] = (this.data?.energy?.annual || [])
+      .map((energy: EnergySample) => {
+        let dateOfSample;
+        try {
+          dateOfSample = DateUtil.ToUtcMidnightIso(new Date(energy.time)) || '';
+        } catch (e) {
+          return null;
+        }
 
-        if (energyDataMap[dateOfSample]) {
+        if (dateOfSample && energyDataMap[dateOfSample]) {
           const sample = {
             ...energy,
             valueKwh: Number(energyDataMap[dateOfSample].manual) || 0,
@@ -156,8 +160,8 @@ export class ManualEnergyUpdateComponent {
           };
         }
         return energy;
-      }
-    );
+      })
+      .filter((e): e is EnergySample => e !== null);
 
     (Object.keys(energyDataMap) || []).map((k) => {
       updatedAnnual.push({
