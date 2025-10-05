@@ -127,6 +127,7 @@ export class AppComponent implements AfterViewInit {
       malfunctions: 'sidenav.malfunctions',
       'malfunction-edit': 'sidenav.malfunctions',
       'routine-check': 'sidenav.routine_check',
+      management: 'sidenav.management',
       users: 'sidenav.users',
       'system-settings': 'sidenav.system_settings',
     };

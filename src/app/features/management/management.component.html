@@ -1,0 +1,151 @@
+<div style="display: flex">
+  <div class="container">
+    <div class="settings">
+      <h1>{{ 'management.title_general' | translate }}</h1>
+    </div>
+    <div class="kpi">
+      <p>{{ 'management.kpi_checked_today' | translate }}:</p>
+      <b>{{ checkedToday$ | async }}</b>
+    </div>
+    <div class="kpi">
+      <p>{{ 'management.kpi_checked_month' | translate }}:</p>
+      <b>{{ checkedThisMonth$ | async }}</b>
+    </div>
+    <div class="kpi">
+      <p>{{ 'management.kpi_systems_total' | translate }}:</p>
+      <b>{{ systemsCount$ | async }}</b>
+    </div>
+    <div class="kpi">
+      <p>{{ 'management.kpi_total_kwp' | translate }}:</p>
+      <b>{{ (totalKwp$ | async) | number:'1.0-0' }}</b>
+    </div>
+    <div class="kpi">
+      <p>{{ 'management.kpi_clients' | translate }}:</p>
+      <b>{{ clientsCount$ | async }}</b>
+    </div>
+  </div>
+
+  <div class="container" style="flex: 1">
+    <div class="settings month-nav">
+      <button mat-icon-button [disabled]="!(canPrev$ | async)" (click)="prevMonth()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <span class="month-title"><h1>{{ (month$ | async) | date:'MMMM yyyy' }}</h1></span>
+      <button mat-icon-button [disabled]="!(canNext$ | async)" (click)="nextMonth()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+    </div>
+    <div class="table-container">
+      <table class="fullwidth" *ngIf="monthlyStats$ | async as ms; else statsLoading">
+        <tr>
+          <th></th>
+          <th colspan="3">{{ 'management.paying_contract' | translate }}</th>
+          <th colspan="3">{{ 'management.trial_contract' | translate }}</th>
+        </tr>
+
+        <tr>
+          <th></th>
+          <th>{{ 'management.current_state' | translate }}</th>
+          <th colspan="2">{{ 'management.change_from_prev' | translate }}</th>
+          <th>{{ 'management.current_state' | translate }}</th>
+          <th colspan="2">{{ 'management.change_from_prev' | translate }}</th>
+        </tr>
+
+        <tr>
+          <td>{{ 'management.total_systems' | translate }}</td>
+          <td>{{ ms.current.numOfPayingSystems }}</td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.numOfPayingSystems }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio.numOfPayingSystems | percent : '1.0-0' }})</td>
+          <td>{{ ms.current.numOfTrialSystems }}</td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.numOfTrialSystems }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio.numOfTrialSystems | percent : '1.0-0' }})</td>
+        </tr>
+
+        <tr>
+          <td>{{ 'management.total_kwp' | translate }}</td>
+          <td>{{ ms.current.payingKWP | number : '1.0-0' }}</td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.payingKWP | number : '1.0-0' }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio.payingKWP | percent : '1.0-0' }})</td>
+          <td>{{ ms.current.trialKWP | number : '1.0-0' }}</td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.trialKWP | number : '1.0-0' }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio.trialKWP | percent : '1.0-0' }})</td>
+        </tr>
+
+        <tr>
+          <td>{{ 'management.total_income' | translate }}</td>
+          <td>{{ ms.current.incomes | number : '1.0-0' }}₪</td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.incomes | number : '1.0-0' }}₪</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio.incomes | percent : '1.0-0' }})</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td>{{ 'management.projects' | translate }}</td>
+          <td></td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.numOfProjectSource }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio['numOfProjectSource'] | percent : '1.0-0' }})</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td>{{ 'management.new' | translate }}</td>
+          <td></td>
+          <td *ngIf="ms.hasPrevMonth; else noData">{{ ms.change.numOfNewSource }}</td>
+          <td *ngIf="ms.hasPrevMonth">({{ ms.changeRatio['numOfNewSource'] | percent : '1.0-0' }})</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+      <ng-template #statsLoading>—</ng-template>
+      <ng-template #noData>
+        <td class="no-data" colspan="2">{{ 'management.no_data' | translate }}</td>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <h1>{{ 'management.title_clients_charges' | translate }}</h1>
+    <table class="mat-elevation-z0 fullwidth" *ngIf="chargesSummary$ | async as summery">
+      <tr *ngFor="let status of paymentStatuses; let idx = index">
+        <td>{{ paymentStatusDictionary[status] }}</td>
+        <td>{{ summery[idx] | number:'1.2-2' }}₪</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<div class="container">
+  <div class="settings">
+    <h1>{{ 'management.title_users_perf' | translate }}</h1>
+  </div>
+  <div class="table-container">
+
+
+    <table mat-table [dataSource]="(usersPerformance$ | async) || []" class="mat-elevation-z0 fullwidth">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> {{ 'management.col_user' | translate }} </th>
+        <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
+      </ng-container>
+      <ng-container matColumnDef="today">
+        <th mat-header-cell *matHeaderCellDef> {{ 'management.col_today' | translate }} </th>
+        <td mat-cell *matCellDef="let row"> {{ row.today }} </td>
+      </ng-container>
+      <ng-container matColumnDef="month">
+        <th mat-header-cell *matHeaderCellDef> {{ 'management.col_month' | translate }} </th>
+        <td mat-cell *matCellDef="let row"> {{ row.month }} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>
+
+

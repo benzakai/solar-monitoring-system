@@ -1,0 +1,59 @@
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;align-items: stretch;
+  overflow: auto;
+  direction: rtl;
+  padding-top: 50px;
+}
+
+.settings {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+  gap: 10px;
+}
+
+.container {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.kpi {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.kpi p {
+  margin: 0;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month-title {
+  font-weight: 600;
+}
+
+.fullwidth {
+  width: 100%;
+}
+
+
