@@ -9,6 +9,7 @@ import { reports } from './reports';
 import { users } from './users';
 import { systemSettings } from './system-settings';
 import { createAlertDialog } from './create-alert-dialog';
+import { settings } from './settings';
 
 export const dictionary = {
   header,
@@ -22,4 +23,5 @@ export const dictionary = {
   users,
   systemSettings,
   createAlertDialog,
+  settings,
 }; 

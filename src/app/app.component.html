@@ -55,6 +55,11 @@
               <mat-icon color="yellow">people</mat-icon>
             </button>
 
+            <button mat-button color="white" (click)="redirect('settings')">
+              {{ 'sidenav.settings' | translate }}
+              <mat-icon color="yellow">tune</mat-icon>
+            </button>
+
             <button mat-button color="white" (click)="redirect('system-settings')">
               {{ 'sidenav.system_settings' | translate }}
               <mat-icon color="yellow">settings</mat-icon>

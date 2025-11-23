@@ -1,0 +1,26 @@
+<div class="sending-content">
+  <mat-checkbox disabled>
+    {{ 'settings.sending.title' | translate }}
+  </mat-checkbox>
+
+  <div class="form-line">
+    <mat-form-field appearance="outline">
+      <input
+        matInput
+        type="email"
+        disabled
+        [value]="'settings.sending.emailPlaceholder' | translate"
+      />
+    </mat-form-field>
+    <label>{{ 'settings.sending.title' | translate }}</label>
+  </div>
+
+  <div class="actions">
+    <button mat-stroked-button color="warn" disabled>Delete Log</button>
+    <button mat-flat-button color="primary" disabled>Save</button>
+  </div>
+
+  <p class="placeholder-text">{{ 'settings.placeholder.message' | translate }}</p>
+</div>
+
+

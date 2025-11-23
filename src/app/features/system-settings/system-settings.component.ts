@@ -58,6 +58,7 @@ import { SystemsService } from '../../endpoint/systems.service';
 import { Storage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from '@angular/fire/storage';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { SystemType } from '../systems/system-type';
+import { SystemContract } from '../systems/system-contract';
 import { ApiIdDialogComponent } from './components/api-id-dialog/api-id-dialog.component';
 import { ContactSelectionDialogComponent } from './components/contact-selection-dialog/contact-selection-dialog.component';
 import { MonthsInputsComponent } from './components/months-inputs/months-inputs.component';
@@ -162,6 +163,8 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   readonly months: Date[] = this.getMonths();
   readonly systemTypes = Object.values(SystemType);
   readonly systemTypeDict = this.getSystemTypeDict();
+  readonly contractOptions = Object.values(SystemContract) as SystemContract[];
+  readonly contractDict = this.getContractDict();
   readonly criteria = Object.values(SystemCriteria);
   readonly criteriaDict = this.getCriteriaDict();
 
@@ -284,6 +287,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       type: [system?.type, Validators.required],
       isActive: [system?.isActive || false],
       portalUrl: [system?.portalUrl],
+      contract: [system?.contract ?? SystemContract.NONE],
       client: [system?.client, Validators.required],
       contactsIds: [system?.contactsIds],
       startTime: [system?.startTime],
@@ -518,6 +522,17 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     };
   }
 
+  private getContractDict(): Record<SystemContract, string> {
+    return {
+      [SystemContract.NONE]: 'contract_none',
+      [SystemContract.YEAR]: 'contract_year',
+      [SystemContract.MONTH]: 'contract_month',
+      [SystemContract.RETROFIT]: 'contract_retrofit',
+      [SystemContract.MANUAL]: 'contract_manual',
+      [SystemContract.COMPENSATION]: 'contract_compensation',
+    };
+  }
+
   checkPvsyst(event: boolean) {
     //TODO implement
   }
@@ -562,9 +577,72 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       width: '600px',
     });
 
-    dialogRef.afterClosed().subscribe((apiId) => {
-      if (apiId) {
-        this.form.get('apiId')?.setValue(apiId);
+    dialogRef.afterClosed().subscribe(async (newApiId) => {
+      if (!newApiId) {
+        return;
+      }
+
+      const isExternal = this.externalPortals.includes(type);
+
+      if (isExternal) {
+        // External portals: require existing system (must be saved first)
+        const currentId = this.activatedRoute.snapshot.params['id'];
+        if (!currentId || currentId === 'new') {
+          this.dialogService.confirm({
+            message: this.translatePipe.transform('system-settings.external_portal_save_first_message'),
+            title: this.translatePipe.transform('system-settings.external_portal_save_first_title'),
+            displayCancel: false,
+          });
+          return;
+        }
+
+        if (!newApiId) {
+          return;
+        }
+
+        // Check duplicate
+        this.systemsService
+          .checkExistApi(type, newApiId, currentId)
+          .pipe(take(1))
+          .subscribe(async (existingId) => {
+            if (existingId) {
+              this.dialogService.confirm({
+                message: this.translatePipe.transform('system-settings.system_exists_message'),
+                title: this.translatePipe.transform('system-settings.system_exists_title'),
+                displayCancel: false,
+              });
+              this.router.navigate(['/system-settings', existingId]);
+              return;
+            }
+
+            // Update and trigger server import
+            this.loading$.next(true);
+            this.systemsService
+              .updateApiId(type, newApiId, currentId)
+              .pipe(take(1))
+              .subscribe((ok) => {
+                this.loading$.next(false);
+                if (ok) {
+                  this.dialogService.confirm({
+                    message: this.translatePipe.transform('system-settings.portal_update_success'),
+                    displayCancel: false,
+                  });
+                  this.router.navigate(['/system-settings', currentId]);
+                } else {
+                  this.dialogService.confirm({
+                    message: this.translatePipe.transform('system-settings.portal_update_failed_message'),
+                    title: this.translatePipe.transform('system-settings.portal_update_failed_title'),
+                    displayCancel: false,
+                  });
+                }
+              });
+          });
+        return;
+      }
+
+      // Non-external portals: just set api id on form
+      if (newApiId) {
+        this.form.get('apiId')?.setValue(newApiId);
         this.form.markAsDirty();
       }
     });

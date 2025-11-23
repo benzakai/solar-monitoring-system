@@ -1,0 +1,82 @@
+<div class="settings-page">
+  <div class="header-section">
+    <div>
+      <h1>{{ 'settings.title' | translate }}</h1>
+      <p>{{ 'settings.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="main-section settings-grid">
+    <div class="settings-columns">
+      <div class="settings-column column-left">
+        <section class="container" id="sending-card">
+          <div class="card-header">
+            <h1>{{ 'settings.sending.title' | translate }}</h1>
+            <p>{{ 'settings.sending.description' | translate }}</p>
+          </div>
+          <app-settings-sending-card></app-settings-sending-card>
+        </section>
+
+        <section class="container" id="prediction-card">
+          <div class="card-header">
+            <h1>{{ 'settings.prediction.title' | translate }}</h1>
+            <p>{{ 'settings.prediction.description' | translate }}</p>
+          </div>
+          <app-settings-prediction-card></app-settings-prediction-card>
+        </section>
+
+        <section class="container" id="malfunctions-card">
+          <div class="card-header">
+            <h1>{{ 'settings.malfunction_types.title' | translate }}</h1>
+            <p>{{ 'settings.malfunction_types.description' | translate }}</p>
+          </div>
+          <app-settings-malfunction-types-card></app-settings-malfunction-types-card>
+        </section>
+      </div>
+
+      <div class="settings-column column-right">
+        <section class="container" id="display-card">
+          <div class="card-header">
+            <h1>{{ 'settings.display.title' | translate }}</h1>
+            <p>{{ 'settings.display.description' | translate }}</p>
+          </div>
+          <app-settings-display-card></app-settings-display-card>
+        </section>
+
+        <section class="container" id="energy-card">
+          <div class="card-header">
+            <h1>{{ 'settings.energy.title' | translate }}</h1>
+            <p>{{ 'settings.energy.subtitle' | translate }}</p>
+          </div>
+          <app-settings-energy-card></app-settings-energy-card>
+        </section>
+
+        <section class="container" id="taoz-card">
+          <div class="card-header">
+            <h1>{{ 'settings.taoz.title' | translate }}</h1>
+            <p>{{ 'settings.taoz.description' | translate }}</p>
+          </div>
+          <app-settings-taoz-card></app-settings-taoz-card>
+        </section>
+
+        <section class="container" id="emails-card">
+          <div class="card-header">
+            <h1>{{ 'settings.emails.title' | translate }}</h1>
+            <p>{{ 'settings.emails.description' | translate }}</p>
+          </div>
+          <app-settings-emails-card></app-settings-emails-card>
+        </section>
+      </div>
+    </div>
+
+    <section class="container" id="templates-card">
+      <div class="card-header">
+        <h1>{{ 'settings.templates.title' | translate }}</h1>
+        <p>{{ 'settings.templates.description' | translate }}</p>
+      </div>
+      <app-settings-templates-card></app-settings-templates-card>
+    </section>
+  </div>
+</div>
+
+

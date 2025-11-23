@@ -1,0 +1,40 @@
+<div class="warnings-grid">
+  <div class="section">
+    <p class="section-title">{{ 'settings.energy.title' | translate }}</p>
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput type="number" disabled />
+      </mat-form-field>
+      <label>Trigger (%)</label>
+    </div>
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput type="number" disabled />
+      </mat-form-field>
+      <label>Days Back</label>
+    </div>
+    <mat-checkbox disabled>All Weekdays</mat-checkbox>
+  </div>
+
+  <div class="section">
+    <p class="section-title">{{ 'settings.sending.title' | translate }}</p>
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput type="number" disabled />
+      </mat-form-field>
+      <label>Threshold (%)</label>
+    </div>
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <mat-select disabled>
+          <mat-option value="8">08:00</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <label>Hour</label>
+    </div>
+  </div>
+
+  <p class="placeholder-text">{{ 'settings.placeholder.message' | translate }}</p>
+</div>
+
+

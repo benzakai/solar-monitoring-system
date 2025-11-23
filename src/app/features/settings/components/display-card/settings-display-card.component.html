@@ -1,0 +1,28 @@
+<div class="card-body">
+  <div class="controls">
+    <mat-icon color="primary">format_size</mat-icon>
+    <mat-slider
+      class="font-slider"
+      [min]="minFont"
+      [max]="maxFont"
+      [step]="1"
+      [disabled]="true"
+      [(ngModel)]="fontSize"
+    >
+    </mat-slider>
+    <div class="actions">
+      <button mat-flat-button color="primary" disabled>
+        {{ 'settings.display.primaryAction' | translate }}
+      </button>
+      <button mat-stroked-button disabled>
+        {{ 'settings.display.secondaryAction' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <p class="placeholder-text">
+    {{ 'settings.placeholder.message' | translate }}
+  </p>
+</div>
+
+

@@ -174,7 +174,7 @@ export class ManualEnergyUpdateComponent {
     console.log(updatedAnnual);
 
     this.energyService
-      .updateAnnualEnergy(this.data.energy.id, updatedAnnual)
+      .updateAnnualEnergy(this.data.system.id, updatedAnnual)
       .subscribe(() => {
         this.dialogRef.close(updatedAnnual);
       });

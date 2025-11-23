@@ -1,0 +1,77 @@
+@if (loading$ | async) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+@if (form; as fg) {
+  <div class="card-body" [formGroup]="fg">
+    <div class="grid">
+      <div></div>
+      <p>{{ 'settings.taoz.columns.summer' | translate }}</p>
+      <p>{{ 'settings.taoz.columns.winter' | translate }}</p>
+      <p>{{ 'settings.taoz.columns.between' | translate }}</p>
+
+      <div class="row-label">
+        {{ 'settings.taoz.rows.high' | translate }}
+      </div>
+      <div formGroupName="highTaoz" class="row-fields">
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="summer" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="winter" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="between" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row-label">
+        {{ 'settings.taoz.rows.low' | translate }}
+      </div>
+      <div formGroupName="lowTaoz" class="row-fields">
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="summer" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="winter" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+        <div class="form-line taoz-field">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" min="0" step="0.01" formControlName="between" />
+            <span matSuffix>₪</span>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+      [disabled]="fg.invalid || saving"
+    >
+      {{ 'settings.taoz.actions.save' | translate }}
+    </button>
+  </div>
+} @else {
+  <div class="skeleton"></div>
+}
+
+

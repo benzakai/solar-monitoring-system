@@ -1,0 +1,132 @@
+@if (loading$ | async) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+@if (malfunctionTypesForm; as formArray) {
+  <div class="types-wrapper">
+    @if (!formArray.length) {
+      <p class="placeholder-text">{{ 'settings.placeholder.message' | translate }}</p>
+    }
+
+    @for (typeGroup of formArray.controls; track typeGroup; let idx = $index) {
+      <div class="type-row" [formGroup]="typeGroup">
+        <div class="type-header">
+          <button mat-icon-button color="primary" (click)="toggle(idx)">
+            <mat-icon>{{ openedIndex === idx ? 'indeterminate_check_box' : 'add_box' }}</mat-icon>
+          </button>
+
+          <div class="form-line type-field">
+            <label class="field-label">
+              {{ 'settings.malfunction_types.labels.code' | translate }}
+            </label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="key" />
+            </mat-form-field>
+          </div>
+
+          <div class="form-line type-field">
+            <label class="field-label">
+              {{ 'settings.malfunction_types.labels.name' | translate }}
+            </label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="text" />
+            </mat-form-field>
+          </div>
+
+          <div class="form-line type-field">
+            <label class="field-label">
+              {{ 'settings.malfunction_types.labels.severity' | translate }}
+            </label>
+            <mat-form-field appearance="outline">
+              <mat-select formControlName="severity">
+                <mat-option [value]="undefined">—</mat-option>
+                @for (severity of severities; track severity) {
+                  @if (severity) {
+                    <mat-option [value]="severity">
+                      {{ ('malfunction.severityType.' + severity) | translate }}
+                    </mat-option>
+                  }
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <button mat-icon-button color="warn" (click)="removeType(idx)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        @if (openedIndex === idx) {
+          <div class="subtypes">
+            @for (subGroup of getSubTypes(typeGroup).controls; track subGroup; let subIdx = $index) {
+              <div class="subtype-row" [formGroup]="subGroup">
+                <div class="form-line type-field">
+                  <label class="field-label">
+                    {{ 'settings.malfunction_types.labels.code' | translate }}
+                  </label>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="key" />
+                  </mat-form-field>
+                </div>
+
+                <div class="form-line type-field">
+                  <label class="field-label">
+                    {{ 'settings.malfunction_types.labels.name' | translate }}
+                  </label>
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="text" />
+                  </mat-form-field>
+                </div>
+
+                <div class="form-line type-field">
+                  <label class="field-label">
+                    {{ 'settings.malfunction_types.labels.severity' | translate }}
+                  </label>
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="severity">
+                      <mat-option [value]="undefined">—</mat-option>
+                      @for (severity of severities; track severity) {
+                        @if (severity) {
+                          <mat-option [value]="severity">
+                            {{ ('malfunction.severityType.' + severity) | translate }}
+                          </mat-option>
+                        }
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <button mat-icon-button color="warn" (click)="removeSubType(typeGroup, subIdx)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+
+            <button mat-stroked-button color="primary" type="button" (click)="addSubType(typeGroup)">
+              {{ 'settings.malfunction_types.actions.addSubType' | translate }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="actions">
+      <button mat-stroked-button color="primary" type="button" (click)="addType()">
+        {{ 'settings.malfunction_types.actions.addType' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+      [disabled]="formArray.invalid || saving"
+    >
+      {{ 'settings.malfunction_types.actions.save' | translate }}
+    </button>
+  </div>
+}
+
+

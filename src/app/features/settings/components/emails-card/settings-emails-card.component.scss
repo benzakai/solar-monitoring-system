@@ -1,0 +1,47 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.templates {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  section {
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .form-line {
+      width: 100%;
+      flex: 1;
+
+      mat-form-field {
+        flex: 1;
+        width: 100%;
+      }
+    }
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+}
+
+.placeholder-text {
+  margin: 0;
+  color: #75808a;
+}
+
+

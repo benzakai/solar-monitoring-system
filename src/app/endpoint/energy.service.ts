@@ -7,6 +7,7 @@ import {
   limit,
   onSnapshot,
   query,
+  setDoc,
   updateDoc,
   where,
 } from '@angular/fire/firestore';
@@ -146,6 +147,6 @@ export class EnergyService {
 
   updateAnnualEnergy(systemId: string, annual: EnergySample[]) {
     const docRef = doc(this.collection, systemId);
-    return from(updateDoc(docRef, { annual }));
+    return from(setDoc(docRef, { annual }, { merge: true }));
   }
 }

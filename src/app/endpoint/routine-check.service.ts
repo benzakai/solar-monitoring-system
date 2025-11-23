@@ -77,11 +77,7 @@ export class RoutineCheckService {
 
               const checks = currentData.checks;
               const last = checks[0] || {};
-              if (
-                last &&
-                last.uid === user?.uid &&
-                DateUtil.IsToday(last.date)
-              ) {
+              if (last && DateUtil.IsToday(last.date)) {
                 checks.shift();
               }
 

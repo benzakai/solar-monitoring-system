@@ -1,8 +1,10 @@
 import { Tarifs } from './tarifs';
+import { MalfunctionTypesTree } from './malfunction-type-tree';
 
 export type App = {
   prediction: AppPrediction;
   TaarifConstants: Tarifs;
+  malfunctionTypes: MalfunctionTypesTree;
 };
 
 export type AppPrediction = {

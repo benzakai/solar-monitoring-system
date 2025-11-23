@@ -76,6 +76,17 @@ export class MalfunctionsService {
     );
   }
 
+  getUnlimitedForSystem(systemId: string): Observable<Malfunction[]> {
+    const q = query(this.collection, where('systemId', '==', systemId));
+    return from(getDocs(q)).pipe(
+      map((querySnapshot) => {
+        return querySnapshot.docs.map(
+          (doc) => ({ ...doc.data(), id: doc.id }) as Malfunction
+        );
+      })
+    );
+  }
+
   public generateLogEntry(
     malfunction: Partial<Malfunction>,
     action?: MalfunctionActionType

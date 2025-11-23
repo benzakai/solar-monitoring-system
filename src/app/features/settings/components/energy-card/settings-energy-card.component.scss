@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .action-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    button {
+      align-self: flex-start;
+    }
+
+    p {
+      margin: 0;
+      color: #5c6670;
+      font-size: 14px;
+    }
+  }
+}
+
+.placeholder-text {
+  margin: 0;
+  color: #75808a;
+  font-size: 0.9rem;
+}
+
+

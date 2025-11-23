@@ -108,6 +108,30 @@ export const systemSettings: Dictionary = {
     en: 'Contract',
     he: 'חוזה',
   },
+  contract_none: {
+    en: 'No Contract',
+    he: 'ללא חוזה',
+  },
+  contract_year: {
+    en: 'Annual Contract',
+    he: 'חוזה שנתי',
+  },
+  contract_month: {
+    en: 'Two-Month Trial',
+    he: 'הרצה',
+  },
+  contract_retrofit: {
+    en: 'Retrofit',
+    he: 'רטרופיט',
+  },
+  contract_manual: {
+    en: 'Manual',
+    he: 'ידני',
+  },
+  contract_compensation: {
+    en: 'Compensation',
+    he: 'פיצוי',
+  },
   location: {
     en: 'Location',
     he: 'מיקום',
@@ -463,5 +487,35 @@ export const systemSettings: Dictionary = {
     washType: { en: 'Wash Type', he: 'סוג שטיפה' },
     washRate: { en: 'Wash Rate', he: 'תדירות שטיפה' },
     comments: { en: 'Comments', he: 'הערות' },
+  },
+
+  // External portals & API import messages
+  external_portal_save_first_title: {
+    en: 'Save new system',
+    he: 'שמירת מערכת חדשה',
+  },
+  external_portal_save_first_message: {
+    en: 'Please save the system first, then link it to the relevant portal.',
+    he: 'יש לשמור תחילה את המערכת ולאחר מכן לשייך אותה לפורטל הרלוונטי',
+  },
+  system_exists_title: {
+    en: 'System exists',
+    he: 'מערכת קיימת',
+  },
+  system_exists_message: {
+    en: 'A system with identical portal data already exists. Navigating to the existing system.',
+    he: 'קיימת כבר מערכת בעלת נתוני פורטל זהים. עובר לעמוד המערכת הקיימת.',
+  },
+  portal_update_success: {
+    en: 'Portal details updated and data import completed successfully.',
+    he: 'עדכון נתוני פורטל וייבוא נתונים התבצע בהצלחה',
+  },
+  portal_update_failed_title: {
+    en: 'Save failed',
+    he: 'שמירת נתונים נכשלה',
+  },
+  portal_update_failed_message: {
+    en: 'Portal data was not saved. Please verify and try again.',
+    he: 'נתוני פורטל לא נשמרו. אנא בדקו את הנתונים ונסו שנית.',
   },
 };

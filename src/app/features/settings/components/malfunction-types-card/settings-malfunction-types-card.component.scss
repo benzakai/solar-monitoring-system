@@ -1,0 +1,67 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.types-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.placeholder-text {
+  color: #75808a;
+}
+
+.type-row {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.type-header,
+.subtype-row {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(140px, 1fr)) auto;
+  gap: 12px;
+  align-items: center;
+
+  .form-line {
+    width: 100%;
+
+    mat-form-field {
+      flex: 1;
+      width: 100%;
+    }
+  }
+}
+
+.subtypes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-inline-start: 32px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .type-header,
+  .subtype-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+

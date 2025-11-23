@@ -9,7 +9,8 @@ import {
   setDoc,
   where,
 } from '@angular/fire/firestore';
-import { forkJoin, from, map, Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, forkJoin, from, map, Observable, of, switchMap } from 'rxjs';
 import { System } from '../domain/system';
 import { getDocs } from 'firebase/firestore';
 import { chunkArray } from './chunk-array.function';
@@ -20,6 +21,7 @@ import { chunkArray } from './chunk-array.function';
 export class SystemsService {
   private firestore = inject(Firestore);
   private collection = collection(this.firestore, 'systems');
+  private http = inject(HttpClient);
 
   public getById(id: string): Observable<System | null> {
     const docRef = doc(this.collection, id);
@@ -77,6 +79,44 @@ export class SystemsService {
     const systemWithId = { ...systemData, id: docRef.id };
     return from(setDoc(docRef, systemWithId)).pipe(
       map(() => docRef.id)
+    );
+  }
+
+  /**
+   * Check if a system with the same type and apiId exists (excluding current system id).
+   * Returns the existing system id if found, otherwise undefined.
+   */
+  checkExistApi(type: string, apiId: Array<string | number | null>, currentSystemId?: string): Observable<string | undefined> {
+    const q = query(this.collection, where('type', '==', type as any), where('apiId', '==', apiId as any));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        const ids = snapshot.docs
+          .filter((doc) => doc.id !== currentSystemId)
+          .map((doc) => doc.id);
+        return ids.length > 0 ? ids[0] : undefined;
+      })
+    );
+  }
+
+  /**
+   * Update system's type/apiId and trigger server-side import via updateNow endpoint.
+   * Returns true on success, false on failure (and reverts type/apiId on failure).
+   */
+  updateApiId(type: string, apiId: Array<string | number | null>, systemId: string): Observable<boolean> {
+    const docRef = doc(this.collection, systemId);
+    if (!type || !systemId) {
+      return of(false);
+    }
+    const url = `https://golan-api.onrender.com/api/updateNow/${type}/${systemId}`;
+    return from(updateDoc(docRef, { type: type as any, apiId: apiId as any })).pipe(
+      switchMap(() => this.http.get<any>(url)),
+      map(() => true),
+      catchError((e: unknown) => {
+        return from(updateDoc(docRef, { type: '' as any, apiId: [] as any })).pipe(
+          map(() => false),
+          catchError(() => of(false))
+        );
+      })
     );
   }
 }

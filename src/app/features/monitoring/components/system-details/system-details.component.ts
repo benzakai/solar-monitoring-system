@@ -177,7 +177,7 @@ export class SystemDetailsComponent implements AfterViewInit {
     switchMap((id: string) =>
       this.malfunctionsReload.pipe(
         switchMap(() =>
-          this.malfunctionsService.getForSystem(id).pipe(
+          this.malfunctionsService.getUnlimitedForSystem(id).pipe(
             switchMap((malfunctions) =>
               this.sortParams.pipe(
                 tap(

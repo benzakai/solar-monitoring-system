@@ -1,0 +1,27 @@
+<div class="card-body">
+  <div class="card-toolbar">
+    <span class="spacer"></span>
+    <button mat-flat-button color="primary" disabled>
+      Save
+    </button>
+  </div>
+
+  <mat-tab-group>
+    @for (tab of tabs; track tab) {
+      <mat-tab [label]="tab | uppercase">
+        <div class="tab-content">
+          <div class="form-line area">
+            <mat-form-field appearance="outline">
+              <textarea matInput disabled rows="10"></textarea>
+            </mat-form-field>
+            <label>{{ tab | uppercase }}</label>
+          </div>
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+
+  <p class="placeholder-text">{{ 'settings.placeholder.message' | translate }}</p>
+</div>
+
+

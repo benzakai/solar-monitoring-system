@@ -1,0 +1,52 @@
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.distributions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+
+  .form-line {
+    width: 100%;
+
+    mat-form-field {
+      flex: 1;
+      width: 100%;
+    }
+  }
+}
+
+.error {
+  color: #c62828;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.skeleton {
+  height: 240px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  margin: 16px;
+}
+
+

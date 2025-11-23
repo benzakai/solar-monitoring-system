@@ -12,5 +12,5 @@ export enum SystemType {
   NETECO = 'NTC',
   SOLAX = 'SLX',
   GOODWE = 'GDW',
-  FUSION= 'FSN'
+  FUSION = 'FSN',
 }

@@ -1,0 +1,70 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.row-label {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.row-fields {
+  display: grid;
+  grid-column: span 3;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+
+  .form-line {
+    width: 100%;
+  }
+
+  .taoz-field {
+    mat-form-field {
+      flex: 1;
+      width: 100%;
+    }
+
+    label {
+      flex: 0 0 110px;
+    }
+  }
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.skeleton {
+  height: 180px;
+  background: rgba(0, 0, 0, 0.04);
+  margin: 16px;
+  border-radius: 12px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .row-fields {
+    grid-column: span 1;
+    grid-template-columns: 1fr;
+  }
+}
+
+

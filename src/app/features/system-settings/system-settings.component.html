@@ -162,6 +162,21 @@
 
               <div class="form-line">
                 <mat-form-field appearance="outline">
+                  <mat-select formControlName="contract">
+                    @for (contract of contractOptions; track contract) {
+                      <mat-option [value]="contract">
+                        {{
+                          ('system_settings.' + contractDict[contract]) | translate
+                        }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <label>{{ 'system_settings.contract' | translate }}</label>
+              </div>
+
+              <div class="form-line">
+                <mat-form-field appearance="outline">
                   <input
                     matInput
                     [matDatepicker]="startPicker"

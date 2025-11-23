@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  mat-icon {
+    font-size: 32px;
+  }
+}
+
+.font-slider {
+  flex: 1;
+  min-width: 200px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.placeholder-text {
+  margin: 8px 0 0;
+  color: #75808a;
+  font-size: 0.9rem;
+}
+
+

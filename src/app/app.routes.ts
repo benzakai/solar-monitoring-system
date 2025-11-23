@@ -14,27 +14,52 @@ import { SYSTEM_SETTINGS_ROUTES } from './features/system-settings/system-settin
 import { WashesComponent } from './features/washes/washes.component';
 import { ClientDetailsComponent } from './features/clients/client-details.component';
 import { ManagementComponent } from './features/management/management.component';
+import { SettingsComponent } from './features/settings/settings.component';
+import { authGuard } from './core/roles/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
-  { path: 'systems', component: MonitoringTableComponent },
-  { path: 'system/:id', component: SystemDetailsComponent },
+  { path: 'systems', component: MonitoringTableComponent, canActivate: [authGuard] },
+  { path: 'system/:id', component: SystemDetailsComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginPageComponent },
-  { path: 'energy-update-check', component: UpdateCheckComponent },
-  { path: 'energy-update-partition', component: UpdatePartitionComponent },
-  { path: 'malfunctions', component: MalfunctionsComponent },
-  { path: 'malfunction-edit/:id', component: MalfuncitonEditComponent },
-  { path: 'routine-check', component: RoutineCheckComponent },
-  { path: 'reports', component: ReportsTableComponent },
-  { path: 'reports/:year', component: ReportsTableComponent },
-  { path: 'reports/:year/:month', component: ReportsTableComponent },
+  { path: 'energy-update-check', component: UpdateCheckComponent, canActivate: [authGuard] },
+  {
+    path: 'energy-update-partition',
+    component: UpdatePartitionComponent,
+    canActivate: [authGuard],
+  },
+  { path: 'malfunctions', component: MalfunctionsComponent, canActivate: [authGuard] },
+  {
+    path: 'malfunction-edit/:id',
+    component: MalfuncitonEditComponent,
+    canActivate: [authGuard],
+  },
+  { path: 'routine-check', component: RoutineCheckComponent, canActivate: [authGuard] },
+  { path: 'reports', component: ReportsTableComponent, canActivate: [authGuard] },
+  { path: 'reports/:year', component: ReportsTableComponent, canActivate: [authGuard] },
+  {
+    path: 'reports/:year/:month',
+    component: ReportsTableComponent,
+    canActivate: [authGuard],
+  },
   { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
-  { path: 'management', component: ManagementComponent },
-  { path: 'users', children: USERS_ROUTES },
-  { path: 'system-settings', children: SYSTEM_SETTINGS_ROUTES },
-  { path: 'client/:id', component: ClientDetailsComponent },
-  { path: 'washes', component: WashesComponent },
+  { path: 'management', component: ManagementComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  {
+    path: 'users',
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
+    children: USERS_ROUTES,
+  },
+  {
+    path: 'system-settings',
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
+    children: SYSTEM_SETTINGS_ROUTES,
+  },
+  { path: 'client/:id', component: ClientDetailsComponent, canActivate: [authGuard] },
+  { path: 'washes', component: WashesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'systems' },
 ];

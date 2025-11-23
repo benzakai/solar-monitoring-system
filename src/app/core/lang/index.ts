@@ -15,6 +15,7 @@ import { personInfo } from './dictionary/person-info-dialog.lang';
 import { monthsInputsLang } from './dictionary/months-inputs.lang';
 import { client as clientLang } from './dictionary/client';
 import { management } from './dictionary/management';
+import { settings } from './dictionary/settings';
 
 export const LANGUAGE_DICTIONARY: InjectionToken<Dictionary> =
   new InjectionToken<Dictionary>('LANGUAGE_DICTIONARY');
@@ -36,4 +37,5 @@ export const language: Dictionary = {
   months_inputs: monthsInputsLang,
   client: clientLang,
   management,
+  settings,
 };

@@ -168,13 +168,12 @@ export class MonitoringTableComponent {
         const daysFromCheck = item?.lastCheck?.date
           ? DateUtil.DaysFromToday(new Date(item?.lastCheck?.date || 0))
           : undefined;
-        const checkedByMeToday =
-          daysFromCheck === 0 && item?.lastCheck?.uid === user.uid;
+        const checkedByAnybodyToday = daysFromCheck === 0;
         const toBeChecked = (daysFromCheck || 100) > 10;
         return {
           ...item,
           daysFromCheck,
-          checkedByMeToday,
+          checkedByAnybodyToday,
           toBeChecked,
         };
       })
@@ -305,7 +304,7 @@ export class MonitoringTableComponent {
   waitingSync: { [key: string]: any } = {};
 
   testedByMeTodayCount = this.monitorFiltered.pipe(
-    map((data) => data.filter((item) => item.checkedByMeToday).length)
+    map((data) => data.filter((item) => item.checkedByAnybodyToday).length)
   );
 
   needsTest = this.monitorFiltered.pipe(

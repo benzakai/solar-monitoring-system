@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { merge, of, startWith, switchMap } from 'rxjs';
+import { filter, merge, of, startWith, switchMap, take } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   loadMonitorItemsSuccess,
@@ -24,6 +24,8 @@ export class MonitorEffects {
       ofType(loadMonitorItems),
       switchMap(() =>
         this.authState.pipe(
+          filter((auth): auth is NonNullable<typeof auth> => Boolean(auth)),
+          take(1),
           switchMap(() =>
             merge(
               this.monitorItemService.getAllSnapshot(),

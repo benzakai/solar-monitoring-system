@@ -1,0 +1,30 @@
+<div class="templates">
+  @for (template of templates; track template) {
+    <section>
+      <header>
+        <h3>{{ template | uppercase }}</h3>
+        <button mat-stroked-button color="primary" disabled>
+          Save
+        </button>
+      </header>
+
+      <div class="form-line">
+        <mat-form-field appearance="outline">
+          <input matInput disabled />
+        </mat-form-field>
+        <label>{{ 'settings.emails.labels.subject' | translate }}</label>
+      </div>
+
+      <div class="form-line area">
+        <mat-form-field appearance="outline">
+          <textarea matInput disabled rows="4"></textarea>
+        </mat-form-field>
+        <label>{{ 'settings.emails.labels.body' | translate }}</label>
+      </div>
+    </section>
+  }
+
+  <p class="placeholder-text">{{ 'settings.placeholder.message' | translate }}</p>
+</div>
+
+

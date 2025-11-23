@@ -40,6 +40,7 @@ import { Router, RouterModule } from '@angular/router';
 import { LogsTableComponent } from '../logs-table/logs-table.component';
 import { RoutingService } from '../../../core/routing/routing.service';
 import {
+  MatDatepickerModule,
   MatDatepickerToggle,
   MatDateRangeInput,
   MatDateRangePicker,
@@ -89,6 +90,7 @@ import { MalfunctionsFiltersControlService } from '../../monitoring/services/mal
     MatDateRangeInput,
     MatDateRangePicker,
     MatDatepickerToggle,
+    MatDatepickerModule,
     MatEndDate,
     MatError,
     MatFormField,
