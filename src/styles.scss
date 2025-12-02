@@ -282,6 +282,14 @@ mat-dialog-content {
   text-align: right;
 }
 
+.form-line-white {
+  mat-form-field {
+    .mdc-notched-outline {
+      background: #fff!important;
+    }
+  }
+}
+
 .form-line {
   display: flex;
   justify-content: flex-end;
@@ -313,6 +321,8 @@ mat-dialog-content {
       border-color: #F1EEA8 !important;
     }
   }
+
+
 
   .mat-mdc-icon-button {
     color: #74725C;

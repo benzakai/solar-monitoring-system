@@ -55,7 +55,13 @@ import { SystemLocation } from '../../domain/system-location';
 import { AppEndpointService } from '../../endpoint/app-endpoint.service';
 import { PeopleService } from '../../endpoint/people.service';
 import { SystemsService } from '../../endpoint/systems.service';
-import { Storage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from '@angular/fire/storage';
+import {
+  Storage,
+  ref,
+  uploadBytesResumable,
+  deleteObject,
+  getDownloadURL,
+} from '@angular/fire/storage';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { SystemType } from '../systems/system-type';
 import { SystemContract } from '../systems/system-contract';
@@ -126,9 +132,12 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   // Form and data
   form!: FormGroup;
-  system$: Observable<System | null> = this.activatedRoute.params.pipe(
+  private systemId$ = this.activatedRoute.params.pipe(
     takeUntilDestroyed(this.destroyRef),
     map((params) => params['id']),
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
+  system$: Observable<System | null> = this.systemId$.pipe(
     switchMap((id) => {
       if (id && id !== 'new') {
         return this.systemsService.getById(id);
@@ -137,6 +146,9 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       }
     }),
     shareReplay({ refCount: true, bufferSize: 1 })
+  );
+  readonly isNewSystemRoute$: Observable<boolean> = this.systemId$.pipe(
+    map((id) => id === 'new')
   );
 
   hasId = this.system$.pipe(map((sys) => Boolean(sys?.id)));
@@ -282,38 +294,38 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.selectedLocation = system?.location ?? undefined;
 
     this.form = this.formBuilder.group({
-      apiId: [system?.apiId || [], Validators.required],
-      name: [system?.name, Validators.required],
-      type: [system?.type, Validators.required],
+      apiId: [system?.apiId || []],
+      name: [system?.name],
+      type: [system?.type],
       isActive: [system?.isActive || false],
       portalUrl: [system?.portalUrl],
       contract: [system?.contract ?? SystemContract.NONE],
-      client: [system?.client, Validators.required],
+      client: [system?.client],
       contactsIds: [system?.contactsIds],
       startTime: [system?.startTime],
       contractStartTime: [system?.contractStartTime],
       annualCheckDate: [system?.annualCheckDate],
       taoz: [system?.taoz],
-      regulation: [system?.regulation, Validators.required],
+      regulation: [system?.regulation],
       excludeFromAverage: [system?.excludeFromAverage],
       communication: [system?.communication],
       installer: [system?.installer],
       monitorPriceKw: [system?.monitorPriceKw],
-      source: [system?.source, Validators.required],
+      source: [system?.source],
       AC: [system?.AC, Validators.min(0)],
-      KWP: [system?.KWP, Validators.required],
-      power: [system?.power, Validators.required],
+      KWP: [system?.KWP],
+      power: [system?.power],
       criteria: [system?.criteria],
       panelType: [system?.panelType],
-      numOfPanels: [system?.numOfPanels, Validators.required],
+      numOfPanels: [system?.numOfPanels],
       images: [system?.images || []],
-      annualPrediction: [null, [Validators.required, Validators.min(0)]],
+      annualPrediction: [null],
       converters: this.formBuilder.array(
         system?.converters?.length
           ? system?.converters.map(({ model, amount }) =>
               this.formBuilder.group({
-                model: [model, Validators.required],
-                amount: [amount, [Validators.required, Validators.min(1)]],
+                model: [model],
+                amount: [amount],
               })
             )
           : []
@@ -362,7 +374,6 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
           regulationControl?.clearValidators();
         } else {
           regulationControl?.enable();
-          regulationControl?.setValidators(Validators.required);
         }
         regulationControl?.updateValueAndValidity();
       });
@@ -530,6 +541,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       [SystemContract.RETROFIT]: 'contract_retrofit',
       [SystemContract.MANUAL]: 'contract_manual',
       [SystemContract.COMPENSATION]: 'contract_compensation',
+      [SystemContract.ADDITIONAL]: 'contract_additional',
     };
   }
 
@@ -589,8 +601,12 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         const currentId = this.activatedRoute.snapshot.params['id'];
         if (!currentId || currentId === 'new') {
           this.dialogService.confirm({
-            message: this.translatePipe.transform('system-settings.external_portal_save_first_message'),
-            title: this.translatePipe.transform('system-settings.external_portal_save_first_title'),
+            message: this.translatePipe.transform(
+              'system-settings.external_portal_save_first_message'
+            ),
+            title: this.translatePipe.transform(
+              'system-settings.external_portal_save_first_title'
+            ),
             displayCancel: false,
           });
           return;
@@ -607,8 +623,12 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
           .subscribe(async (existingId) => {
             if (existingId) {
               this.dialogService.confirm({
-                message: this.translatePipe.transform('system-settings.system_exists_message'),
-                title: this.translatePipe.transform('system-settings.system_exists_title'),
+                message: this.translatePipe.transform(
+                  'system-settings.system_exists_message'
+                ),
+                title: this.translatePipe.transform(
+                  'system-settings.system_exists_title'
+                ),
                 displayCancel: false,
               });
               this.router.navigate(['/system-settings', existingId]);
@@ -624,14 +644,20 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
                 this.loading$.next(false);
                 if (ok) {
                   this.dialogService.confirm({
-                    message: this.translatePipe.transform('system-settings.portal_update_success'),
+                    message: this.translatePipe.transform(
+                      'system-settings.portal_update_success'
+                    ),
                     displayCancel: false,
                   });
                   this.router.navigate(['/system-settings', currentId]);
                 } else {
                   this.dialogService.confirm({
-                    message: this.translatePipe.transform('system-settings.portal_update_failed_message'),
-                    title: this.translatePipe.transform('system-settings.portal_update_failed_title'),
+                    message: this.translatePipe.transform(
+                      'system-settings.portal_update_failed_message'
+                    ),
+                    title: this.translatePipe.transform(
+                      'system-settings.portal_update_failed_title'
+                    ),
                     displayCancel: false,
                   });
                 }
@@ -655,15 +681,11 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   async save() {
     const dial = this.dialogService;
     this.form.updateValueAndValidity();
-    if (this.form.invalid || !this.selectedLocation) {
+    if (this.form.invalid) {
       const errorsIn = Object.keys(this.form?.controls || {})
         .map((k) => [k, this.form.get(k)?.invalid])
         .filter(([s, i]) => i)
         .map(([k]) => k);
-
-      if (!this.selectedLocation) {
-        errorsIn.push('location');
-      }
 
       dial.confirm({
         message: 'Invalid Fields: ' + errorsIn.join(', '),
@@ -794,7 +816,8 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     const task = uploadBytesResumable(storageRef, file);
     this.currentUploadTask = task;
     task.on('state_changed', (snapshot) => {
-      this.currentUploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      this.currentUploadProgress =
+        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
     });
 
     const snapshot = await task;
@@ -807,7 +830,9 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
     // persist immediately
     await new Promise<void>((resolve, reject) => {
-      this.systemsService.updateSystem(systemId, { images }).subscribe({ next: () => resolve(), error: reject });
+      this.systemsService
+        .updateSystem(systemId, { images })
+        .subscribe({ next: () => resolve(), error: reject });
     });
 
     this.currentUploadTask = undefined;
@@ -833,7 +858,9 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.form.markAsDirty();
 
     await new Promise<void>((resolve, reject) => {
-      this.systemsService.updateSystem(systemId, { images }).subscribe({ next: () => resolve(), error: reject });
+      this.systemsService
+        .updateSystem(systemId, { images })
+        .subscribe({ next: () => resolve(), error: reject });
     });
   }
 

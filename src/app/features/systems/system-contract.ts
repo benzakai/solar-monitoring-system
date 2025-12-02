@@ -5,5 +5,6 @@ export enum SystemContract {
   RETROFIT = 'retrofit',
   MANUAL = 'manual',
   COMPENSATION = 'compensation',
+  ADDITIONAL = 'additional',
 }
 

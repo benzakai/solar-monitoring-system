@@ -32,9 +32,17 @@
         </div>
 
         <div class="system-name-field">
-          <label>{{ 'system_settings.portal_url' | translate }}</label>
+          <label>{{ 'system_settings.contract' | translate }}</label>
           <mat-form-field appearance="outline">
-            <input matInput formControlName="portalUrl" />
+            <mat-select formControlName="contract">
+              @for (contract of contractOptions; track contract) {
+                <mat-option [value]="contract">
+                  {{
+                    ('system_settings.' + contractDict[contract]) | translate
+                  }}
+                </mat-option>
+              }
+            </mat-select>
           </mat-form-field>
         </div>
 
@@ -158,21 +166,6 @@
                   <input matInput formControlName="communication" />
                 </mat-form-field>
                 <label>{{ 'system_settings.communication' | translate }}</label>
-              </div>
-
-              <div class="form-line">
-                <mat-form-field appearance="outline">
-                  <mat-select formControlName="contract">
-                    @for (contract of contractOptions; track contract) {
-                      <mat-option [value]="contract">
-                        {{
-                          ('system_settings.' + contractDict[contract]) | translate
-                        }}
-                      </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <label>{{ 'system_settings.contract' | translate }}</label>
               </div>
 
               <div class="form-line">
@@ -520,9 +513,26 @@
             <h1>{{ 'system_settings.images' | translate }}</h1>
             <div class="header-actions">
               <mat-progress-bar [value]="imageProgress()" *ngIf="imageProgress()"></mat-progress-bar>
-              <button mat-icon-button class="edit-button" type="button" [disabled]="noId | async" (click)="fileInput.click()" matTooltip="{{ 'system_settings.add_image' | translate }}">
-                <mat-icon>add_photo_alternate</mat-icon>
-              </button>
+              @let isNewRoute = isNewSystemRoute$ | async;
+              <span
+                class="add-image-button-wrapper"
+                [matTooltip]="
+                  isNewRoute
+                    ? ('system_settings.save_before_adding_images' | translate)
+                    : ('system_settings.add_image' | translate)
+                "
+              >
+                <button
+                  mat-icon-button
+                  class="edit-button add-image-button"
+                  type="button"
+                  [disabled]="noId | async"
+                  (click)="fileInput.click()"
+                  [ngClass]="{ 'add-image-button--disabled': isNewRoute }"
+                >
+                  <mat-icon>add_photo_alternate</mat-icon>
+                </button>
+              </span>
               <input hidden type="file" accept="image/*" #fileInput (change)="onImageSelected($event)" />
             </div>
           </div>

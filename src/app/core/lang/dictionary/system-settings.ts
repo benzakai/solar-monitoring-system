@@ -132,6 +132,10 @@ export const systemSettings: Dictionary = {
     en: 'Compensation',
     he: 'פיצוי',
   },
+  contract_additional: {
+    en: 'Additional Contract',
+    he: 'חוזה נוסף',
+  },
   location: {
     en: 'Location',
     he: 'מיקום',
@@ -165,6 +169,10 @@ export const systemSettings: Dictionary = {
   add_image: {
     en: 'Add Image',
     he: 'הוסף תמונה',
+  },
+  save_before_adding_images: {
+    en: 'Save the system to add images',
+    he: 'יש לשמור את המערכת כדי להוסיף תמונות',
   },
   remove_image: {
     en: 'Remove Image',

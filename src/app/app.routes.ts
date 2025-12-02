@@ -16,6 +16,7 @@ import { ClientDetailsComponent } from './features/clients/client-details.compon
 import { ManagementComponent } from './features/management/management.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { authGuard } from './core/roles/auth.guard';
+import { adminGuard } from './core/roles/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -45,18 +46,18 @@ export const routes: Routes = [
   { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
-  { path: 'management', component: ManagementComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  { path: 'management', component: ManagementComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard, adminGuard] },
   {
     path: 'users',
-    canActivate: [authGuard],
-    canActivateChild: [authGuard],
+    canActivate: [authGuard, adminGuard],
+    canActivateChild: [authGuard, adminGuard],
     children: USERS_ROUTES,
   },
   {
     path: 'system-settings',
-    canActivate: [authGuard],
-    canActivateChild: [authGuard],
+    canActivate: [authGuard, adminGuard],
+    canActivateChild: [authGuard, adminGuard],
     children: SYSTEM_SETTINGS_ROUTES,
   },
   { path: 'client/:id', component: ClientDetailsComponent, canActivate: [authGuard] },

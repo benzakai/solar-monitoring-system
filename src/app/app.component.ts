@@ -35,6 +35,7 @@ import { TranslatePipe } from './core/lang/translate.pipe';
 import { env } from './env/env';
 import { CurrentUserService } from './features/people/services/current-user.service';
 import { HeaderComponent } from './core/header/header.component';
+import { UserRole } from './endpoint/users.service';
 
 @Component({
   selector: 'app-root',
@@ -68,7 +69,9 @@ export class AppComponent implements AfterViewInit {
   toggle = inject(MENU_TOOGLE);
   auth = inject(AngularFireAuth);
   currentUserService = inject(CurrentUserService);
-  currentRole = this.currentUserService.user.pipe(map((user) => user?.role));
+  isAdmin$ = this.currentUserService.user.pipe(
+    map((user) => user?.role === UserRole.ADMIN)
+  );
   router = inject(Router);
   feature = env.feature;
 

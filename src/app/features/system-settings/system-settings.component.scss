@@ -663,6 +663,16 @@ mat-card {
   color: #2196F3;
 }
 
+.add-image-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.add-image-button.add-image-button--disabled,
+.add-image-button.add-image-button--disabled mat-icon {
+  color: #9e9e9e;
+}
+
 .link {
 
 }

@@ -35,10 +35,12 @@
               <mat-icon color="yellow">leaderboard</mat-icon>
             </button>
 
-            <button mat-button color="white" (click)="redirect('management')">
-              {{ 'sidenav.management' | translate }}
-              <mat-icon color="yellow">supervised_user_circle</mat-icon>
-            </button>
+            @if (isAdmin$ | async) {
+              <button mat-button color="white" (click)="redirect('management')">
+                {{ 'sidenav.management' | translate }}
+                <mat-icon color="yellow">supervised_user_circle</mat-icon>
+              </button>
+            }
 
             <button mat-button color="white" (click)="creteSystem()">
               {{ 'sidenav.create_system' | translate }}
@@ -50,20 +52,22 @@
               <mat-icon color="yellow">wash</mat-icon>
             </button>
 
-            <button mat-button color="white" (click)="redirect('users')">
-              {{ 'sidenav.users' | translate }}
-              <mat-icon color="yellow">people</mat-icon>
-            </button>
+            @if (isAdmin$ | async) {
+              <button mat-button color="white" (click)="redirect('users')">
+                {{ 'sidenav.users' | translate }}
+                <mat-icon color="yellow">people</mat-icon>
+              </button>
 
-            <button mat-button color="white" (click)="redirect('settings')">
-              {{ 'sidenav.settings' | translate }}
-              <mat-icon color="yellow">tune</mat-icon>
-            </button>
+              <button mat-button color="white" (click)="redirect('settings')">
+                {{ 'sidenav.settings' | translate }}
+                <mat-icon color="yellow">tune</mat-icon>
+              </button>
 
-            <button mat-button color="white" (click)="redirect('system-settings')">
-              {{ 'sidenav.system_settings' | translate }}
-              <mat-icon color="yellow">settings</mat-icon>
-            </button>
+              <button mat-button color="white" (click)="redirect('system-settings')">
+                {{ 'sidenav.system_settings' | translate }}
+                <mat-icon color="yellow">settings</mat-icon>
+              </button>
+            }
 
             @if (feature.energyPartitionDaily) {
               <button mat-button color="white" (click)="redirect('energy-update-partition')">
