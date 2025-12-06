@@ -134,6 +134,7 @@ export class AppComponent implements AfterViewInit {
       users: 'sidenav.users',
       'system-settings': 'sidenav.system_settings',
       settings: 'settings.title',
+      clients: 'client.list_title',
     };
     this.title.next(translationKeys[page] || '');
   }

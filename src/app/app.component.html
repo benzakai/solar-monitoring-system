@@ -35,6 +35,11 @@
               <mat-icon color="yellow">leaderboard</mat-icon>
             </button>
 
+            <button mat-button color="white" (click)="redirect('clients')">
+              {{ 'sidenav.clients' | translate }}
+              <mat-icon color="yellow">groups</mat-icon>
+            </button>
+
             @if (isAdmin$ | async) {
               <button mat-button color="white" (click)="redirect('management')">
                 {{ 'sidenav.management' | translate }}

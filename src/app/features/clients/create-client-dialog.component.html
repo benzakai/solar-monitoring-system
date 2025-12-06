@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>{{ 'client.create_dialog_title' | translate }}</h2>
+
+<mat-dialog-content class="new-contact-form">
+  <form [formGroup]="form" class="dialog-form">
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="name">
+        <mat-error *ngIf="form.controls.name.hasError('required')">
+          {{ 'client.form_name_required' | translate }}
+        </mat-error>
+      </mat-form-field>
+      <label>{{ 'client.form_name' | translate }}</label>
+    </div>
+
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="email" type="email">
+        <mat-error *ngIf="form.controls.email.hasError('email')">
+          {{ 'client.form_email_invalid' | translate }}
+        </mat-error>
+      </mat-form-field>
+      <label>{{ 'client.form_email' | translate }}</label>
+    </div>
+
+    <div class="form-line">
+      <mat-form-field appearance="outline">
+        <input matInput formControlName="phone">
+        <mat-error *ngIf="form.controls.phone.hasError('required')">
+          {{ 'client.form_phone_required' | translate }}
+        </mat-error>
+      </mat-form-field>
+      <label>{{ 'client.form_phone' | translate }}</label>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close type="button">
+    {{ 'cancel' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    (click)="save()"
+    [disabled]="saving || form.invalid"
+  >
+    <span *ngIf="!saving">{{ 'client.create_dialog_save' | translate }}</span>
+    <mat-progress-spinner
+      *ngIf="saving"
+      diameter="24"
+      mode="indeterminate"
+    ></mat-progress-spinner>
+  </button>
+</mat-dialog-actions>

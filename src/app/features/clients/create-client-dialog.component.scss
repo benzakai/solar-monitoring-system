@@ -1,0 +1,34 @@
+.new-contact-form {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dialog-form {
+  margin: 24px;
+}
+
+.form-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  label {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  mat-form-field {
+    flex: 1;
+    max-width: 280px;
+  }
+}
+
+mat-dialog-content {
+  padding-top: 0;
+}

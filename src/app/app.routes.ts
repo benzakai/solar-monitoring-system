@@ -13,6 +13,7 @@ import { USERS_ROUTES } from './features/users/users.routes';
 import { SYSTEM_SETTINGS_ROUTES } from './features/system-settings/system-settings.routes';
 import { WashesComponent } from './features/washes/washes.component';
 import { ClientDetailsComponent } from './features/clients/client-details.component';
+import { ClientsComponent } from './features/clients/clients.component';
 import { ManagementComponent } from './features/management/management.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { authGuard } from './core/roles/auth.guard';
@@ -60,6 +61,7 @@ export const routes: Routes = [
     canActivateChild: [authGuard, adminGuard],
     children: SYSTEM_SETTINGS_ROUTES,
   },
+  { path: 'clients', component: ClientsComponent, canActivate: [authGuard] },
   { path: 'client/:id', component: ClientDetailsComponent, canActivate: [authGuard] },
   { path: 'washes', component: WashesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'systems' },

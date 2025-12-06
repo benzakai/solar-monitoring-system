@@ -24,6 +24,7 @@ export const LANGUAGE: InjectionToken<BehaviorSubject<'en' | 'he'>> =
 
 export const language: Dictionary = {
   ...mainLang,
+  main: mainLang,
   header,
   create_alert_dialog: createAlertDialogLang,
   system_details,

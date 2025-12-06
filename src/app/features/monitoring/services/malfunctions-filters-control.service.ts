@@ -194,5 +194,46 @@ export class MalfunctionsFiltersControlService {
           this.systemsControl.setValue(res, { emitEvent: true });
         }
       });
+
+    this.clientsControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) => {
+        const ids = (value || [])
+          .map((client: any) => client?.id)
+          .filter(Boolean);
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { clients: ids.length ? ids : null },
+          queryParamsHandling: 'merge',
+        });
+      });
+
+    combineLatest([
+      this.route.queryParams.pipe(startWith(this.route.snapshot.queryParams)),
+      this.monitorFacade.clients,
+    ])
+      .pipe(takeUntilDestroyed())
+      .subscribe(([params, clients]) => {
+        if (!clients?.length) {
+          return;
+        }
+        const v = params['clients'] || [];
+        const urlValue = Array.isArray(v) ? v : [v];
+        const controlValue = (this.clientsControl.value || []).map(
+          (client: any) => client?.id
+        );
+        const strUrl = urlValue.sort().join(',');
+        const strVal = controlValue.sort().join(',');
+        if (strUrl !== strVal) {
+          const clientsMap = clients.reduce(
+            (acc, client) => acc.set(client.id, client),
+            new Map<string, any>()
+          );
+          const selected = urlValue
+            .map((id: string) => clientsMap.get(id))
+            .filter(Boolean);
+          this.clientsControl.setValue(selected, { emitEvent: false });
+        }
+      });
   }
 }

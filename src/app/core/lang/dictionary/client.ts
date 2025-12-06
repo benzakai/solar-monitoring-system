@@ -1,6 +1,20 @@
 import { Dictionary } from '../types/dictionary';
 
 export const client: Dictionary = {
+  list_title: { en: 'Clients', he: 'לקוחות' },
+  list_filters_client: { en: 'Filter by client', he: 'סינון לפי לקוח' },
+  list_filters_type: { en: 'Filter by client type', he: 'סינון לפי סוג לקוח' },
+  list_filters_contract: { en: 'Filter by contract', he: 'סינון לפי חוזה' },
+  list_show_inactive: { en: 'Show inactive clients', he: 'הצג לקוחות לא פעילים' },
+  list_create: { en: 'New client', he: 'לקוח חדש' },
+  contracts: { en: 'Contracts', he: 'חוזים' },
+  charge_months: { en: 'Charge months', he: 'חודשי חיוב' },
+  malfunctions_year: { en: 'Malfunctions this year', he: 'תקלות השנה' },
+  summary_clients: { en: 'Clients', he: 'לקוחות' },
+  summary_systems: { en: 'Systems', he: 'מערכות' },
+  summary_kwp: { en: 'Total kWp', he: 'סה״כ קילו-ואט' },
+  summary_monitoring: { en: 'Monitoring income', he: 'הכנסות ניטור' },
+  empty_state: { en: 'No clients match the current filters', he: 'אין לקוחות תואמים למסננים' },
   name: { en: 'Client Name', he: 'שם לקוח' },
   email: { en: 'Email', he: 'אימייל' },
   phone: { en: 'Phone', he: 'טלפון' },
@@ -28,9 +42,20 @@ export const client: Dictionary = {
   remove: { en: 'Remove', he: 'הסר' },
   coordinator: { en: 'Client Manager', he: 'מנהל/ת לקוח' },
   is_client: { en: 'Is client', he: 'האם לקוח' },
+  create_dialog_title: { en: 'Create client', he: 'יצירת לקוח' },
+  create_dialog_save: { en: 'Create', he: 'צור' },
+  form_name: { en: 'Client name', he: 'שם לקוח' },
+  form_name_required: { en: 'Name is required', he: 'יש להזין שם' },
+  form_email: { en: 'Email', he: 'אימייל' },
+  form_email_invalid: { en: 'Enter a valid email', he: 'יש להזין אימייל תקין' },
+  form_phone: { en: 'Phone number', he: 'מספר טלפון' },
+  form_phone_required: { en: 'Phone is required', he: 'יש להזין מספר טלפון' },
   types: {
     private: { en: 'Private', he: 'פרטי' },
     business: { en: 'Business', he: 'עסקי' },
+    village: { en: 'Village', he: 'כפר' },
+    commercial: { en: 'Commercial', he: 'מסחרי' },
+    waterCompany: { en: 'Water Company', he: 'חברת מים' },
   },
 };
 

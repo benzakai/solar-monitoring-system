@@ -1,0 +1,159 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 21px;
+  padding: 16px;
+  border-radius: 12px;
+
+  mat-form-field {
+    width: 182px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .filters-field--clients {
+    width: 182px;
+  }
+
+  .filters-toggle {
+    margin: 0;
+  }
+
+  button {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+}
+
+.filters-spacer,
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+}
+
+.table-container {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+}
+
+table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 1px;
+  position: relative;
+
+  th.mat-mdc-header-cell {
+    position: relative;
+  }
+}
+
+th {
+  position: relative;
+  overflow: visible;
+
+  .description {
+    position: absolute;
+    top: -40px;
+    display: flex;
+    white-space: nowrap;
+    padding: 0 10px;
+    align-items: center;
+    height: 40px;
+
+    &:not(.empty):before {
+      content: " ";
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 10px;
+      background-color: #fff;
+      left: -20px;
+      bottom: -5px;
+    }
+  }
+}
+
+.mat-header-row, .mat-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+.mat-column {
+  &-annualMal { width: 100px; }
+  &-openMal { width: 100px; }
+  &-totalKWP { width: 80px; }
+  &-numOfSystems { width: 80px; }
+  &-price { width: 100px; }
+  &-chargeMonths { width: 120px; }
+  &-startDate { width: 100px; }
+  &-contracts { width: 120px; }
+  &-clientType { width: 100px; }
+  &-name { text-align: right !important; }
+}
+
+.contract-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.contract-chip {
+  background: #eef2fb;
+  border-radius: 10px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: #394867;
+}
+
+.download-xls img {
+  width: 18px;
+  height: 18px;
+}
+
+.empty-state {
+  margin: 32px auto;
+  color: #8a8c93;
+  font-size: 14px;
+  text-align: center;
+}
+
+.main-spinner {
+  margin: auto;
+}
+
+a.link.disabled {
+  pointer-events: none;
+  color: #b5b5b5;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.red {
+  color: #f44336;
+  font-weight: bold;
+}
+
+::ng-deep mat-form-field.input {
+  width: calc(100% - 20px);
+  margin: 2px 10px;
+}
+
