@@ -21,24 +21,52 @@ import { adminGuard } from './core/roles/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
-  { path: 'systems', component: MonitoringTableComponent, canActivate: [authGuard] },
-  { path: 'system/:id', component: SystemDetailsComponent, canActivate: [authGuard] },
+  {
+    path: 'systems',
+    component: MonitoringTableComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'system/:id',
+    component: SystemDetailsComponent,
+    canActivate: [authGuard],
+  },
   { path: 'login', component: LoginPageComponent },
-  { path: 'energy-update-check', component: UpdateCheckComponent, canActivate: [authGuard] },
+  {
+    path: 'energy-update-check',
+    component: UpdateCheckComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'energy-update-partition',
     component: UpdatePartitionComponent,
     canActivate: [authGuard],
   },
-  { path: 'malfunctions', component: MalfunctionsComponent, canActivate: [authGuard] },
+  {
+    path: 'malfunctions',
+    component: MalfunctionsComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'malfunction-edit/:id',
     component: MalfuncitonEditComponent,
     canActivate: [authGuard],
   },
-  { path: 'routine-check', component: RoutineCheckComponent, canActivate: [authGuard] },
-  { path: 'reports', component: ReportsTableComponent, canActivate: [authGuard] },
-  { path: 'reports/:year', component: ReportsTableComponent, canActivate: [authGuard] },
+  {
+    path: 'routine-check',
+    component: RoutineCheckComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'reports',
+    component: ReportsTableComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'reports/:year',
+    component: ReportsTableComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'reports/:year/:month',
     component: ReportsTableComponent,
@@ -47,8 +75,16 @@ export const routes: Routes = [
   { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
-  { path: 'management', component: ManagementComponent, canActivate: [authGuard, adminGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard, adminGuard] },
+  {
+    path: 'management',
+    component: ManagementComponent,
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+    canActivate: [authGuard, adminGuard],
+  },
   {
     path: 'users',
     canActivate: [authGuard, adminGuard],
@@ -57,12 +93,16 @@ export const routes: Routes = [
   },
   {
     path: 'system-settings',
-    canActivate: [authGuard, adminGuard],
-    canActivateChild: [authGuard, adminGuard],
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
     children: SYSTEM_SETTINGS_ROUTES,
   },
   { path: 'clients', component: ClientsComponent, canActivate: [authGuard] },
-  { path: 'client/:id', component: ClientDetailsComponent, canActivate: [authGuard] },
+  {
+    path: 'client/:id',
+    component: ClientDetailsComponent,
+    canActivate: [authGuard],
+  },
   { path: 'washes', component: WashesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'systems' },
 ];

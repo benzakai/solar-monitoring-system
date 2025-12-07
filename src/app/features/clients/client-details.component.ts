@@ -1,9 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, AfterViewInit, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  FormsModule,
+} from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, combineLatest, map, of, shareReplay, switchMap, take, startWith } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  take,
+  startWith,
+} from 'rxjs';
 
 // Material
 import { MatCardModule } from '@angular/material/card';
@@ -37,6 +60,7 @@ import { RecentClientReportsComponent } from './recent-client-reports.component'
 import { ClientType } from '../../domain/client-type';
 import { AppMetadataService } from '../../endpoint/app-metadata.service';
 import { ChargePeriod } from '../../domain/charge-period';
+import { MonitorItem } from '../../domain/monitor-item';
 
 @Component({
   selector: 'app-client-details',
@@ -84,7 +108,9 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
 
   clientTypesDict$ = this.appMetadata.clientTypes$();
   clientTypes$ = this.clientTypesDict$.pipe(
-    map((obj) => (obj ? Object.keys(obj).sort((a, b) => obj[a]!.localeCompare(obj[b]!)) : []))
+    map((obj) =>
+      obj ? Object.keys(obj).sort((a, b) => obj[a]!.localeCompare(obj[b]!)) : []
+    )
   );
 
   chargePeriods = [ChargePeriod.YEAR, ChargePeriod.HALF, ChargePeriod.QUARTER];
@@ -123,7 +149,9 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       clientId
         ? this.systems
             .getSystems()
-            .pipe(map((systems) => systems.filter((s) => s.client?.id === clientId)))
+            .pipe(
+              map((systems) => systems.filter((s) => s.client?.id === clientId))
+            )
         : of([] as System[])
     ),
     shareReplay({ refCount: true, bufferSize: 1 })
@@ -137,17 +165,22 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       const systemById = new Map<string, System>(
         (systems || []).map((s: System) => [s.id, s])
       );
-      return (items || []).map((mi: any) => {
-        const sys = systemById.get(mi.id);
+      const misById = new Map<string, MonitorItem>(
+        (items || []).map((s: MonitorItem) => [s.id, s])
+      );
+      return (systems || []).map((x: any) => {
+        const sys = systemById.get(x.id);
+        const mi = systemById.get(x.id);
         const monitorPriceKw = sys?.monitorPriceKw;
         const taoz = sys?.taoz ?? null;
         const regulation = sys?.regulation;
         const priceTotal =
           typeof monitorPriceKw === 'number'
-            ? (monitorPriceKw || 0) * (mi.kwp || 0)
+            ? (monitorPriceKw || 0) * (x.kwp || 0)
             : undefined;
         return {
           ...mi,
+          sys,
           _monitorPriceKw: monitorPriceKw,
           _priceTotal: priceTotal,
           _taoz: taoz,
@@ -166,9 +199,16 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     )
   );
 
-  months = Array.from({ length: 12 }, (_, i) => ({ value: i, label: new Date(2024, i, 1) }));
+  months = Array.from({ length: 12 }, (_, i) => ({
+    value: i,
+    label: new Date(2024, i, 1),
+  }));
   today = new Date();
-  chartPeriodStart: Date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  chartPeriodStart: Date = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1
+  );
   chartPeriodEnd: Date = new Date();
   minDate?: Date;
   chartStartCtrl = new FormControl<Date | null>(null);
@@ -194,18 +234,28 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
         let earliestEnergy: Date | undefined;
         try {
           const energies = await Promise.all(
-            systems.map((s) => this.energy.getEnergy(s.id).pipe(take(1)).toPromise())
+            systems.map((s) =>
+              this.energy.getEnergy(s.id).pipe(take(1)).toPromise()
+            )
           );
           const minTs = Math.min(
             ...energies
-              .map((e) => (e?.daily?.length ? Math.min(...e.daily.map((d) => d.time)) : Infinity))
+              .map((e) =>
+                e?.daily?.length
+                  ? Math.min(...e.daily.map((d) => d.time))
+                  : Infinity
+              )
               .filter((v) => isFinite(v))
           );
-          earliestEnergy = isFinite(minTs) ? this.startOfDay(new Date(minTs)) : undefined;
+          earliestEnergy = isFinite(minTs)
+            ? this.startOfDay(new Date(minTs))
+            : undefined;
         } catch {}
         this.minDate = clientStart || earliestEnergy;
         this.setDefaultRange();
-        this.chartStartCtrl.setValue(this.chartPeriodStart, { emitEvent: true });
+        this.chartStartCtrl.setValue(this.chartPeriodStart, {
+          emitEvent: true,
+        });
         this.chartEndCtrl.setValue(this.chartPeriodEnd, { emitEvent: true });
       });
     // bind systems data to table dataSource
@@ -229,7 +279,11 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
         case 'issuesYear':
           return Number(item.open_issues || 0);
         case 'tariff':
-          return item._taoz ? (item._taoz === 'high' ? 2 : 1) : Number(item._regulation ?? 0);
+          return item._taoz
+            ? item._taoz === 'high'
+              ? 2
+              : 1
+            : Number(item._regulation ?? 0);
         case 'pricePerKw':
           return Number(item._monitorPriceKw ?? 0);
         case 'priceTotal':
@@ -245,13 +299,17 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   }
 
   private buildForm(client: Person | null) {
+    const rawStartDate = (client as any)?.startDate;
+    // Convert Firestore Timestamp to Date if needed
+    const startDate = rawStartDate?.toDate?.() ?? (rawStartDate ? new Date(rawStartDate) : null);
+
     this.form = this.formBuilder.group({
       name: [client?.name, Validators.required],
       email: [client?.email, [Validators.email]],
       phone: [client?.phone],
       isActive: [client?.isActive ?? true],
       isDailyReport: [(client as any)?.isDailyReport ?? false],
-      startDate: [(client as any)?.startDate ?? null],
+      startDate: [startDate],
       clientType: [(client as any)?.clientType ?? null],
       chargePeriod: [(client as any)?.chargePeriod ?? null],
       chargeMonth: [(client as any)?.chargeMonth ?? null],
@@ -263,7 +321,15 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     if (this.form.invalid) return;
     this.saving$.next(true);
     try {
-      await this.people.updatePerson(clientId, this.form.value).pipe(take(1)).toPromise();
+      const formValue = { ...this.form.value };
+      // Convert startDate to ISO string format
+      if (formValue.startDate instanceof Date) {
+        formValue.startDate = formValue.startDate.toISOString();
+      }
+      await this.people
+        .updatePerson(clientId, formValue)
+        .pipe(take(1))
+        .toPromise();
       this.form.markAsPristine();
     } finally {
       this.saving$.next(false);
@@ -275,7 +341,10 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     if (!clientId) return;
     this.saving$.next(true);
     try {
-      await this.people.updatePerson(clientId, { coordinatorUid: uid }).pipe(take(1)).toPromise();
+      await this.people
+        .updatePerson(clientId, { coordinatorUid: uid })
+        .pipe(take(1))
+        .toPromise();
       this.form.get('coordinatorUid')?.markAsPristine();
     } finally {
       this.saving$.next(false);
@@ -303,8 +372,13 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       normalizedStart = this.startOfDay(this.minDate);
     }
     if (normalizedEnd.getTime() < normalizedStart.getTime()) {
-      const proposedStart = new Date(normalizedEnd.getTime() - 31 * 24 * 60 * 60 * 1000);
-      normalizedStart = this.minDate && proposedStart < this.minDate ? this.startOfDay(this.minDate) : this.startOfDay(proposedStart);
+      const proposedStart = new Date(
+        normalizedEnd.getTime() - 31 * 24 * 60 * 60 * 1000
+      );
+      normalizedStart =
+        this.minDate && proposedStart < this.minDate
+          ? this.startOfDay(this.minDate)
+          : this.startOfDay(proposedStart);
     }
 
     this.chartPeriodStart = normalizedStart;
@@ -314,10 +388,17 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   }
 
   private setDefaultRange() {
-    const yesterday = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() - 1);
+    const yesterday = new Date(
+      this.today.getFullYear(),
+      this.today.getMonth(),
+      this.today.getDate() - 1
+    );
     const end = this.endOfDay(yesterday);
     const startCandidate = new Date(end.getTime() - 31 * 24 * 60 * 60 * 1000);
-    const start = this.minDate && startCandidate < this.minDate ? this.startOfDay(this.minDate) : this.startOfDay(startCandidate);
+    const start =
+      this.minDate && startCandidate < this.minDate
+        ? this.startOfDay(this.minDate)
+        : this.startOfDay(startCandidate);
     this.chartPeriodStart = start;
     this.chartPeriodEnd = end;
   }
@@ -327,7 +408,15 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   }
 
   endOfDay(d: Date): Date {
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+    return new Date(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
   }
 
   openClientInfo() {
@@ -342,5 +431,3 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     return (v || '').toString().replace(/\s|-/g, '');
   }
 }
-
-
