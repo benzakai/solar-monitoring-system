@@ -8,6 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HeaderComponent } from '../../../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../../../core/header/header-portal-remote.component';
 import { MonitoringFiltersComponent } from '../monitoring-filters/monitoring-filters.component';
 import { DateUtil } from '../../../../core/date/DateUtil';
 import { AsyncPipe, DatePipe, formatDate, JsonPipe } from '@angular/common';
@@ -71,6 +72,7 @@ import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-e
   standalone: true,
   imports: [
     HeaderComponent,
+    HeaderPortalRemoteComponent,
     MonitoringFiltersComponent,
     ReactiveFormsModule,
     AsyncPipe,

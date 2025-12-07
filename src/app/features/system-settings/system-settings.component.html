@@ -1,4 +1,13 @@
 @if (system$ | async; as system) {
+  <app-header-portal-remote>
+    <div class="header-portal-content">
+      <div class="header-portal-text">
+        <span class="header-portal-label">{{ 'sidenav.system_settings' | translate}}</span>
+        <span class="header-portal-name">{{ system.name }}</span>
+      </div>
+    </div>
+  </app-header-portal-remote>
+
   @if (form) {
     <form [formGroup]="form">
       <!-- Header with system name -->
@@ -47,7 +56,7 @@
         </div>
 
         <div class="system-name-field activity">
-          <button mat-icon-button class="edit-button" [disabled]="noId | async">
+          <button mat-icon-button class="edit-button" [disabled]="noId | async" (click)="goToSystemDetails()">
             <mat-icon color="primary">bar_chart_4_bars</mat-icon>
           </button>
           <label>{{ 'system_settings.active_system' | translate }}</label>

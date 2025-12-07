@@ -36,6 +36,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '../../../core/lang/translate.pipe';
 import { HeaderComponent } from '../../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../../core/header/header-portal-remote.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -69,6 +70,7 @@ import { RoutineCheckService } from '../../../endpoint/routine-check.service';
     FormsModule,
     TranslatePipe,
     HeaderComponent,
+    HeaderPortalRemoteComponent,
     MatSelectModule,
     MatInputModule,
     MatCheckboxModule,

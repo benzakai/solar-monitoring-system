@@ -45,6 +45,7 @@ import { DialogService } from '../../core/dialog/services/dialog.service';
 import { EnergyCalc } from '../../core/energy/energy-calculator';
 import { PredictionCalculator } from '../../core/energy/prediction-calculator';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { RoutingService } from '../../core/routing/routing.service';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
 import { AppPrediction } from '../../domain/app';
@@ -94,6 +95,7 @@ import { ImagePreviewDialogComponent } from './components/image-preview-dialog/i
     MatCardModule,
     MatProgressBarModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
     MatRadioModule,
     MonthsInputsComponent,
     MatSlideToggleModule,

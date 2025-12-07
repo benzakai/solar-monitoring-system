@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { SettingsDisplayCardComponent } from './components/display-card/settings-display-card.component';
 import { SettingsEnergyCardComponent } from './components/energy-card/settings-energy-card.component';
 import { SettingsPredictionCardComponent } from './components/prediction-card/settings-prediction-card.component';
@@ -17,6 +18,7 @@ import { SettingsTemplatesCardComponent } from './components/templates-card/sett
   imports: [
     CommonModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
     SettingsDisplayCardComponent,
     SettingsEnergyCardComponent,
     SettingsPredictionCardComponent,

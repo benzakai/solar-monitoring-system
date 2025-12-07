@@ -25,6 +25,7 @@ import { System } from '../../domain/system';
 import { Malfunction, MalfunctionStatus } from '../../domain/malfunction';
 import { Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { AppMetadataService } from '../../endpoint/app-metadata.service';
 import { CoordinatorsService } from '../people/services/coordinators.service';
 import { Sort } from '@angular/material/sort';
@@ -82,6 +83,7 @@ interface ClientsFilters {
     MatTooltipModule,
     RouterModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
     SortHeaderComponent,
   ],
   templateUrl: './clients.component.html',

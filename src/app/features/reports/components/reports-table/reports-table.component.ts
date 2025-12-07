@@ -37,6 +37,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SeverityIconComponent } from '../../../malfunctions/severity-icon/severity-icon.component';
 import { SortHeaderComponent } from '../../../monitoring/components/sort-header/sort-header.component';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../../../core/header/header-portal-remote.component';
 import { Person } from '../../../../domain/person';
 import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
@@ -123,6 +124,7 @@ type See = {
     MatChipListbox,
     MatChipOption,
     RouterModule,
+    HeaderPortalRemoteComponent,
   ],
   providers: [FiltersControlService],
   templateUrl: './reports-table.component.html',

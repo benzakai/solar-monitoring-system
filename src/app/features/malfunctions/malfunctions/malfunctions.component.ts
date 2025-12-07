@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { HeaderComponent } from '../../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../../core/header/header-portal-remote.component';
 import { TranslatePipe } from '../../../core/lang/translate.pipe';
 import { Store } from '@ngrx/store';
 import {
@@ -70,6 +71,7 @@ import { MalfunctionsFiltersControlService } from '../../monitoring/services/mal
   standalone: true,
   imports: [
     HeaderComponent,
+    HeaderPortalRemoteComponent,
     TranslatePipe,
     AsyncPipe,
     DecimalPipe,

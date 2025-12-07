@@ -95,18 +95,18 @@ th {
   background: white;
 }
 
-.mat-column {
-  &-annualMal { width: 100px; }
-  &-openMal { width: 100px; }
-  &-totalKWP { width: 80px; }
-  &-numOfSystems { width: 80px; }
-  &-price { width: 100px; }
-  &-chargeMonths { width: 120px; }
-  &-startDate { width: 100px; }
-  &-contracts { width: 120px; }
-  &-clientType { width: 100px; }
-  &-name { text-align: right !important; }
-}
+//.mat-column {
+//  &-annualMal { width: 100px; }
+//  &-openMal { width: 100px; }
+//  &-totalKWP { width: 80px; }
+//  &-numOfSystems { width: 80px; }
+//  &-price { width: 100px; }
+//  &-chargeMonths { width: 120px; }
+//  &-startDate { width: 100px; }
+//  &-contracts { width: 120px; }
+//  &-clientType { width: 100px; }
+//  &-name { text-align: right !important; }
+//}
 
 .contract-list {
   display: flex;

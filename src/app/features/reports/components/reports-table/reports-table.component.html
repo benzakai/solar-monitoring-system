@@ -1,3 +1,7 @@
+<app-header-portal-remote>
+  <span>{{ 'sidenav.reports' | translate }}</span>
+</app-header-portal-remote>
+
 <div class="filters">
   @if(currentStatuses | async; as statuses) {
     <mat-chip-listbox class="mat-mdc-chip-set-stacked" [multiple]="true" >

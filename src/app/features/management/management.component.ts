@@ -14,6 +14,7 @@ import { Firestore, collection } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Check } from '../../domain/checks';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { SystemsService } from '../../endpoint/systems.service';
 import { PeopleService } from '../../endpoint/people.service';
 import { PaymentsService } from '../../endpoint/payments.service';
@@ -34,6 +35,7 @@ type UserPerfRow = { name: string; today: number; month: number };
     MatIconModule,
     MatButtonModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
   ],
   templateUrl: './management.component.html',
   styleUrl: './management.component.css',

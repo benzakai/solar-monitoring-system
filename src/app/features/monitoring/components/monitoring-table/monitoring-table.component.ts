@@ -40,6 +40,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
 import * as XLSX from 'xlsx';
 import { HeaderComponent } from '../../../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../../../core/header/header-portal-remote.component';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
 import { FiltersControlService } from '../../services/filters-control.service';
 import { MonitorItem } from '../../../../domain/monitor-item';
@@ -81,6 +82,7 @@ import { DialogService } from '../../../../core/dialog/services/dialog.service';
       MatDialogModule,
       MonitoringFiltersComponent,
       HeaderComponent,
+      HeaderPortalRemoteComponent,
       IssuesCountPipe,
       SortHeaderComponent,
       RouterModule,

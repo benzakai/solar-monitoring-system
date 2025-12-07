@@ -12,6 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MonitoringFiltersComponent } from '../monitoring-filters/monitoring-filters.component';
 import { HeaderComponent } from '../../../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../../../core/header/header-portal-remote.component';
 import { IssuesCountPipe } from '../../pipes/issues-count.pipe';
 import { SortHeaderComponent } from '../sort-header/sort-header.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -36,6 +37,7 @@ import { FiltersControlService } from '../../services/filters-control.service';
       MatDialogModule,
       MonitoringFiltersComponent,
       HeaderComponent,
+      HeaderPortalRemoteComponent,
       IssuesCountPipe,
       SortHeaderComponent,
       RouterModule,

@@ -1,3 +1,14 @@
+@if (system | async; as sys) {
+  <app-header-portal-remote>
+    <div class="header-portal-content">
+      <div class="header-portal-text">
+        <span class="header-portal-label">{{ 'sidenav.system_monitoring' | translate}}</span>
+        <span class="header-portal-name">{{ sys.name }}</span>
+      </div>
+    </div>
+  </app-header-portal-remote>
+}
+
 <div class="container">
   <div class="settings title">
 

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { UsersService } from '../../endpoint/users.service';
 import { User } from '../../domain/user';
 import { UserRole } from '../../endpoint/users.service';
@@ -28,6 +29,7 @@ import { Functions, httpsCallable } from '@angular/fire/functions';
     MatIconModule,
     MatDialogModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
     MatSlideToggleModule,
     MatTooltipModule,
   ],

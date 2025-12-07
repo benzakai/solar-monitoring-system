@@ -6,6 +6,7 @@ import {
   AfterViewInit,
   ViewChild,
   inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
@@ -50,6 +51,7 @@ import { SystemsService } from '../../endpoint/systems.service';
 import { Person } from '../../domain/person';
 import { System } from '../../domain/system';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { ClientSystemsChartComponent } from './client-systems-chart.component';
 import { PersonInfoDialogComponent } from '../system-settings/components/person-info-dialog/person-info-dialog.component';
 import { ClientContactsTableComponent } from './contacts-table/client-contacts-table.component';
@@ -84,6 +86,7 @@ import { MonitorItem } from '../../domain/monitor-item';
     MatDialogModule,
     RouterModule,
     TranslatePipe,
+    HeaderPortalRemoteComponent,
     ClientSystemsChartComponent,
     ClientContactsTableComponent,
     ClientSendingListComponent,
@@ -103,6 +106,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   private coordinatorsService = inject(CoordinatorsService);
   private monitorFacade = inject(MonitorFacade);
   private appMetadata = inject(AppMetadataService);
+  private cdr = inject(ChangeDetectorRef);
 
   translate = new TranslatePipe();
 
@@ -121,6 +125,11 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   saving$ = new BehaviorSubject<boolean>(false);
 
   form!: FormGroup;
+
+  // Header name editing
+  editingName = false;
+  editNameCtrl = new FormControl<string>('');
+  displayName: string | null = null;
 
   coordinators$ = this.coordinatorsService.coordinators;
 
@@ -220,6 +229,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       this.buildForm(client);
       this.loading$.next(false);
       this.clientId = (client as any)?.id || (client as any)?._id || null;
+      this.displayName = client?.name || null;
       this.chartStartCtrl.setValue(this.chartPeriodStart, { emitEvent: false });
       this.chartEndCtrl.setValue(this.chartPeriodEnd, { emitEvent: false });
     });
@@ -429,5 +439,37 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
 
   sanitizePhone(v?: string | null): string {
     return (v || '').toString().replace(/\s|-/g, '');
+  }
+
+  startEditName(currentName: string) {
+    this.editNameCtrl.setValue(currentName || '');
+    this.editingName = true;
+  }
+
+  async saveName(clientId: string) {
+    const newName = this.editNameCtrl.value?.trim();
+    if (!newName || !clientId) {
+      this.cancelEditName();
+      return;
+    }
+    this.saving$.next(true);
+    try {
+      await this.people
+        .updatePerson(clientId, { name: newName })
+        .pipe(take(1))
+        .toPromise();
+      this.form.get('name')?.setValue(newName);
+      this.displayName = newName;
+      this.editingName = false;
+      this.cdr.detectChanges();
+    } finally {
+      this.saving$.next(false);
+    }
+  }
+
+  cancelEditName() {
+    this.editingName = false;
+    this.editNameCtrl.setValue('');
+    this.cdr.detectChanges();
   }
 }

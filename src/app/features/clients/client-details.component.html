@@ -1,4 +1,26 @@
 @if (client$ | async; as client) {
+  <app-header-portal-remote>
+    <div class="header-portal-content">
+      @if (!editingName) {
+        <button mat-icon-button (click)="startEditName(displayName || client.name)">
+          <mat-icon class="icon-edit">edit</mat-icon>
+        </button>
+        <div class="header-portal-text">
+          <span class="header-portal-label">{{ 'client.name' | translate }}</span>
+          <span class="header-portal-name">{{ displayName || client.name }}</span>
+        </div>
+      } @else {
+        <button mat-icon-button (click)="saveName(client._id)">
+          <mat-icon class="icon-save">check</mat-icon>
+        </button>
+        <button mat-icon-button (click)="cancelEditName()">
+          <mat-icon class="icon-cancel">close</mat-icon>
+        </button>
+        <input class="header-portal-input" [formControl]="editNameCtrl" />
+      }
+    </div>
+  </app-header-portal-remote>
+
   @if (form) {
     <form [formGroup]="form">
 

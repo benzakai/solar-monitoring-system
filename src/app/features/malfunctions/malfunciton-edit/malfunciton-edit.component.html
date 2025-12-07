@@ -1,5 +1,9 @@
+@if (system | async; as sys) {
+  <app-header-portal-remote>
+    <span>{{ sys.name }} - {{ 'sidenav.malfunctions' | translate }}</span>
+  </app-header-portal-remote>
+}
 
-<br>
 <form [formGroup]="form">
   <div class="level">
     <div class="side">

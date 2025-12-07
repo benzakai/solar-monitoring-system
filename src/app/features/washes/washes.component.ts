@@ -21,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MonitoringFiltersComponent } from '../monitoring/components/monitoring-filters/monitoring-filters.component';
 import { HeaderComponent } from '../../core/header/header.component';
+import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { IssuesCountPipe } from '../monitoring/pipes/issues-count.pipe';
 import { SortHeaderComponent } from '../monitoring/components/sort-header/sort-header.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -57,6 +58,7 @@ import { RoutingService } from '../../core/routing/routing.service';
     MatMenuModule,
     MonitoringFiltersComponent,
     HeaderComponent,
+    HeaderPortalRemoteComponent,
     IssuesCountPipe,
     SortHeaderComponent,
     MatTooltipModule,

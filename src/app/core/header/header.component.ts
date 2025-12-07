@@ -1,4 +1,5 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import {
   combineLatest,
@@ -33,6 +34,8 @@ import { MENU_TOOGLE } from './menu';
 import { UsersService } from '../../endpoint/users.service';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 import { Router } from '@angular/router';
+import { HeaderPortalService } from './header-portal.service';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -52,6 +55,7 @@ import { Router } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
+    NgTemplateOutlet,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -69,8 +73,12 @@ export class HeaderComponent {
   menu = inject(MENU_TOOGLE);
 
   router = inject(Router);
+  headerPortalService = inject(HeaderPortalService);
 
   usersService = inject(UsersService);
+  
+  /** Template from the portal, if any remote component registered one */
+  portalTemplate$ = this.headerPortalService.template$;
 
   coordinators = this.coordinatorsService.coordinators;
   coordinatorsControl = new FormControl([] as string[]);
