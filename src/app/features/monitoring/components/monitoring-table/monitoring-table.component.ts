@@ -484,12 +484,18 @@ export class MonitoringTableComponent {
       this.appEndpointService.get('prediction').pipe(filter((p) => !!p)),
     ])
       .pipe(
+        filter(([system, energy, prediction]) =>
+          Boolean(system && energy && prediction)
+        ),
         switchMap(([system, energy, prediction]) =>
           this.environmentalEnergyService.getEnvironmentalEnergies(
             system,
             prediction
           )
-        )
+        ),
+        shareReplay({ bufferSize: 1, refCount: true }),
+        filter(Boolean),
+        first()
       )
       .subscribe((result) => {
         loader.close();

@@ -179,17 +179,20 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       );
       return (systems || []).map((x: any) => {
         const sys = systemById.get(x.id);
-        const mi = systemById.get(x.id);
+        const mi = misById.get(x.id);
         const monitorPriceKw = sys?.monitorPriceKw;
         const taoz = sys?.taoz ?? null;
         const regulation = sys?.regulation;
+        const kwp = mi?.kwp ?? sys?.KWP ?? 0;
         const priceTotal =
           typeof monitorPriceKw === 'number'
-            ? (monitorPriceKw || 0) * (x.kwp || 0)
+            ? (monitorPriceKw || 0) * kwp
             : undefined;
         return {
           ...mi,
           sys,
+          kwp,
+          portal: mi?.portal ?? '',
           _monitorPriceKw: monitorPriceKw,
           _priceTotal: priceTotal,
           _taoz: taoz,

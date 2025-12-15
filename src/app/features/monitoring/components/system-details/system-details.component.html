@@ -19,9 +19,15 @@
         <h1 >
 
           <span>שם מערכת: {{s.name}}</span>
-          <span class="mat-body">[לקוח:  <a class="link" [routerLink]="['/client', s?.client?.id]">{{s.client?.name}}</a>]</span>
+          @if(client | async; as c) {
+            <span class="mat-body">[לקוח:  <a class="link" [routerLink]="['/client', s?.client?.id]">{{c?.clientName}}</a>]</span>
+          }
+
         </h1>
+
+
       }
+
 
 
   </div>

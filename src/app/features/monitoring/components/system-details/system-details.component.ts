@@ -66,6 +66,7 @@ import { EnvironmentalSystemsDialogComponent } from '../environmental-systems-di
 import { SortHeaderComponent } from '../sort-header/sort-header.component';
 import { ManualEnergyUpdateComponent } from '../manual-energy-update/manual-energy-update.component';
 import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
+import { PeopleService } from '../../../../endpoint/people.service';
 
 @Component({
   selector: 'app-system-details',
@@ -103,6 +104,7 @@ import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-e
 })
 export class SystemDetailsComponent implements AfterViewInit {
   translator = new TranslatePipe();
+  people = inject(PeopleService);
   protected readonly DateUtil = DateUtil;
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
@@ -162,6 +164,11 @@ export class SystemDetailsComponent implements AfterViewInit {
         .pipe(map((system) => ({ system, prediction })))
     ),
     shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  client = this.systemDetails.pipe(
+    map((details) => details?.system?.client?.id),
+    switchMap((id) => (id ? this.people.getById(id) : of({ clientName: '' })))
   );
 
   system = this.systemDetails.pipe(map(({ system }) => system));
