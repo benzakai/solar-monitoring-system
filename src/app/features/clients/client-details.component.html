@@ -2,12 +2,12 @@
   <app-header-portal-remote>
     <div class="header-portal-content">
       @if (!editingName) {
-        <button mat-icon-button (click)="startEditName(displayName || client.name)">
+        <button mat-icon-button (click)="startEditName(displayName || '')">
           <mat-icon class="icon-edit">edit</mat-icon>
         </button>
         <div class="header-portal-text">
           <span class="header-portal-label">{{ 'client.name' | translate }}</span>
-          <span class="header-portal-name">{{ displayName || client.name }}</span>
+          <span class="header-portal-name">{{ displayName }}</span>
         </div>
       } @else {
         <button mat-icon-button (click)="saveName(client._id)">
@@ -41,7 +41,7 @@
         <div class="details-form">
           <div class="form-line">
             <label>{{ 'client.name' | translate }}</label>
-            <a class="link" href="#" (click)="openClientInfo()">{{ form.get('name')?.value }}</a>
+            <a class="link" href="#" (click)="openClientInfo()">{{ displayName }}</a>
           </div>
 
           <div class="form-line aligned">

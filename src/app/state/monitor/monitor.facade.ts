@@ -54,7 +54,15 @@ export class MonitorFacade {
     share()
   );
 
-  public monitorItemsAll = this.store.select(selectMonitorItems);
+  public monitorItemsAll = this.store.select(selectMonitorInited).pipe(
+    tap((inited) => {
+      if (!inited) {
+        this.store.dispatch(loadMonitorItems());
+      }
+    }),
+    switchMap(() => this.store.select(selectMonitorItems)),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
   public monitorItemsMap = this.monitorItems.pipe(
     map((items) => new Map(items.map((item) => [item.id, item]))),

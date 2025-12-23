@@ -6,16 +6,22 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MonitorFacade } from '../../../../state/monitor/monitor.facade';
 import { IdName } from '../../../../domain/id-name';
 import { combineLatest, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
-import {NgIf} from "@angular/common";
+import { NgIf } from '@angular/common';
 import { PeopleService } from '../../../../endpoint/people.service';
-import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-contact-selection-dialog',
@@ -49,14 +55,14 @@ export class ContactSelectionDialogComponent {
   selectedTabIndex = 0;
   isSaving = false;
 
-  clients$ = this.monitorFacade.clientsAll;
-  filteredClients$: Observable<IdName[]>;
+  clients$ = this.peopleService.getAllClients();
+  filteredClients$: Observable<{ _id: string; name: string }[]>;
 
   constructor() {
     this.newContactForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required]
+      name: [''],
+      email: ['', [Validators.email]],
+      phone: [''],
     });
 
     this.filteredClients$ = combineLatest([
@@ -72,8 +78,8 @@ export class ContactSelectionDialogComponent {
     );
   }
 
-  onClientSelected({ id, name }: IdName): void {
-    this.dialogRef.close({ id, name });
+  onClientSelected({ _id, name }: any): void {
+    this.dialogRef.close({ _id, name });
   }
 
   onSaveNewContact() {

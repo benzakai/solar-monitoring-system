@@ -273,6 +273,10 @@ export const mainLang: Dictionary = {
     he: 'נבדק',
     en: 'Checked',
   },
+  annual: {
+    en: 'Annual',
+    he: 'שנתי',
+  },
   months: {
     0: {
       en: 'January',

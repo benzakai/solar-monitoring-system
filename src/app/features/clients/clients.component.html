@@ -266,7 +266,7 @@
             {{ 'client.name' | translate }}
           </th>
           <td mat-cell *matCellDef="let row">
-            <a class="link" [routerLink]="['/client', row.id]">{{ row.name }}</a>
+            <a class="link" [routerLink]="['/client', row.id]">{{ row.clientName || row.name }}</a>
           </td>
         </ng-container>
 

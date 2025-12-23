@@ -1,4 +1,9 @@
-import { AsyncPipe, CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import {
+  AsyncPipe,
+  CommonModule,
+  DatePipe,
+  DecimalPipe,
+} from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +21,16 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, combineLatest, first, map, Observable, shareReplay, startWith, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  first,
+  map,
+  Observable,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { PeopleService } from '../../endpoint/people.service';
 import { SystemsService } from '../../endpoint/systems.service';
 import { Store } from '@ngrx/store';
@@ -37,6 +51,7 @@ import { CreateClientDialogComponent } from './create-client-dialog.component';
 interface ClientListRow {
   id: string;
   name: string;
+  clientName: string;
   clientType?: string;
   startDate?: Date;
   chargeMonths?: number[];
@@ -138,9 +153,8 @@ export class ClientsComponent {
   private readonly reloadClients$ = new BehaviorSubject<void>(void 0);
   private readonly rawClients$ = this.reloadClients$.pipe(
     switchMap(() => this.peopleService.getAllClients()),
-    map(
-      (clients) =>
-        (clients || []).filter((client: any) => client?.isClient !== false)
+    map((clients) =>
+      (clients || []).filter((client: any) => client?.isClient !== false)
     ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
@@ -202,13 +216,13 @@ export class ClientsComponent {
 
   readonly clientsSearchControl = new FormControl('');
 
-  private readonly clientsControlState$ = this.filtersForm.controls.clients.valueChanges.pipe(
-    startWith(this.filtersForm.controls.clients.value || [])
-  );
+  private readonly clientsControlState$ =
+    this.filtersForm.controls.clients.valueChanges.pipe(
+      startWith(this.filtersForm.controls.clients.value || [])
+    );
 
-  readonly numberOfClients$: Observable<number | string> = this.clientsControlState$.pipe(
-    map((clients) => clients?.length || 'All')
-  );
+  readonly numberOfClients$: Observable<number | string> =
+    this.clientsControlState$.pipe(map((clients) => clients?.length || 'All'));
 
   readonly selectedClients$ = combineLatest([
     this.clientOptions$,
@@ -231,7 +245,9 @@ export class ClientsComponent {
 
       if (search) {
         const lowerSearch = search.toLowerCase();
-        result = result.filter((option) => option.fulltext.includes(lowerSearch));
+        result = result.filter((option) =>
+          option.fulltext.includes(lowerSearch)
+        );
       }
 
       return result;
@@ -329,7 +345,9 @@ export class ClientsComponent {
     this.filteredRows$,
     this.sortState$,
   ]).pipe(
-    map(([rows, sort]) => this.sortRows(rows, sort.sortField, sort.sortDirection))
+    map(([rows, sort]) =>
+      this.sortRows(rows, sort.sortField, sort.sortDirection)
+    )
   );
 
   readonly summary$ = this.filteredRows$.pipe(
@@ -454,7 +472,7 @@ export class ClientsComponent {
 
     const price = systems.reduce(
       (acc, system) =>
-        acc + (Number(system.monitorPriceKw || 0) * Number(system.KWP || 0)),
+        acc + Number(system.monitorPriceKw || 0) * Number(system.KWP || 0),
       0
     );
     const totalKWP = systems.reduce(
@@ -477,6 +495,7 @@ export class ClientsComponent {
     return {
       id,
       name: client?.name || client?.clientName || '',
+      clientName: client?.clientName || '',
       clientType: client?.clientType || '',
       startDate: this.normalizeDate(client?.startDate),
       chargeMonths,
@@ -566,8 +585,8 @@ export class ClientsComponent {
           return (a.annualMal - b.annualMal) * dir;
         case 'startDate':
           return (
-            ((a.startDate?.getTime() || 0) -
-              (b.startDate?.getTime() || 0)) * dir
+            ((a.startDate?.getTime() || 0) - (b.startDate?.getTime() || 0)) *
+            dir
           );
         default:
           return a.name.localeCompare(b.name) * dir;
@@ -611,5 +630,3 @@ export class ClientsComponent {
     return client?._id || client?.id || '';
   }
 }
-
-

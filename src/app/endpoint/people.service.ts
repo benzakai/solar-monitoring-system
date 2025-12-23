@@ -28,12 +28,19 @@ export class PeopleService {
         if (!snapshot.exists()) return null;
         const data = snapshot.data() as any;
         // ensure both id and _id are available for consumers
-        return { _id: snapshot.id, id: snapshot.id, ...data } as unknown as Person;
+        return {
+          _id: snapshot.id,
+          id: snapshot.id,
+          ...data,
+        } as unknown as Person;
       })
     );
   }
 
-  updatePerson(id: string, data: Partial<Person> & Record<string, any>): Observable<void> {
+  updatePerson(
+    id: string,
+    data: Partial<Person> & Record<string, any>
+  ): Observable<void> {
     const ref = doc(this.collection, id);
     return from(updateDoc(ref, data));
   }
@@ -47,7 +54,7 @@ export class PeopleService {
       const q = query(this.collection, where('__name__', 'in', chunk));
       const p = from(getDocs(q)).pipe(
         map((snapshot) =>
-          snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
+          snapshot.docs.map((doc) => ({ ...doc.data(), _id: doc.id }) as Person)
         )
       );
       return p;
@@ -59,7 +66,7 @@ export class PeopleService {
     const q = query(this.collection);
     return from(getDocs(q)).pipe(
       map((snapshot) =>
-        snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
+        snapshot.docs.map((doc) => ({ ...doc.data(), _id: doc.id }) as Person)
       )
     );
   }
@@ -68,7 +75,7 @@ export class PeopleService {
     const q = query(this.collection, where('isClient', '==', true));
     return from(getDocs(q)).pipe(
       map((snapshot) =>
-        snapshot.docs.map((doc) => ({ ...doc.data() }) as Person)
+        snapshot.docs.map((doc) => ({ ...doc.data(), _id: doc.id }) as Person)
       )
     );
   }
@@ -81,12 +88,13 @@ export class PeopleService {
     const docRef = doc(this.collection);
     const newClient = {
       name: props.clientName,
+      clientName: props.clientName,
       email: props.email,
       phone: props.phone,
       isClient: true,
       isActive: true,
       clientType: 'private',
-      id: docRef.id,
+      _id: docRef.id,
     };
     return from(setDoc(docRef, newClient)).pipe(map(() => newClient));
   }

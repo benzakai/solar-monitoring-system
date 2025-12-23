@@ -167,9 +167,13 @@ export class ReportsTableComponent {
       .some(Boolean);
   }
 
+  readonly ANNUAL_REPORT = -1;
+
   d = new Date();
   dateControl = new FormControl(this.d.getMonth() - 1);
   yearControl = new FormControl(this.d.getFullYear());
+
+  isAnnual = false;
 
   activeClient = new FormControl([true, false]);
 
@@ -215,9 +219,11 @@ export class ReportsTableComponent {
     this.selectedDateYear,
   ]).pipe(
     map(([month, year]) => {
+      this.isAnnual = month === this.ANNUAL_REPORT;
+      const effectiveMonth = this.isAnnual ? 0 : (month ?? this.d.getMonth() - 1);
       const newDate = Date.UTC(
         year || this.d.getUTCFullYear(),
-        month || this.d.getMonth() - 1,
+        effectiveMonth,
         1
       );
       return new Date(newDate);
@@ -265,12 +271,20 @@ export class ReportsTableComponent {
     this.clientsWithSystems,
     this.selectedDate.pipe(tap(() => this.loading.next(true))),
   ]).pipe(
-    switchMap(([clients, dateSelected]) =>
-      combineLatest([
+    switchMap(([clients, dateSelected]) => {
+      const isAnnualMode = this.isAnnual;
+      const reportsQuery$ = isAnnualMode
+        ? this.reportsService.getReportsFromYear(dateSelected.getUTCFullYear())
+        : this.reportsService.getReportsFromMonth(
+            dateSelected.getUTCFullYear(),
+            dateSelected.getUTCMonth()
+          );
+
+      return combineLatest([
         this.emailsService
           .getEmailsFromMonth(
             dateSelected.getUTCFullYear(),
-            dateSelected.getUTCMonth()
+            isAnnualMode ? 0 : dateSelected.getUTCMonth()
           )
           .pipe(
             map((emails) => {
@@ -293,21 +307,16 @@ export class ReportsTableComponent {
               return emailsByClientId;
             })
           ),
-        this.reportsService
-          .getReportsFromMonth(
-            dateSelected.getUTCFullYear(),
-            dateSelected.getUTCMonth()
+        reportsQuery$.pipe(
+          map(
+            (reports) =>
+              (reports || []).reduce(
+                (acc, report) =>
+                  Object.assign(acc, { [report.client.id]: report }),
+                {}
+              ) as { [key in string]: ReportData }
           )
-          .pipe(
-            map(
-              (reports) =>
-                (reports || []).reduce(
-                  (acc, report) =>
-                    Object.assign(acc, { [report.client.id]: report }),
-                  {}
-                ) as { [key in string]: ReportData }
-            )
-          ),
+        ),
       ]).pipe(
         tap(() => this.loading.next(false)),
         map(([emailsMapByClient, reportsMapByClient]) => {
@@ -328,8 +337,8 @@ export class ReportsTableComponent {
 
           return clientsWithEmails;
         })
-      )
-    ),
+      );
+    }),
     shareReplay({ refCount: true, bufferSize: 1 })
   );
 
@@ -397,9 +406,10 @@ export class ReportsTableComponent {
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
-  sendToSelected(isAnnual = false) {
+  sendToSelected() {
     const dialog = this.dialogService.loader(true);
     let sent = 1;
+    const isAnnual = this.isAnnual;
 
     this.filteredReports
       .pipe(
@@ -455,16 +465,14 @@ export class ReportsTableComponent {
 
   preview(
     client: Person,
-    existingReport?: ReportData,
-    isAnnual: boolean = false
+    existingReport?: ReportData
   ) {
+    const isAnnual = this.isAnnual;
     this.selectedDate.pipe(first()).subscribe((date) => {
       const reportTime =
         existingReport?.date || alignDateToReport(date).getTime();
       const queryParam = this.reportDocId(client._id, reportTime, isAnnual);
       const url = `${window.location.origin}/report-preview/${queryParam}`;
-
-      window.location.origin;
 
       window.open(
         url,
@@ -488,10 +496,10 @@ export class ReportsTableComponent {
 
   download(
     client: Person,
-    existingReportTime: number,
-    isAnnual: boolean = false
+    existingReportTime: number
   ) {
     const dialog = this.dialogService.loader();
+    const isAnnual = this.isAnnual;
     this.selectedDate
       .pipe(
         first(),
@@ -514,10 +522,10 @@ export class ReportsTableComponent {
 
   recreateReport(
     systems: System[],
-    isAnnual: boolean = false,
     comment?: string
   ) {
     const dialog = this.dialogService.loader();
+    const isAnnual = this.isAnnual;
     this.selectedDate
       .pipe(
         switchMap((date) => {
@@ -655,7 +663,7 @@ export class ReportsTableComponent {
       .afterClosed()
       .subscribe((comment) => {
         if (comment) {
-          this.recreateReport(systems, false, comment);
+          this.recreateReport(systems, comment);
         }
       });
   }
@@ -668,8 +676,9 @@ export class ReportsTableComponent {
     });
   }
 
-  sendEmail(client: Person, time: number, isAnnual: boolean = false) {
+  sendEmail(client: Person, time: number) {
     const dialog = this.dialogService.loader();
+    const isAnnual = this.isAnnual;
     const docId = this.reportDocId(client._id, time, isAnnual);
 
     this.reportFileService

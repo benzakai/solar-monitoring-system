@@ -907,10 +907,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
           if (system?.client) {
             // It's a contact
             const currentContacts = this.form.get('contactsIds')?.value || [];
-            if (!currentContacts.includes(selectedClient.id)) {
+            if (!currentContacts.includes(selectedClient._id)) {
               this.form
                 .get('contactsIds')
-                ?.setValue([...currentContacts, selectedClient.id]);
+                ?.setValue([...currentContacts, selectedClient._id]);
               this.form.markAsDirty();
             }
           } else {

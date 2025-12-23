@@ -49,6 +49,10 @@ export class WashesService {
       runTransaction(this.firestore, async (transaction) => {
         const washDoc = await transaction.get(washRef);
         if (!washDoc.exists()) {
+          transaction.set(washRef, {
+            id: systemId,
+            washes: [wash],
+          });
           return;
         }
 

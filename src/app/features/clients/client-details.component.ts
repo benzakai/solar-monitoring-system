@@ -232,7 +232,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       this.buildForm(client);
       this.loading$.next(false);
       this.clientId = (client as any)?.id || (client as any)?._id || null;
-      this.displayName = client?.name || null;
+      this.displayName = client?.clientName || client?.name || null;
       this.chartStartCtrl.setValue(this.chartPeriodStart, { emitEvent: false });
       this.chartEndCtrl.setValue(this.chartPeriodEnd, { emitEvent: false });
     });
@@ -314,7 +314,9 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   private buildForm(client: Person | null) {
     const rawStartDate = (client as any)?.startDate;
     // Convert Firestore Timestamp to Date if needed
-    const startDate = rawStartDate?.toDate?.() ?? (rawStartDate ? new Date(rawStartDate) : null);
+    const startDate =
+      rawStartDate?.toDate?.() ??
+      (rawStartDate ? new Date(rawStartDate) : null);
 
     this.form = this.formBuilder.group({
       name: [client?.name, Validators.required],
@@ -458,7 +460,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     this.saving$.next(true);
     try {
       await this.people
-        .updatePerson(clientId, { name: newName })
+        .updatePerson(clientId, { clientName: newName })
         .pipe(take(1))
         .toPromise();
       this.form.get('name')?.setValue(newName);

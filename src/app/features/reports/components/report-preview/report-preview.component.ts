@@ -101,6 +101,8 @@ export class ReportPreviewComponent {
   comment: string = '';
   date: number = 0;
 
+  isAnnual = false;
+
   reps: Observable<SystemReportData[]> = this.activatedRoute.params.pipe(
     map((params) => {
       const pageParam = params['id'];
@@ -122,34 +124,24 @@ export class ReportPreviewComponent {
       }
     }),
     map((d) => d.split('_')),
-    switchMap(([clientId, time, isAnnual]) => {
-      this.date = time;
+    switchMap(([clientId, time, annualFlag]) => {
+      this.date = Number(time);
+      this.isAnnual = annualFlag === 'A';
 
       return this.reportService
-        .getForClientAndTime(clientId, Number(time))
+        .getForClientAndTime(clientId, Number(time), this.isAnnual)
         .pipe(
           map(
             (reports) =>
               reports
                 .map((d) => createSystemReportData(d as any as SystemReportDoc))
                 .sort((a, b) => a.systemName.localeCompare(b.systemName))
-            // .filter((r) => {
-            //   const lastYear = r.productionPerMonthLastYear.reduce(
-            //     (acc, i) => acc + i,
-            //     0
-            //   );
-            //   const thisYear = r.productionPerMonth.reduce(
-            //     (acc, i) => acc + i,
-            //     0
-            //   );
-            //   return thisYear || lastYear;
-            // })
           ),
           tap((clientSystemsData) => {
             console.log(8);
             this.title += this.isAnnual ? 'שנתי' : 'חודשי';
-            this.clientName = clientSystemsData[0].clientName;
-            this.comment = clientSystemsData[0].comment;
+            this.clientName = clientSystemsData[0]?.clientName || '';
+            this.comment = clientSystemsData[0]?.comment || '';
 
             if (clientSystemsData?.length > 16) {
               this.noBg = true;
@@ -162,6 +154,4 @@ export class ReportPreviewComponent {
         );
     })
   );
-
-  isAnnual = false;
 }

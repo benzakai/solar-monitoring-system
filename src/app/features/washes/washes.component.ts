@@ -129,16 +129,16 @@ export class WashesComponent implements OnInit {
 
   washesRows = combineLatest([
     this.monitorFacade.monitorItems,
-    this.washesService
-      .getWashes()
-      .pipe(
-        map((washes) =>
-          washes.map((w) => ({
-            ...w,
-            washes: w.washes.filter(({ date }) => date > this.startOfYear),
-          }))
-        )
-      ),
+    this.washesService.getWashes().pipe(
+      map((washes) =>
+        washes.map((w) => ({
+          ...w,
+          washes: (w?.washes || []).filter(
+            ({ date }) => date > this.startOfYear
+          ),
+        }))
+      )
+    ),
   ]).pipe(
     takeUntilDestroyed(this.destroyRef),
     filter(([monitorItems, washes]) => Boolean(monitorItems && washes)),

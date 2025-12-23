@@ -168,7 +168,9 @@ export class SystemDetailsComponent implements AfterViewInit {
 
   client = this.systemDetails.pipe(
     map((details) => details?.system?.client?.id),
-    switchMap((id) => (id ? this.people.getById(id) : of({ clientName: '' })))
+    switchMap((id) =>
+      id ? this.people.getById(id) : of({ clientName: '', name: '' })
+    )
   );
 
   system = this.systemDetails.pipe(map(({ system }) => system));
