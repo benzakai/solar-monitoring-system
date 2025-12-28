@@ -359,7 +359,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       switchMap((system) => {
         const contactIds = system?.contactsIds || [];
         if (system?.client) {
-          contactIds.push(system.client.id);
+          contactIds.push(system.client._id);
         }
         return this.peopleService.getPeopleByIds(contactIds);
       })
@@ -903,22 +903,22 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         take(1)
       )
       .subscribe((selectedClient) => {
-        this.system$.pipe(take(1)).subscribe((system) => {
-          if (system?.client) {
-            // It's a contact
-            const currentContacts = this.form.get('contactsIds')?.value || [];
-            if (!currentContacts.includes(selectedClient._id)) {
-              this.form
-                .get('contactsIds')
-                ?.setValue([...currentContacts, selectedClient._id]);
-              this.form.markAsDirty();
-            }
-          } else {
-            // It's a client
-            this.form.get('client')?.setValue(selectedClient);
+        const currentClient = this.form.get('client')?.value;
+
+        if (currentClient) {
+          // Already have a client, add as contact
+          const currentContacts = this.form.get('contactsIds')?.value || [];
+          if (!currentContacts.includes(selectedClient._id)) {
+            this.form
+              .get('contactsIds')
+              ?.setValue([...currentContacts, selectedClient._id]);
             this.form.markAsDirty();
           }
-        });
+        } else {
+          // No client yet, set as client
+          this.form.get('client')?.setValue(selectedClient);
+          this.form.markAsDirty();
+        }
       });
   }
 
@@ -928,7 +928,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     const currentContacts = this.form.get('contactsIds')?.value || [];
     const client = this.form.get('client')?.value;
 
-    if (this.selectedContactId === client?.id) {
+    if (this.selectedContactId === client?._id) {
       this.form.get('client')?.setValue(null);
     }
 
@@ -944,7 +944,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   isClient(contactId: string): boolean {
     const client = this.form.get('client')?.value;
-    return client?.id === contactId;
+    return client?._id === contactId;
   }
 
   // Helper methods for form validation
