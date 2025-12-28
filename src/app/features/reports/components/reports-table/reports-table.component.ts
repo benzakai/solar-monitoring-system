@@ -579,7 +579,7 @@ export class ReportsTableComponent {
                   .getEnergyByIds(system?.location?.relatedSystems || [])
                   .pipe(map((energies) => (energies || []).filter(Boolean))),
                 this.energyService.getEnergy(systemId),
-                this.malfunctionsService.getForSystem(systemId),
+                this.malfunctionsService.getUnlimitedForSystem(systemId),
                 this.appService.getMalfunctionsTypes(),
                 this.washesService.getBySystemId(systemId, true),
                 this.appService.get('prediction').pipe(filter(Boolean)),

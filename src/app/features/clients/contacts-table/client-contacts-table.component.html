@@ -44,8 +44,11 @@
 
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>{{ 'actions' | translate }}</th>
-      <td mat-cell *matCellDef="let row">
+      <td mat-cell *matCellDef="let row" class="actions-cell">
         <button mat-flat-button color="primary" (click)="saveRow(row)">{{ 'save' | translate }}</button>
+        <button mat-icon-button color="warn" (click)="deleteContact(row)" [matTooltip]="'delete' | translate">
+          <mat-icon>delete</mat-icon>
+        </button>
       </td>
     </ng-container>
 

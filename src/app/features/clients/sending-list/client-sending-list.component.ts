@@ -108,10 +108,10 @@ export class ClientSendingListComponent {
       width: '600px',
     });
     const selected = await ref.afterClosed().toPromise();
-    if (selected?.id) {
+    if (selected?._id) {
       const list = Array.from(
         new Set(
-          [...(this.client.sendingList || []), selected.id].filter(Boolean)
+          [...(this.client.sendingList || []), selected._id].filter(Boolean)
         )
       );
       this.save(list);

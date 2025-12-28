@@ -58,6 +58,7 @@ import { ClientContactsTableComponent } from './contacts-table/client-contacts-t
 import { ClientSendingListComponent } from './sending-list/client-sending-list.component';
 import { EnergyService } from '../../endpoint/energy.service';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
+import { RoutingService } from '../../core/routing/routing.service';
 import { RecentClientReportsComponent } from './recent-client-reports.component';
 import { ClientType } from '../../domain/client-type';
 import { AppMetadataService } from '../../endpoint/app-metadata.service';
@@ -107,6 +108,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   private monitorFacade = inject(MonitorFacade);
   private appMetadata = inject(AppMetadataService);
   private cdr = inject(ChangeDetectorRef);
+  private routingService = inject(RoutingService);
 
   translate = new TranslatePipe();
 
@@ -476,5 +478,9 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
     this.editingName = false;
     this.editNameCtrl.setValue('');
     this.cdr.detectChanges();
+  }
+
+  navigateToSystemApi(systemId: string) {
+    this.routingService.navigateToSystemApi(systemId);
   }
 }

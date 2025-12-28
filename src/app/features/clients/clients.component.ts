@@ -205,8 +205,8 @@ export class ClientsComponent {
       clients
         .map((client: any) => ({
           id: this.getClientId(client),
-          name: client?.name || client?.clientName || '',
-          fulltext: (client?.name || client?.clientName || '').toLowerCase(),
+          name: client?.clientName || client?.name || '',
+          fulltext: (client?.clientName || client?.name || '').toLowerCase(),
         }))
         .filter((option) => option.id && option.name)
         .sort((a, b) => a.name.localeCompare(b.name))

@@ -90,9 +90,14 @@ export class ContactSelectionDialogComponent {
     const { name, email, phone } = this.newContactForm.value;
     this.peopleService
       .addClient({ clientName: name, email, phone })
-      .subscribe((newClient) => {
-        this.isSaving = false;
-        this.dialogRef.close(newClient);
+      .subscribe({
+        next: (newClient) => {
+          this.isSaving = false;
+          this.dialogRef.close(newClient);
+        },
+        error: () => {
+          this.isSaving = false;
+        },
       });
   }
 }

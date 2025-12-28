@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -46,6 +46,7 @@ export class ClientContactsTableComponent implements OnChanges {
   private people = inject(PeopleService);
   private systemsService = inject(SystemsService);
   private dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() systems: System[] | null = [];
 
@@ -124,14 +125,55 @@ export class ClientContactsTableComponent implements OnChanges {
   async addContact() {
     const ref = this.dialog.open(ContactSelectionDialogComponent, { width: '600px' });
     const sel = await firstValueFrom(ref.afterClosed());
-    if (sel?.id) {
-      const person = await firstValueFrom(this.people.getById(sel.id));
-      if (person && !this.rows.some((r) => r.contact._id === person._id)) {
-        this.rows = [
-          ...this.rows,
-          { contact: person as Person, selectedSystemIds: [] },
-        ];
+    if (!sel) return;
+    
+    // Dialog returns _id (not id), and for new contacts it returns the full object
+    const personId = sel._id;
+    if (!personId) return;
+    
+    // Check if already in rows
+    if (this.rows.some((r) => r.contact._id === personId)) return;
+    
+    // If it's a new contact, sel already has all the data; otherwise fetch it
+    let person: Person;
+    if (sel.name && sel.email !== undefined) {
+      // New contact - use returned data directly
+      person = sel as Person;
+    } else {
+      // Existing contact - fetch full data
+      const fetched = await firstValueFrom(this.people.getById(personId));
+      if (!fetched) return;
+      person = fetched;
+    }
+    
+    this.rows = [
+      ...this.rows,
+      { contact: person, selectedSystemIds: [] },
+    ];
+    this.cdr.detectChanges();
+  }
+
+  async deleteContact(row: ContactRow) {
+    const systemsArr = Array.isArray(this.systems) ? this.systems : [];
+    const contactId = row.contact._id;
+
+    this.loading$.next(true);
+    try {
+      // Remove contact from all systems (same logic as old system when saving with empty systems)
+      for (const sys of systemsArr) {
+        const hasContact = (sys.contactsIds || []).includes(contactId);
+        if (hasContact) {
+          const updated = new Set(sys.contactsIds || []);
+          updated.delete(contactId);
+          await firstValueFrom(
+            this.systemsService.updateSystem(sys.id, { contactsIds: Array.from(updated) })
+          );
+        }
       }
+      // Remove from local rows
+      this.rows = this.rows.filter((r) => r.contact._id !== contactId);
+    } finally {
+      this.loading$.next(false);
     }
   }
 }

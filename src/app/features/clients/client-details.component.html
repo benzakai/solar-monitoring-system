@@ -170,7 +170,9 @@
 
               <ng-container matColumnDef="portal">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="portal">פורטל</th>
-                <td mat-cell *matCellDef="let s">{{ s.portal }}</td>
+                <td mat-cell *matCellDef="let s" class="link">
+                  <a class="link" (click)="navigateToSystemApi(s.id)" href="javascript:void(0)">{{ s.portal }}</a>
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="kwp">
