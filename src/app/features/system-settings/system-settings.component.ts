@@ -357,11 +357,16 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.systemContacts$ = this.form.valueChanges.pipe(
       startWith(this.form.value),
       switchMap((system) => {
-        const contactIds = system?.contactsIds || [];
+        const contactIds: string[] = [...(system?.contactsIds || [])];
         if (system?.client) {
-          contactIds.push(system.client._id);
+          const clientId = system.client._id || system.client.id;
+          if (clientId) {
+            contactIds.push(clientId);
+          }
         }
-        return this.peopleService.getPeopleByIds(contactIds);
+        // Filter out undefined/null values and ensure unique IDs
+        const uniqueIds = [...new Set(contactIds.filter(Boolean))];
+        return this.peopleService.getPeopleByIds(uniqueIds);
       })
     );
 
@@ -892,8 +897,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   }
 
   openContactSelection() {
+    const hasClient = !!this.form.get('client')?.value;
     const dialogRef = this.dialog.open(ContactSelectionDialogComponent, {
       width: '600px',
+      data: { mode: hasClient ? 'contact' : 'client' },
     });
 
     dialogRef
@@ -902,21 +909,21 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         filter((result) => !!result),
         take(1)
       )
-      .subscribe((selectedClient) => {
+      .subscribe((selectedPerson) => {
         const currentClient = this.form.get('client')?.value;
 
         if (currentClient) {
           // Already have a client, add as contact
           const currentContacts = this.form.get('contactsIds')?.value || [];
-          if (!currentContacts.includes(selectedClient._id)) {
+          if (!currentContacts.includes(selectedPerson._id)) {
             this.form
               .get('contactsIds')
-              ?.setValue([...currentContacts, selectedClient._id]);
+              ?.setValue([...currentContacts, selectedPerson._id]);
             this.form.markAsDirty();
           }
         } else {
           // No client yet, set as client
-          this.form.get('client')?.setValue(selectedClient);
+          this.form.get('client')?.setValue(selectedPerson);
           this.form.markAsDirty();
         }
       });
@@ -927,8 +934,9 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
     const currentContacts = this.form.get('contactsIds')?.value || [];
     const client = this.form.get('client')?.value;
+    const clientId = client?._id || client?.id;
 
-    if (this.selectedContactId === client?._id) {
+    if (this.selectedContactId === clientId) {
       this.form.get('client')?.setValue(null);
     }
 
@@ -944,7 +952,8 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
   isClient(contactId: string): boolean {
     const client = this.form.get('client')?.value;
-    return client?._id === contactId;
+    const clientId = client?._id || client?.id;
+    return clientId === contactId;
   }
 
   // Helper methods for form validation

@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ 'system_settings.add_contact' | translate }}</h2>
+<h2 mat-dialog-title>{{ titleKey | translate }}</h2>
 
 <mat-tab-group animationDuration="0ms" [(selectedIndex)]="selectedTabIndex">
   <mat-tab label="{{ 'system_settings.list' | translate }}">
@@ -8,10 +8,23 @@
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <div class="opts">
-        @for (client of filteredClients$ | async; track client._id) {
-          <div class="listitem" (click)="onClientSelected(client)">
-            <span>{{ client.name }}</span>
-          </div>
+        @if (filteredPeople$ | async; as people) {
+          @for (person of people; track person._id) {
+            <div class="listitem" (click)="onPersonSelected(person)">
+              @if(mode==="client") {
+                <span>{{ person.clientName }}</span>
+              } @else {
+                <span>{{ person.name }}</span>
+              }
+
+            </div>
+          }
+        } @else {
+          <mat-progress-spinner
+            class="main-spinner"
+            diameter="30"
+            mode="indeterminate"
+          ></mat-progress-spinner>
         }
       </div>
     </mat-dialog-content>
@@ -69,7 +82,7 @@
   <button
     mat-flat-button
     *ngIf="selectedTabIndex === 1"
-    (click)="onSaveNewContact()"
+    (click)="onSaveNew()"
     color="primary"
     [disabled]="isSaving || newContactForm.invalid"
   >

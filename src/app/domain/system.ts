@@ -21,6 +21,7 @@ export interface System {
   client?: {
     name: string;
     id: string;
+    _id?: string;
   };
   lastConnectionTime?: string;
   comments: string;

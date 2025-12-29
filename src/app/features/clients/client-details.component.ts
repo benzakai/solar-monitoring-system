@@ -147,7 +147,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   clientMonitorItems$ = combineLatest([this.monitorItems$, this.client$]).pipe(
     map(([items, client]) => {
       const clientId = (client as any)?._id || (client as any)?.id;
-      return (items || []).filter((i) => i?.client?.id === clientId);
+      return (items || []).filter((i) => i?.client?.id === clientId || (i?.client as any)?._id === clientId);
     }),
     shareReplay({ refCount: true, bufferSize: 1 })
   );
@@ -161,7 +161,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
         ? this.systems
             .getSystems()
             .pipe(
-              map((systems) => systems.filter((s) => s.client?.id === clientId))
+              map((systems) => systems.filter((s) => s.client?.id === clientId || (s.client as any)?._id === clientId))
             )
         : of([] as System[])
     ),

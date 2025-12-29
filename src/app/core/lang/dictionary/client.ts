@@ -36,6 +36,7 @@ export const client: Dictionary = {
   loading: { en: 'Loading...', he: 'טוען...' },
   systems: { en: 'Systems', he: 'מערכות' },
   contacts_title: { en: 'Contacts in client systems', he: 'אנשי קשר במערכות הלקוח' },
+  no_systems_for_contacts: { en: 'No systems assigned to this client. Add systems first to manage contacts.', he: 'אין מערכות משויכות ללקוח זה. הוסף מערכות תחילה כדי לנהל אנשי קשר.' },
   sending_list_title: { en: 'Mailing list', he: 'רשימת תפוצה' },
   add_email_placeholder: { en: 'Add email', he: 'הוסף אימייל' },
   add: { en: 'Add', he: 'הוסף' },

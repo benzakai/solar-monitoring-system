@@ -91,23 +91,38 @@ export class ClientContactsTableComponent implements OnChanges {
     const contactId = row.contact._id;
     const selectedSet = new Set(row.selectedSystemIds);
 
+    if (!contactId) {
+      console.error('[ClientContactsTable] Cannot save: contact has no _id');
+      return;
+    }
+
+    if (!systemsArr.length) {
+      console.error('[ClientContactsTable] Cannot save: no systems available');
+      return;
+    }
+
     this.loading$.next(true);
     try {
       for (const sys of systemsArr) {
         const hasContact = (sys.contactsIds || []).includes(contactId);
         const shouldHave = selectedSet.has(sys.id);
         if (hasContact !== shouldHave) {
-          const updated = new Set(sys.contactsIds || []);
+          const updatedIds = new Set(sys.contactsIds || []);
           if (shouldHave) {
-            updated.add(contactId);
+            updatedIds.add(contactId);
           } else {
-            updated.delete(contactId);
+            updatedIds.delete(contactId);
           }
+          const newContactsIds = Array.from(updatedIds);
           await firstValueFrom(
-            this.systemsService.updateSystem(sys.id, { contactsIds: Array.from(updated) })
+            this.systemsService.updateSystem(sys.id, { contactsIds: newContactsIds })
           );
+          // Update local system data to keep in sync
+          sys.contactsIds = newContactsIds;
         }
       }
+    } catch (error) {
+      console.error('[ClientContactsTable] Error saving contact to systems:', error);
     } finally {
       this.loading$.next(false);
     }
@@ -122,8 +137,15 @@ export class ClientContactsTableComponent implements OnChanges {
     });
   }
 
+  onSystemSelectionChange(row: ContactRow, selectedIds: string[]) {
+    row.selectedSystemIds = selectedIds || [];
+  }
+
   async addContact() {
-    const ref = this.dialog.open(ContactSelectionDialogComponent, { width: '600px' });
+    const ref = this.dialog.open(ContactSelectionDialogComponent, { 
+      width: '600px',
+      data: { mode: 'contact' }
+    });
     const sel = await firstValueFrom(ref.afterClosed());
     if (!sel) return;
     
@@ -165,13 +187,18 @@ export class ClientContactsTableComponent implements OnChanges {
         if (hasContact) {
           const updated = new Set(sys.contactsIds || []);
           updated.delete(contactId);
+          const newContactsIds = Array.from(updated);
           await firstValueFrom(
-            this.systemsService.updateSystem(sys.id, { contactsIds: Array.from(updated) })
+            this.systemsService.updateSystem(sys.id, { contactsIds: newContactsIds })
           );
+          // Update local system data to keep in sync
+          sys.contactsIds = newContactsIds;
         }
       }
       // Remove from local rows
       this.rows = this.rows.filter((r) => r.contact._id !== contactId);
+    } catch (error) {
+      console.error('[ClientContactsTable] Error deleting contact from systems:', error);
     } finally {
       this.loading$.next(false);
     }

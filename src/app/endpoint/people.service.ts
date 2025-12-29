@@ -80,6 +80,21 @@ export class PeopleService {
     );
   }
 
+  /**
+   * Returns only contacts (people who are NOT clients).
+   * A contact is a person without isClient: true
+   */
+  getAllContacts(): Observable<Person[]> {
+    return this.getAllPeople().pipe(
+      map((people) => {
+        console.log('[PeopleService] All people:', people);
+        const contacts = people.filter((person: any) => person.isClient !== true);
+        console.log('[PeopleService] Filtered contacts:', contacts);
+        return contacts;
+      })
+    );
+  }
+
   addClient(props: {
     clientName: string;
     email: string;
@@ -97,5 +112,21 @@ export class PeopleService {
       _id: docRef.id,
     };
     return from(setDoc(docRef, newClient)).pipe(map(() => newClient));
+  }
+
+  addContact(props: {
+    name: string;
+    email: string;
+    phone: string;
+  }): Observable<any> {
+    const docRef = doc(this.collection);
+    const newContact = {
+      name: props.name,
+      email: props.email,
+      phone: props.phone,
+      isActive: true,
+      _id: docRef.id,
+    };
+    return from(setDoc(docRef, newContact)).pipe(map(() => newContact));
   }
 }

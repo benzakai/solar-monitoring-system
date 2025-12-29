@@ -13,6 +13,7 @@ mat-dialog-content {
     flex: 1 1 1px;
     min-height: 50vh;
     overflow: auto;
+    position: relative;
 
     button {
       margin: 2px 5px;
@@ -39,4 +40,13 @@ mat-dialog-content {
 
 mat-form-field {
   width: 70%;
+}
+
+.main-spinner {
+  margin: auto;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

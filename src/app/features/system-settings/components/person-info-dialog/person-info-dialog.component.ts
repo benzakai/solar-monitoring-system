@@ -65,6 +65,7 @@ export class PersonInfoDialogComponent implements OnInit {
       phone: [this.person?.phone],
       email: [this.person?.email, Validators.email],
       position: [this.person?.position],
+      clientName: [this.person?.clientName],
     });
   }
 

@@ -1,6 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
@@ -22,6 +26,10 @@ import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import { NgIf } from '@angular/common';
 import { PeopleService } from '../../../../endpoint/people.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+export interface ContactSelectionDialogData {
+  mode: 'client' | 'contact';
+}
 
 @Component({
   selector: 'app-contact-selection-dialog',
@@ -49,55 +57,88 @@ export class ContactSelectionDialogComponent {
   private dialogRef = inject(MatDialogRef<ContactSelectionDialogComponent>);
   private fb = inject(FormBuilder);
   private peopleService = inject(PeopleService);
+  private data = inject<ContactSelectionDialogData>(MAT_DIALOG_DATA, {
+    optional: true,
+  });
 
   searchControl = new FormControl('');
   newContactForm: FormGroup;
   selectedTabIndex = 0;
   isSaving = false;
 
-  clients$ = this.peopleService.getAllClients();
-  filteredClients$: Observable<{ _id: string; name: string }[]>;
+  /** 'client' mode shows only clients, 'contact' mode shows only contacts (non-clients) */
+  mode: 'client' | 'contact' = this.data?.mode ?? 'client';
+
+  /** Title key for translation */
+  get titleKey(): string {
+    return this.mode === 'client'
+      ? 'system_settings.add_client'
+      : 'system_settings.add_contact';
+  }
+
+  filteredPeople$: Observable<
+    { _id: string; name: string; clientName?: string }[]
+  >;
 
   constructor() {
+    console.log(
+      '[ContactSelectionDialog] mode:',
+      this.mode,
+      'data:',
+      this.data
+    );
+
     this.newContactForm = this.fb.group({
       name: [''],
       email: ['', [Validators.email]],
       phone: [''],
     });
 
-    this.filteredClients$ = combineLatest([
-      this.clients$,
+    const people$ =
+      this.mode === 'client'
+        ? this.peopleService.getAllClients()
+        : this.peopleService.getAllContacts();
+
+    this.filteredPeople$ = combineLatest([
+      people$,
       this.searchControl.valueChanges.pipe(startWith('')),
     ]).pipe(
-      map(([clients, searchTerm]) => {
+      map(([people, searchTerm]) => {
+        console.log('[ContactSelectionDialog] People received:', people);
         const filterValue = (searchTerm || '').toLowerCase();
-        return clients.filter((client) =>
-          client.name.toLowerCase().includes(filterValue)
+        return people.filter(
+          (person) =>
+            person.name?.toLowerCase().includes(filterValue) ||
+            person.clientName?.toLowerCase().includes(filterValue) //
         );
       })
     );
   }
 
-  onClientSelected({ _id, name }: any): void {
+  onPersonSelected({ _id, name }: any): void {
     this.dialogRef.close({ _id, name });
   }
 
-  onSaveNewContact() {
+  onSaveNew() {
     if (this.newContactForm.invalid) {
       return;
     }
     this.isSaving = true;
     const { name, email, phone } = this.newContactForm.value;
-    this.peopleService
-      .addClient({ clientName: name, email, phone })
-      .subscribe({
-        next: (newClient) => {
-          this.isSaving = false;
-          this.dialogRef.close(newClient);
-        },
-        error: () => {
-          this.isSaving = false;
-        },
-      });
+
+    const save$ =
+      this.mode === 'client'
+        ? this.peopleService.addClient({ clientName: name, email, phone })
+        : this.peopleService.addContact({ name, email, phone });
+
+    save$.subscribe({
+      next: (newPerson) => {
+        this.isSaving = false;
+        this.dialogRef.close(newPerson);
+      },
+      error: () => {
+        this.isSaving = false;
+      },
+    });
   }
 }

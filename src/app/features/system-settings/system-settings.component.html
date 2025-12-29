@@ -124,7 +124,7 @@
               @for (contact of contacts; track contact._id) {
                 <mat-list-option [value]="contact._id">
                   <div style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center">
-                    {{ contact.name }}
+                    {{ contact?.clientName || contact.name }}
                     <a class="link" href="tel:{{contact.email}}">{{contact.email}}</a>
                     <a class="link" href="tel:{{contact.phone}}">{{contact.phone}}</a>
                   </div>
@@ -152,6 +152,10 @@
                     : ('system_settings.add_client' | translate)
                 }}</span>
             </button>
+          } @else {
+            <div class="contacts-loading">
+              <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+            </div>
           }
 
 

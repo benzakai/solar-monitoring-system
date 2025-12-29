@@ -40,6 +40,13 @@
         <label>{{ 'personInfo.edit.name' | translate }}</label>
       </div>
 
+      <div class="form-line" *ngIf="person.isClient">
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="clientName">
+        </mat-form-field>
+        <label>{{ 'personInfo.edit.clientName' | translate }}</label>
+      </div>
+
       <div class="form-line">
         <mat-form-field appearance="outline" class="full-width">
           <input matInput formControlName="phone">

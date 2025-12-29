@@ -38,6 +38,10 @@ export const personInfo = {
       en: 'Name',
       he: 'שם',
     },
+    clientName: {
+      en: 'Client Name',
+      he: 'שם לקוח',
+    },
     phone: {
       en: 'Phone',
       he: 'טלפון',

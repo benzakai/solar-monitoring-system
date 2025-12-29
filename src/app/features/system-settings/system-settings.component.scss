@@ -677,6 +677,13 @@ mat-card {
 
 }
 
+.contacts-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
 .details-column {
   max-width: 45%;
 }
