@@ -36,6 +36,7 @@
             <label>{{ 'client.daily_report' | translate }}</label>
             <mat-slide-toggle formControlName="isDailyReport"></mat-slide-toggle>
           </div>
+
         </div>
 
         <div class="details-form">
@@ -123,7 +124,20 @@
             <span class="mat-body-strong">{{ 'client.monitor_price_total' | translate }}: </span>
             {{ (totalPrice$ | async) | number : '1.2-2' }}₪
           </p>
-          <button mat-flat-button color="primary" [disabled]="form.pristine" (click)="save(client._id)">{{ 'save' | translate }}</button>
+          <div style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+            <button
+              mat-icon-button
+              color="warn"
+              [matTooltip]="'client.delete_client' | translate"
+              (click)="deleteClient(client._id)"
+              [disabled]="deleting$ | async"
+              class="delete-client-btn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-flat-button color="primary" [disabled]="form.pristine" (click)="save(client._id)">{{ 'save' | translate }}</button>
+          </div>
+
         </div>
       </div>
 

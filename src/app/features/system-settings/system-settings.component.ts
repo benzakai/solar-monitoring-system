@@ -295,6 +295,13 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private buildForm(system: System | null) {
     this.selectedLocation = system?.location ?? undefined;
 
+    const safeClient = system?.client
+      ? {
+          name: system?.client?.name,
+          id: system?.client?.id || system?.client._id,
+        }
+      : system?.client;
+
     this.form = this.formBuilder.group({
       apiId: [system?.apiId || []],
       name: [system?.name],
@@ -302,7 +309,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       isActive: [system?.isActive || false],
       portalUrl: [system?.portalUrl],
       contract: [system?.contract ?? SystemContract.NONE],
-      client: [system?.client],
+      client: [safeClient],
       contactsIds: [system?.contactsIds],
       startTime: [system?.startTime],
       contractStartTime: [system?.contractStartTime],
@@ -923,7 +930,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
           }
         } else {
           // No client yet, set as client
-          this.form.get('client')?.setValue(selectedPerson);
+          this.form.get('client')?.setValue({
+            name: selectedPerson?.clientName,
+            id: selectedPerson?._id,
+          });
           this.form.markAsDirty();
         }
       });

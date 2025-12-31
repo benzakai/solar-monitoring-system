@@ -58,6 +58,13 @@ export const client: Dictionary = {
     commercial: { en: 'Commercial', he: 'מסחרי' },
     waterCompany: { en: 'Water Company', he: 'חברת מים' },
   },
+  delete_client: { en: 'Delete Client', he: 'מחק לקוח' },
+  delete_confirm_title: { en: 'Delete Client', he: 'מחיקת לקוח' },
+  delete_confirm_message: { en: 'Are you sure you want to delete this client?', he: 'האם אתה בטוח שברצונך למחוק לקוח זה?' },
+  delete_has_systems_title: { en: 'Cannot Delete Client', he: 'לא ניתן למחוק לקוח' },
+  delete_has_systems_message: { en: 'This client is assigned to the following system:', he: 'לקוח זה משויך למערכת הבאה:' },
+  delete_success: { en: 'Client deleted successfully', he: 'הלקוח נמחק בהצלחה' },
+  go_to_system: { en: 'Go to system settings', he: 'עבור להגדרות המערכת' },
 };
 
 

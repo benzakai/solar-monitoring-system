@@ -265,7 +265,7 @@
             {{ 'malfunction.list.systemName' | translate }}
           </th>
           <td mat-cell *matCellDef="let m">
-            <a class="link" [routerLink]="['/system', m.id]">{{
+            <a class="link" [routerLink]="['/system', m.system?.id]">{{
               m?.system?.system_name
             }}</a>
           </td>

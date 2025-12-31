@@ -52,9 +52,16 @@
             <mat-autocomplete #cps="matAutocomplete">
               @if (foundSystems | async; as sys) {
                 @for(s of sys; track s.id) {
-                  <mat-option (click)="goToSystemDetails(s?.id)">
-                    {{ s?.system_name }}
-                  </mat-option>
+                  @if(s['isClient']) {
+                    <mat-option (click)="goToClientDetails(s?.id)">
+                      <mat-icon>person</mat-icon>{{ s['clientName'] }}
+                    </mat-option>
+                  } @else {
+                    <mat-option (click)="goToSystemDetails(s?.id)">
+                      {{ s?.system_name }}
+                    </mat-option>
+                  }
+
                 }
               }
             </mat-autocomplete>

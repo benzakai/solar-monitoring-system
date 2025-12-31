@@ -20,7 +20,7 @@
 
           <span>שם מערכת: {{s.name}}</span>
           @if(client | async; as c) {
-            <span class="mat-body">[לקוח:  <a class="link" [routerLink]="['/client', s?.client?.id]">{{c?.clientName || c?.name}}</a>]</span>
+            <span class="mat-body">[לקוח:  <a class="link" [routerLink]="['/client', c?._id]">{{c?.clientName || c?.name}}</a>]</span>
           }
 
         </h1>

@@ -8,8 +8,10 @@ import {
   where,
   getDoc,
   updateDoc,
+  collectionData,
+  deleteDoc,
 } from '@angular/fire/firestore';
-import { forkJoin, from, map, Observable, of } from 'rxjs';
+import { forkJoin, from, map, Observable, of, shareReplay } from 'rxjs';
 import { chunkArray } from './chunk-array.function';
 import { getDocs } from 'firebase/firestore';
 import { Person } from '../domain/person';
@@ -80,6 +82,13 @@ export class PeopleService {
     );
   }
 
+  getAllClientsLive(): Observable<Person[]> {
+    const q = query(this.collection, where('isClient', '==', true));
+    return collectionData(q, { idField: '_id' }).pipe(
+      shareReplay({ bufferSize: 1, refCount: true })
+    ) as Observable<Person[]>;
+  }
+
   /**
    * Returns only contacts (people who are NOT clients).
    * A contact is a person without isClient: true
@@ -88,7 +97,9 @@ export class PeopleService {
     return this.getAllPeople().pipe(
       map((people) => {
         console.log('[PeopleService] All people:', people);
-        const contacts = people.filter((person: any) => person.isClient !== true);
+        const contacts = people.filter(
+          (person: any) => person.isClient !== true
+        );
         console.log('[PeopleService] Filtered contacts:', contacts);
         return contacts;
       })
@@ -128,5 +139,10 @@ export class PeopleService {
       _id: docRef.id,
     };
     return from(setDoc(docRef, newContact)).pipe(map(() => newContact));
+  }
+
+  deletePerson(id: string): Observable<void> {
+    const ref = doc(this.collection, id);
+    return from(deleteDoc(ref));
   }
 }

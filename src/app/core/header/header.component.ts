@@ -35,6 +35,8 @@ import { UsersService } from '../../endpoint/users.service';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 import { Router } from '@angular/router';
 import { HeaderPortalService } from './header-portal.service';
+import { Person } from '../../domain/person';
+import { PeopleService } from '../../endpoint/people.service';
 
 @Component({
   selector: 'app-header',
@@ -76,7 +78,8 @@ export class HeaderComponent {
   headerPortalService = inject(HeaderPortalService);
 
   usersService = inject(UsersService);
-  
+  peopleService = inject(PeopleService);
+
   /** Template from the portal, if any remote component registered one */
   portalTemplate$ = this.headerPortalService.template$;
 
@@ -94,17 +97,17 @@ export class HeaderComponent {
 
   facade = inject(MonitorFacade);
 
-  foundSystems: Observable<Partial<MonitorItem>[]> =
-    this.searchControl.valueChanges.pipe(
-      debounceTime(200),
-      map((search) => (search?.length ? search.toLowerCase() : '')),
-      withLatestFrom(
-        combineLatest([this.facade.fulltextAll, this.facade.clientsAll])
-      ),
-      map(([phrase, [systems, clients]]) =>
-        phrase ? this.searchForSystems(phrase, systems, clients) : []
-      )
-    );
+  foundSystems: Observable<Partial<MonitorItem & Person>[]> = combineLatest([
+    this.searchControl.valueChanges,
+    this.facade.fulltextAll,
+    this.facade.clientsAll,
+    this.peopleService.getAllClientsLive(),
+  ]).pipe(
+    debounceTime(200),
+    map(([phrase, systems, clients, people]) =>
+      phrase ? this.searchForSystems(phrase, systems, clients, people) : []
+    )
+  );
 
   constructor() {
     this.lang
@@ -136,18 +139,28 @@ export class HeaderComponent {
   private searchForSystems(
     phrase: string,
     systems: (MonitorItem & { system_name_idx: string })[],
-    clients: any[]
+    clients: any[],
+    people: Person[]
   ): Partial<MonitorItem>[] {
     if (!(phrase && systems.length && clients.length)) {
       return [];
     }
 
+    const finalPhrase = phrase?.length ? phrase.toLowerCase() : '';
+
     const systemsFoundByName = systems.filter((client) =>
       client.system_name_idx.includes(phrase)
     );
-    const clientsFound = clients.filter((client) =>
-      client.fulltext.includes(phrase)
-    );
+    const clientsFound = clients
+      .filter((client) => client.fulltext.includes(phrase))
+      .map((client) => ({ ...client, id: client._id }));
+
+    const clientsOfClientType = (people || [])
+      .filter((c) => c.clientName?.includes(finalPhrase))
+      .map((c) => ({
+        ...c,
+        id: c._id,
+      }));
     const clientsMap = clientsFound.reduce(
       (acc, client) => Object.assign(acc, { [client.id]: true }),
       {}
@@ -156,7 +169,13 @@ export class HeaderComponent {
       (system) => system.client?.id && clientsMap[system.client.id]
     );
 
-    return [...systemsFoundByName, ...systemsFoundByClient];
+    return [
+      ...systemsFoundByName,
+      ...systemsFoundByClient,
+      ...clientsOfClientType,
+    ].map((d) => ({
+      ...d,
+    }));
   }
 
   selectAllCoordinators() {
@@ -168,6 +187,12 @@ export class HeaderComponent {
   goToSystemDetails(id?: string) {
     if (id) {
       this.router.navigate(['/system', id]);
+    }
+  }
+
+  goToClientDetails(id?: string) {
+    if (id) {
+      this.router.navigate(['/client', id]);
     }
   }
 

@@ -8,7 +8,7 @@ import {
   inject,
   ChangeDetectorRef,
 } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
   FormControl,
@@ -54,6 +54,7 @@ import { TranslatePipe } from '../../core/lang/translate.pipe';
 import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { ClientSystemsChartComponent } from './client-systems-chart.component';
 import { PersonInfoDialogComponent } from '../system-settings/components/person-info-dialog/person-info-dialog.component';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../core/dialog/components/confirmation-dialog/confirmation-dialog.component';
 import { ClientContactsTableComponent } from './contacts-table/client-contacts-table.component';
 import { ClientSendingListComponent } from './sending-list/client-sending-list.component';
 import { EnergyService } from '../../endpoint/energy.service';
@@ -109,8 +110,13 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   private appMetadata = inject(AppMetadataService);
   private cdr = inject(ChangeDetectorRef);
   private routingService = inject(RoutingService);
+  private router = inject(Router);
 
   translate = new TranslatePipe();
+
+  // Delete client state
+  deleting$ = new BehaviorSubject<boolean>(false);
+  deleteBlockedBySystem: { id: string; name: string } | null = null;
 
   clientTypesDict$ = this.appMetadata.clientTypes$();
   clientTypes$ = this.clientTypesDict$.pipe(
@@ -482,5 +488,76 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
 
   navigateToSystemApi(systemId: string) {
     this.routingService.navigateToSystemApi(systemId);
+  }
+
+  async deleteClient(clientId: string) {
+    if (!clientId) return;
+
+    this.deleting$.next(true);
+    this.deleteBlockedBySystem = null;
+
+    try {
+      // First check if the client is assigned to any system
+      const systems = await this.systems
+        .getSystemsByClientId(clientId)
+        .pipe(take(1))
+        .toPromise();
+
+      if (systems && systems.length > 0) {
+        // Client is assigned to a system - show info dialog
+        const firstSystem = systems[0];
+        this.deleteBlockedBySystem = {
+          id: firstSystem.id,
+          name: firstSystem.name,
+        };
+        this.deleting$.next(false);
+
+        this.dialog.open(ConfirmationDialogComponent, {
+          width: '400px',
+          data: {
+            title: this.translate.transform('client.delete_has_systems_title'),
+            message: `${this.translate.transform('client.delete_has_systems_message')} ${firstSystem.name}`,
+            confirmText: this.translate.transform('client.go_to_system'),
+            displayCancel: false,
+          } as ConfirmationDialogData,
+        }).afterClosed().subscribe((result) => {
+          if (result) {
+            this.router.navigate(['/system-settings', firstSystem.id]);
+          }
+        });
+        return;
+      }
+
+      // No systems assigned - ask for confirmation
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        width: '400px',
+        data: {
+          title: this.translate.transform('client.delete_confirm_title'),
+          message: this.translate.transform('client.delete_confirm_message'),
+          confirmText: this.translate.transform('client.delete_client'),
+          cancelText: this.translate.transform('cancel'),
+        } as ConfirmationDialogData,
+      });
+
+      dialogRef.afterClosed().subscribe(async (confirmed) => {
+        if (confirmed) {
+          this.deleting$.next(true);
+          try {
+            await this.people
+              .deletePerson(clientId)
+              .pipe(take(1))
+              .toPromise();
+            this.router.navigate(['/clients']);
+          } finally {
+            this.deleting$.next(false);
+          }
+        } else {
+          this.deleting$.next(false);
+        }
+      });
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      this.deleting$.next(false);
+    }
   }
 }
