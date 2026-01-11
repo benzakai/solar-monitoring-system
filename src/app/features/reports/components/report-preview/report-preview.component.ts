@@ -22,6 +22,7 @@ import { SystemDashboardComponent } from '../components/system-dashboard/system-
 import { ReportMalfunctionTableComponent } from '../components/malfunction-table/report-malfunction-table.component';
 import { MonthChartComponent } from '../components/month-chart/month-chart.component';
 import { AnnualChartComponent } from '../components/annual-chart/annual-chart.component';
+import { MultiAnnualChartComponent } from '../components/multi-annual-chart/multi-annual-chart.component';
 import { PageTemplateComponent } from '../components/page-template/page-template.component';
 import { ReportFooterComponent } from '../components/report-footer/report-footer.component';
 import { ReportHeaderComponent } from '../components/report-header/report-header.component';
@@ -73,6 +74,7 @@ export interface SystemReportData {
     AsyncPipe,
     DecimalPipe,
     AnnualChartComponent,
+    MultiAnnualChartComponent,
     SystemDashboardComponent,
     ReportMalfunctionTableComponent,
     MonthChartComponent,

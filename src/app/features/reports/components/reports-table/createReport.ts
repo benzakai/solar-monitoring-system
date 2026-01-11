@@ -28,7 +28,9 @@ export const createReport = (
   }
 
   const reportComment = comment;
-
+  if (isAnnual) {
+    date.setUTCMonth(0);
+  }
   date.setUTCDate(1);
   const KWP = system.KWP;
   const startDate = system.startTime ? +new Date(system.startTime) : null;
@@ -151,7 +153,9 @@ export const createReport = (
     KWP,
     ...(startDate !== null ? { startDate } : {}),
     prediction,
-    ...(environmentAnnualMeanEnergy !== undefined ? { environmentAnnualMeanEnergy } : {}),
+    ...(environmentAnnualMeanEnergy !== undefined
+      ? { environmentAnnualMeanEnergy }
+      : {}),
     ...(environmentMonthEnergy !== undefined ? { environmentMonthEnergy } : {}),
     ...(energyInMonth !== undefined ? { energyInMonth } : {}),
     ...(monthProfit !== undefined ? { monthProfit } : {}),

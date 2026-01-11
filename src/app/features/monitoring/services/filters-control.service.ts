@@ -12,6 +12,7 @@ import {
 import { MonitorFacade } from '../../../state/monitor/monitor.facade';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CoordinatorsService } from '../../people/services/coordinators.service';
 
 @Injectable()
 export class FiltersControlService {
@@ -25,7 +26,7 @@ export class FiltersControlService {
     distinctUntilChanged(),
     debounceTime(100)
   );
-
+  coordinatorsService = inject(CoordinatorsService);
   portalControl = new FormControl();
   portalControlState = this.portalControl.valueChanges.pipe(
     startWith(this.portalControl.value)
@@ -96,25 +97,29 @@ export class FiltersControlService {
   );
   clientsSearchControl = new FormControl();
   clients = combineLatest([
-    this.monitorFacade.clients,
+    this.coordinatorsService.allCustomersOfSelectedCoordinatorsMap.pipe(
+      map((data) => Array.from(data.values()))
+    ),
     this.clientsSearchControl.valueChanges.pipe(startWith(null)),
     this.clientsControlState,
   ]).pipe(
     map(([data, search, selected]) => {
       let result;
       if (!search) {
-        result = data;
+        result = data.filter((item) => item.clientName || item.name);
       } else {
         const lowerSearch = search.toLowerCase();
-        result = data.filter((item) => item.fulltext.includes(lowerSearch));
+        result = data.filter((item) =>
+          (item.clientName || item.name || '').includes(lowerSearch)
+        );
       }
 
       const selectedSet: Record<string, any> = {};
-      selected.forEach((item: { id: string }) => {
-        selectedSet[item.id] = true;
+      selected.forEach((item: { _id: string }) => {
+        selectedSet[item._id] = true;
       });
 
-      return result.filter((item) => !selectedSet[item.id]);
+      return result.filter((item) => !selectedSet[item._id]);
     })
   );
   clientsAll = combineLatest([
@@ -139,11 +144,12 @@ export class FiltersControlService {
       return result.filter((item) => !selectedSet[item.id]);
     })
   );
+
   clientsControlStateMap = this.clientsControlState.pipe(
     map((data) => {
       const result: Record<string, boolean> = {};
       data.forEach((item: any) => {
-        result[item.id] = true;
+        result[item._id || item.id] = true;
       });
       return result;
     })

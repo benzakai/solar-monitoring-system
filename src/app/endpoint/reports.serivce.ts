@@ -15,7 +15,10 @@ import {
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { ReportData } from '../domain/report';
 
-const alignDateToReport = (date: Date) => {
+const alignDateToReport = (date: Date, isAnnual: boolean = false) => {
+  if (isAnnual) {
+    date.setUTCMonth(0); // styczeń
+  }
   date.setUTCDate(1);
   date.setUTCHours(0, 0, 0, 0);
   return date;
@@ -68,14 +71,13 @@ export class ReportsService {
   }
 
   public getReportsFromYear(year: number): Observable<ReportData[]> {
-    const startDate = alignDateToReport(new Date(Date.UTC(year, 0, 1)));
+    const startDate = alignDateToReport(new Date(Date.UTC(year, 0, 1)), true);
     const endDate = alignDateToReport(new Date(Date.UTC(year + 1, 0, 1)));
     endDate.setHours(endDate.getUTCHours() - 1);
     const q = query(
       this.collection,
       where('isAnnual', '==', true),
-      where('date', '>=', startDate.getTime()),
-      where('date', '<=', endDate.getTime())
+      where('date', '==', startDate.getTime())
     );
 
     return this.getSnap(q).pipe(

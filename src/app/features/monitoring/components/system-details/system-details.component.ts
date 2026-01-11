@@ -457,10 +457,6 @@ export class SystemDetailsComponent implements AfterViewInit {
       const start = Math.max(measureStart, systemStartTime);
       const end = range.end?.getTime() || 0;
 
-      if (!energy.annual?.length) {
-        return;
-      }
-
       energyPath = (energy.annual || [])
         .filter((e) => e.time >= start && e.time <= end)
         .map((e) => {

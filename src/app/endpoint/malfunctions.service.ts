@@ -178,10 +178,11 @@ export class MalfunctionsService {
   }
 
   getAllSnapshot(statuses: string[] = ['open']): Observable<Malfunction[]> {
+    const timeStart = DateUtil.DaysBack(365);
     const limitedQuery = query(
       this.collection,
       where('status', 'in', statuses),
-      where('#modified', '>=', DateUtil.DaysBack(90))
+      where('#modified', '>=', timeStart)
     );
 
     return new Observable<Malfunction[]>((observer) => {
@@ -209,7 +210,7 @@ export class MalfunctionsService {
     const limitedQuery = query(
       this.collection,
       where('status', 'in', statuses),
-      where('#modified', '>=', DateUtil.DaysBack(90))
+      where('#modified', '>=', DateUtil.DaysBack(365))
     );
 
     return new Observable<Malfunction[]>((observer) => {
@@ -238,7 +239,7 @@ export class MalfunctionsService {
     const limitedQuery = query(
       this.collection,
       where('status', 'in', statuses),
-      where('#modified', '>=', DateUtil.DaysBack(90))
+      where('#modified', '>=', DateUtil.DaysBack(365))
     );
 
     return new Observable<Malfunction[]>((observer) => {

@@ -42,13 +42,24 @@ export class MonitorFacade {
         ),
         this.coordinatorsService.coordinatorsShowAll,
       ]).pipe(
-        map(([items, customers, showAll]) =>
-          showAll
-            ? items
-            : items.filter(
-                (item) => item?.client?.id && customers?.has(item.client.id)
-              )
-        )
+        map(([items, customers, showAll]) => {
+          const mapClientName = (item: MonitorItem) => ({
+            ...item,
+            client: item?.client?.id && customers?.has(item.client.id)
+              ? {
+                  ...item.client,
+                  name: customers.get(item.client.id!)?.name ?? item.client.name,
+                }
+              : item.client,
+          });
+          return showAll
+            ? items.map(mapClientName)
+            : items
+                .filter(
+                  (item) => item?.client?.id && customers?.has(item.client.id)
+                )
+                .map(mapClientName);
+        })
       )
     ),
     share()
@@ -83,7 +94,7 @@ export class MonitorFacade {
     map((data) =>
       data.map((item) => ({
         ...item,
-        system_name_idx: item.system_name.toLowerCase(),
+        system_name_idx: (item.system_name || '').toLowerCase(),
       }))
     ),
     shareReplay({ bufferSize: 1, refCount: true })
@@ -93,7 +104,7 @@ export class MonitorFacade {
     map((data) =>
       data.map((item) => ({
         ...item,
-        system_name_idx: item.system_name.toLowerCase(),
+        system_name_idx: (item.system_name || '').toLowerCase(),
       }))
     ),
     shareReplay({ bufferSize: 1, refCount: true })
@@ -109,7 +120,7 @@ export class MonitorFacade {
       });
       return Object.keys(clients).map((id) => ({
         ...clients[id],
-        fulltext: clients[id].name.toLowerCase(),
+        fulltext: (clients[id].name || '').toLowerCase(),
       }));
     }),
     shareReplay({ bufferSize: 1, refCount: true })

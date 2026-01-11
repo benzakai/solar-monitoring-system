@@ -931,7 +931,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         } else {
           // No client yet, set as client
           this.form.get('client')?.setValue({
-            name: selectedPerson?.clientName,
+            name: selectedPerson?.clientName || selectedPerson?.name,
             id: selectedPerson?._id,
           });
           this.form.markAsDirty();

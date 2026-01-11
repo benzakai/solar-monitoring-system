@@ -148,17 +148,20 @@
               </th>
               <td mat-cell *matCellDef="let m">
 
-                @if (m?.email?.delivery?.state) {
-                  <span [class]="m.email.delivery.state">
+                @if (m?.report) {
+                  @if (m?.email?.delivery?.state) {
+                    <span [class]="m.email.delivery.state">
                     {{ 'reportsTable.status.' + ( m.email.delivery.state ) | translate }}
                   </span>
-                } @else {
-                  @if (m?.report) {
-                    {{'reportsTable.status.project' | translate}}
                   } @else {
-                    {{'reportsTable.status.not_created' | translate}}
+                    {{'reportsTable.status.project' | translate}}
                   }
+
+                } @else {
+                  {{'reportsTable.status.not_created' | translate}}
                 }
+
+
               </td>
             </ng-container>
 
@@ -195,7 +198,7 @@
               </th>
               <td mat-cell *matCellDef="let m">
                 <a class="link" [routerLink]="['/client', m.systems[0]?.client?.id]">
-                  {{ m.systems.length ? m.systems[0]?.client?.name : (m.clientName || m.name) }}
+                  {{ (m.clientName || m.name) }}
                 </a>
               </td>
             </ng-container>

@@ -46,12 +46,14 @@ export class CoordinatorsService {
   allCustomersOfSelectedCoordinatorsMap = combineLatest([
     this.allCustomers,
     this.coordinatorsSelected,
+    this.coordinatorsShowAllSource,
   ]).pipe(
-    map(([customers, coordinators]) => {
+    map(([customers, coordinators, allCoords]) => {
       const map: Record<string, boolean> = (coordinators || []).reduce(
         (acc, c) => Object.assign(acc, { [c]: true }),
         {}
       );
+
       const allCustomers = customers.filter(
         (c) => c?.coordinatorUid && map[c.coordinatorUid]
       );

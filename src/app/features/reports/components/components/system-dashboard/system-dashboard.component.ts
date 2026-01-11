@@ -28,6 +28,7 @@ interface DashboardView {
   arrowClass?: string;
   noData?: boolean;
   lineSection?: boolean;
+  value?: any;
 }
 
 @Component({
@@ -94,16 +95,32 @@ export class SystemDashboardComponent implements OnInit {
       {
         label: () => 'ביחס לחודש מקביל אשתקד',
         value: (data) => {
-          const lastMonth = data.totalMonthLastYear;
-          return data.totalMonth / lastMonth || 0;
+          // Use productionPerMonth for consistency with chart (both use multiAnnual data)
+          const currentMonth = new Date(data.date).getMonth();
+          const thisYear = data.productionPerMonth[currentMonth] || 0;
+          const lastYear = data.productionPerMonthLastYear[currentMonth] || 0;
+          return thisYear / lastYear || 0;
         },
         displayValue: this.formatPercent,
         withArrow: true,
-        noData: (data) => !data.totalMonthLastYear,
+        noData: (data) => {
+          const currentMonth = new Date(data.date).getMonth();
+          return !data.productionPerMonthLastYear[currentMonth];
+        },
       },
       {
         label: () => 'ביחס לסביבה',
-        value: (data) => data.monthEnvironmentRatio,
+        value: (data) => {
+          // Use productionPerMonth for consistency with chart (both use multiAnnual data)
+          const currentMonth = new Date(data.date).getMonth();
+          const thisMonthProduction =
+            data.productionPerMonth[currentMonth] || 0;
+          const environmentSum = data.environmentMonthEnergy.reduce(
+            (sum: number, e: { valueKwh: number }) => sum + (e.valueKwh || 0),
+            0
+          );
+          return thisMonthProduction / environmentSum || 0;
+        },
         displayValue: this.formatPercent,
         withArrow: true,
         noData: (data) => !data.environmentMonthEnergy.length,
@@ -183,11 +200,14 @@ export class SystemDashboardComponent implements OnInit {
   private setView() {
     this.dashboardView = this.dashboardSet.map((ds) => {
       const value = ds.value(this.systemData);
+      const displayValue = ds.displayValue(value);
+      const valuePercent = displayValue !== '0%';
       return {
-        displayValue: ds.displayValue(value),
+        displayValue,
+        value: value,
         label: ds.label(this.date),
         withArrow: !!ds.withArrow,
-        arrowClass: ds.withArrow ? this.arrowClass(value) : '',
+        arrowClass: ds.withArrow && valuePercent ? this.arrowClass(value) : '',
         noData: ds.noData?.(this.systemData),
         lineSection: ds.lineSection,
       };

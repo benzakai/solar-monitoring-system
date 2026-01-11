@@ -76,6 +76,13 @@
                 ></app-annual-chart>
               }
 
+              @if (isAnnual && systemData.multiAnnual?.length) {
+                <app-multi-annual-chart
+                  [annualData]="systemData.multiAnnual"
+                  [date]="date"
+                ></app-multi-annual-chart>
+              }
+
             </div>
 
           </section>
