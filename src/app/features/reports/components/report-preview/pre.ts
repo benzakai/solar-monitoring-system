@@ -55,11 +55,13 @@ export function createSystemReportData(json: SystemReportDoc) {
   const annualMalfunctions = json.malfunctions.sort(
     (a, b) => +new Date(a.openTime || 0) - +new Date(b.openTime || 0)
   );
-  const malfunctions = annualMalfunctions.filter(
-    (m) =>
-      +new Date(m.openTime!) <= DateUtil.EndOfMonth(json.date) &&
-      (!m.closeTime || +new Date(m.closeTime) >= json.date)
-  );
+  const malfunctions = json.isAnnual
+    ? annualMalfunctions
+    : annualMalfunctions.filter(
+        (m) =>
+          +new Date(m.openTime!) <= DateUtil.EndOfMonth(json.date) &&
+          (!m.closeTime || +new Date(m.closeTime) >= json.date)
+      );
 
   return {
     systemId: json.systemId,
