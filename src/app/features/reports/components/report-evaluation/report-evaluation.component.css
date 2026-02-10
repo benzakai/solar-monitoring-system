@@ -1,0 +1,429 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  direction: ltr;
+  text-align: left;
+  background: #ffffff;
+}
+
+/* ── Controls bar ── */
+.eval-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px 8px;
+  flex-wrap: wrap;
+}
+
+.control-field {
+  width: 180px;
+}
+
+.year-field {
+  width: 120px;
+}
+
+.client-field {
+  width: 220px;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.create-button {
+  height: 56px;
+  min-width: 130px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-spinner {
+  display: inline-block;
+}
+
+.progress-label {
+  font-size: 13px;
+  color: #666;
+  margin-left: 8px;
+}
+
+/* ── Results area ── */
+.eval-results {
+  flex: 1 1 1px;
+  overflow: auto;
+  padding: 8px 24px 24px;
+}
+
+.center-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #888;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  color: #aaa;
+}
+
+.empty-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+}
+
+/* ── Expansion panels ── */
+.system-panel {
+  margin-bottom: 8px;
+}
+
+.panel-system-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.panel-client {
+  color: #666;
+  margin-right: 16px;
+}
+
+.panel-chips {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.chip-kwp {
+  font-size: 12px;
+}
+
+.chip-energy {
+  font-size: 12px;
+}
+
+.chip-good {
+  --mdc-chip-elevated-container-color: #e8f5e9;
+  --mdc-chip-label-text-color: #2e7d32;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.chip-warn {
+  --mdc-chip-elevated-container-color: #fff3e0;
+  --mdc-chip-label-text-color: #e65100;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.chip-bad {
+  --mdc-chip-elevated-container-color: #ffebee;
+  --mdc-chip-label-text-color: #c62828;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ── Report body inside panel ── */
+.report-body {
+  padding: 8px 0;
+}
+
+.report-section {
+  padding: 12px 0;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1565c0;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Info grid ── */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.info-item.highlight {
+  background: #e3f2fd;
+}
+
+.info-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.good-ratio {
+  color: #2e7d32 !important;
+  font-weight: 700 !important;
+}
+
+.warn-ratio {
+  color: #e65100 !important;
+  font-weight: 700 !important;
+}
+
+.bad-ratio {
+  color: #c62828 !important;
+  font-weight: 700 !important;
+}
+
+/* ── Monthly breakdown table ── */
+.monthly-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.monthly-header,
+.monthly-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 6px 12px;
+}
+
+.monthly-header {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.monthly-row {
+  border-top: 1px solid #eee;
+}
+
+.monthly-row:hover {
+  background: #f9f9f9;
+}
+
+.monthly-row.current-month {
+  background: #e3f2fd;
+  font-weight: 600;
+}
+
+.month-cell {
+  font-size: 13px;
+  padding: 2px 4px;
+  text-align: center;
+}
+
+.month-cell.head {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #666;
+  text-align: center;
+}
+
+.month-cell.num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.month-cell.env-clickable {
+  cursor: pointer;
+  color: #1565c0;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.month-cell.env-clickable:hover {
+  color: #0d47a1;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+/* ── Subsection title ── */
+.subsection-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin: 14px 0 6px 0;
+}
+
+/* ── Environment daily table ── */
+.env-daily-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.env-daily-header,
+.env-daily-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  padding: 5px 12px;
+}
+
+.env-daily-header {
+  background: #f5f5f5;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.env-daily-row {
+  border-top: 1px solid #eee;
+}
+
+.env-daily-row:hover {
+  background: #f9f9f9;
+}
+
+.env-total-row {
+  background: #e8f5e9;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+.env-cell {
+  font-size: 13px;
+  padding: 2px 4px;
+  text-align: center;
+}
+
+.env-cell.head {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #666;
+  text-align: center;
+}
+
+.env-cell.num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Multi annual list ── */
+.multi-annual-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ma-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.ma-year {
+  font-size: 12px;
+  color: #888;
+}
+
+.ma-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── Malfunctions table ── */
+.malfunctions-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+.malf-header,
+.malf-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 1.5fr 1.5fr 1fr 2fr;
+  padding: 6px 12px;
+}
+
+.malf-header {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.malf-row {
+  border-top: 1px solid #eee;
+}
+
+.malf-row:hover {
+  background: #f9f9f9;
+}
+
+.malf-cell {
+  font-size: 12px;
+  padding: 2px 4px;
+  word-break: break-word;
+  text-align: center;
+}
+
+.malf-cell.head {
+  text-transform: uppercase;
+  color: #666;
+  font-size: 11px;
+  text-align: center;
+}
+
+.malf-cell.wide {
+  grid-column: span 1;
+}
+
+.status-open {
+  color: #e65100;
+  font-weight: 600;
+}
+
+.status-closed {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* ── Washes ── */
+.washes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Comment ── */
+.comment-text {
+  padding: 8px 12px;
+  background: #fffde7;
+  border-radius: 6px;
+  border-left: 3px solid #ffc107;
+  font-style: italic;
+}

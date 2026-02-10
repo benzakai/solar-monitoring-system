@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { formatDate } from '@angular/common';
 import ApexCharts from 'apexcharts';
-import { DateUtil } from '../../../../../core/date/DateUtil';
 import { EnergySample } from '../../../../../domain/energy';
 import { Utilities } from '../../../../../core/math/utilities';
 
@@ -31,22 +30,24 @@ export class MultiAnnualChartComponent implements OnInit, AfterViewInit {
   @Input() date: number = NaN;
 
   years: number[] = [];
+  nYears: number[] = [];
   energy: number[] = [];
 
   constructor() {}
 
   ngOnInit() {
-    // Get 5 years back
-    const date = new Date(this.date);
+    let utcYear = new Date(this.date).getUTCFullYear();
+
     for (let i = 0; i < this.MAX_YEARS; i++) {
-      this.years.unshift(+date);
-      date.setFullYear(date.getFullYear() - 1);
+      this.years.unshift(Date.UTC(utcYear, 0, 1));
+      this.nYears.unshift(utcYear);
+      utcYear--;
     }
-    // Find the annual energy for each year
-    this.energy = this.years.map(
+
+    this.energy = this.nYears.map(
       (y) =>
-        (this.annualData.find((e) => DateUtil.IsSameYear(e.time, y))
-          ?.valueKwh || NaN) / 1000
+        (this.annualData.find((e) => new Date(e.time).getUTCFullYear() === y)
+          ?.valueKwh || 0) / 1000
     );
   }
 
@@ -58,7 +59,9 @@ export class MultiAnnualChartComponent implements OnInit, AfterViewInit {
   }
 
   buildChart() {
-    const yAxis = Utilities.ChartAxis(Math.max(...this.energy.filter(Boolean)));
+    const energy = this.energy;
+    const yAxis = Utilities.ChartAxis(Math.max(...energy));
+    console.log(energy);
     const options = {
       chart: {
         height: 320,
@@ -81,7 +84,7 @@ export class MultiAnnualChartComponent implements OnInit, AfterViewInit {
         {
           name: 'רב-שנתי',
           type: 'column',
-          data: this.energy,
+          data: energy,
         },
         {
           name: 'HACK-for-color-2',

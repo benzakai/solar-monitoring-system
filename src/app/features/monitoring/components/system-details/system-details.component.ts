@@ -67,6 +67,9 @@ import { SortHeaderComponent } from '../sort-header/sort-header.component';
 import { ManualEnergyUpdateComponent } from '../manual-energy-update/manual-energy-update.component';
 import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
 import { PeopleService } from '../../../../endpoint/people.service';
+import { LanguageService } from '../../../../core/lang/language.service';
+import { EnergyService } from '../../../../endpoint/energy.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-system-details',
@@ -105,7 +108,13 @@ import { PeopleService } from '../../../../endpoint/people.service';
 export class SystemDetailsComponent implements AfterViewInit {
   translator = new TranslatePipe();
   people = inject(PeopleService);
+  languageService = inject(LanguageService);
+  energyService = inject(EnergyService);
+  snackBar = inject(MatSnackBar);
   protected readonly DateUtil = DateUtil;
+  
+  // Store current chart data for click handling
+  currentMonthlyChartData: { calculatedData: { x: number; y: number }[]; multiAnnualData: { x: number; y: number }[]; predictionData: { x: number; y: number }[]; system: System | null } | null = null;
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
     sortDirection: 'desc',
@@ -149,7 +158,9 @@ export class SystemDetailsComponent implements AfterViewInit {
   systemId = this.route.params.pipe(map((params) => params['id']));
 
   chart?: ApexCharts;
+  monthsChart?: ApexCharts;
   @ViewChild('chart', { static: true }) chartDiv?: ElementRef<HTMLDivElement>;
+  @ViewChild('monthsChartDiv', { static: false }) monthsChartDiv?: ElementRef<HTMLDivElement>;
 
   generation = new BehaviorSubject<number>(0);
 
@@ -243,6 +254,90 @@ export class SystemDetailsComponent implements AfterViewInit {
     ),
     shareReplay({ bufferSize: 1, refCount: true }),
     filter((data) => !!data)
+  );
+
+  monthlyChartData = this.systemDetailsAndEnergy.pipe(
+    map(({ energy, system, prediction }) => {
+      const multiAnnual = energy?.multiAnnual || [];
+      const annual = energy?.annual || [];
+      
+      if (multiAnnual.length === 0 && annual.length === 0) {
+        return { calculatedData: [], multiAnnualData: [], predictionData: [], system };
+      }
+
+      // Sort chronologically from oldest to newest
+      const sortedMultiAnnual = [...multiAnnual].sort((a, b) => a.time - b.time);
+      const sortedAnnual = [...annual].sort((a, b) => a.time - b.time);
+      
+      // Get date range - from first data point to current month (using UTC)
+      const firstMultiAnnual = sortedMultiAnnual[0]?.time || Infinity;
+      const firstAnnual = sortedAnnual[0]?.time || Infinity;
+      const firstTime = Math.min(firstMultiAnnual, firstAnnual);
+      
+      if (firstTime === Infinity) {
+        return { calculatedData: [], multiAnnualData: [], predictionData: [], system };
+      }
+
+      // Use UTC for consistent timestamps
+      const firstDateObj = new Date(firstTime);
+      const firstYear = firstDateObj.getUTCFullYear();
+      const firstMonth = firstDateObj.getUTCMonth();
+      
+      const nowObj = new Date();
+      const lastYear = nowObj.getUTCFullYear();
+      const lastMonth = nowObj.getUTCMonth();
+
+      // Generate all months in the range using UTC timestamps
+      const allMonthTimestamps: number[] = [];
+      let currentYear = firstYear;
+      let currentMonth = firstMonth;
+      
+      while (currentYear < lastYear || (currentYear === lastYear && currentMonth <= lastMonth)) {
+        allMonthTimestamps.push(Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0));
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+      }
+
+      // Create two series: calculated from daily and multiAnnual
+      const calculatedData: { x: number; y: number }[] = [];
+      const multiAnnualData: { x: number; y: number }[] = [];
+
+      allMonthTimestamps.forEach((monthTimestamp) => {
+        const monthDate = new Date(monthTimestamp);
+        const monthUtc = monthDate.getUTCMonth();
+        const yearUtc = monthDate.getUTCFullYear();
+        
+        // Calculate from annual (daily) data - RED
+        const monthStart = monthTimestamp;
+        const monthEnd = Date.UTC(yearUtc, monthUtc + 1, 1, 0, 0, 0, 0);
+        
+        const dailyForMonth = sortedAnnual.filter(
+          (e) => e.time >= monthStart && e.time < monthEnd
+        );
+        const calculatedValue = dailyForMonth.reduce((sum, e) => sum + e.valueKwh, 0);
+        calculatedData.push({ x: monthTimestamp, y: calculatedValue });
+
+        // Data from multiAnnual - BLUE (compare using UTC month/year)
+        const found = sortedMultiAnnual.find((e) => {
+          const eDate = new Date(e.time);
+          return eDate.getUTCMonth() === monthUtc && eDate.getUTCFullYear() === yearUtc;
+        });
+        multiAnnualData.push({ x: monthTimestamp, y: found?.valueKwh || 0 });
+      });
+
+      // Create prediction data for each month
+      const predictionCalc = PredictionCalculator.getPredictionCalculation(system, prediction);
+      const predictionData = allMonthTimestamps.map((monthTimestamp) => ({
+        x: monthTimestamp,
+        y: predictionCalc[new Date(monthTimestamp).getUTCMonth()] || 0,
+      }));
+
+      return { calculatedData, multiAnnualData, predictionData, system };
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   readonly seriesNames = ['Energy', 'Environment', 'Prediction'];
@@ -350,6 +445,10 @@ export class SystemDetailsComponent implements AfterViewInit {
       )
     );
 
+  get isMonthsView() {
+    return this.periodType.value === 'months';
+  }
+
   constructor() {
     this.periodTypeChange.pipe(takeUntilDestroyed()).subscribe((type) => {
       if (type === 'date') {
@@ -357,6 +456,156 @@ export class SystemDetailsComponent implements AfterViewInit {
       } else {
         this.range.disable();
       }
+    });
+
+    // Subscribe to months chart data
+    this.periodTypeChange.pipe(
+      takeUntilDestroyed(),
+      filter((type) => type === 'months'),
+      switchMap(() => this.monthlyChartData)
+    ).subscribe((chartData) => {
+      setTimeout(() => this.buildMonthsChart(chartData));
+    });
+  }
+
+  buildMonthsChart(chartData: { calculatedData: { x: number; y: number }[]; multiAnnualData: { x: number; y: number }[]; predictionData: { x: number; y: number }[]; system: System | null }) {
+    if (!this.monthsChartDiv?.nativeElement) return;
+
+    // Store chart data for click handling
+    this.currentMonthlyChartData = chartData;
+
+    // Destroy existing chart
+    this.monthsChart?.destroy();
+
+    const lang = this.languageService.getCurrentLang();
+    const calculatedLabel = lang === 'he' ? 'חישוב מימים (לחץ להוספה)' : 'Calculated (click to add)';
+    const multiAnnualLabel = lang === 'he' ? 'נתוני חודש' : 'Monthly data';
+    const predictionLabel = lang === 'he' ? 'צפי' : 'Prediction';
+
+    const options = {
+      chart: {
+        type: 'bar',
+        height: 300,
+        toolbar: { show: false },
+        animations: { enabled: false },
+        events: {
+          dataPointSelection: (event: any, chartContext: any, config: any) => {
+            this.onMonthsChartClick(config.seriesIndex, config.dataPointIndex);
+          },
+        },
+      },
+      states: {
+        hover: {
+          filter: { type: 'lighten', value: 0.15 },
+        },
+        active: {
+          filter: { type: 'darken', value: 0.35 },
+        },
+      },
+      colors: ['#e53935', '#039be5', '#fff176'],
+      series: [
+        {
+          name: calculatedLabel,
+          type: 'column',
+          data: chartData.calculatedData,
+        },
+        {
+          name: multiAnnualLabel,
+          type: 'column',
+          data: chartData.multiAnnualData,
+        },
+        {
+          name: predictionLabel,
+          type: 'line',
+          data: chartData.predictionData,
+        },
+      ],
+      xaxis: {
+        type: 'category',
+        labels: {
+          formatter: (val: any) => val ? formatDate(val, 'MMM yy', lang) : '',
+          rotate: -45,
+          rotateAlways: true,
+          style: { fontSize: '10px' },
+        },
+      },
+      yaxis: {
+        min: 0,
+        decimalsInFloat: 0,
+        labels: { align: 'center' },
+        title: { text: 'kWh' },
+      },
+      stroke: { width: [0, 0, 2] },
+      markers: { size: [0, 0, 3] },
+      plotOptions: {
+        bar: { 
+          columnWidth: '80%',
+        },
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+      },
+      dataLabels: { enabled: false },
+      tooltip: {
+        x: {
+          formatter: (val: any) => val ? formatDate(val, 'MMMM yyyy', lang) : '',
+        },
+        y: {
+          formatter: (v: number) => twoDecimalNumber(v) + ' kWh',
+        },
+      },
+    };
+
+    this.monthsChart = new ApexCharts(this.monthsChartDiv.nativeElement, options);
+    this.monthsChart.render();
+  }
+
+  onMonthsChartClick(seriesIndex: number, dataPointIndex: number) {
+    // Only handle clicks on the red (calculated) series - seriesIndex 0
+    if (seriesIndex !== 0) return;
+    
+    if (!this.currentMonthlyChartData || !this.currentMonthlyChartData.system) return;
+
+    const calculatedPoint = this.currentMonthlyChartData.calculatedData[dataPointIndex];
+    const multiAnnualPoint = this.currentMonthlyChartData.multiAnnualData[dataPointIndex];
+    
+    // Only save if there's a calculated value and it's different from multiAnnual
+    if (calculatedPoint.y <= 0) return;
+    
+    const lang = this.languageService.getCurrentLang();
+    const monthName = formatDate(calculatedPoint.x, 'MMMM yyyy', lang);
+    const confirmMsg = lang === 'he' 
+      ? `להוסיף ${twoDecimalNumber(calculatedPoint.y)} kWh ל-${monthName}?`
+      : `Add ${twoDecimalNumber(calculatedPoint.y)} kWh to ${monthName}?`;
+    
+    if (confirm(confirmMsg)) {
+      this.saveCalculatedToMultiAnnual(
+        this.currentMonthlyChartData.system.id,
+        calculatedPoint.x,
+        calculatedPoint.y
+      );
+    }
+  }
+
+  saveCalculatedToMultiAnnual(systemId: string, timestamp: number, value: number) {
+    const lang = this.languageService.getCurrentLang();
+    
+    this.energyService.addMultiAnnualEntry(systemId, {
+      time: timestamp,
+      valueKwh: value,
+    }).subscribe({
+      next: () => {
+        const successMsg = lang === 'he' ? 'הנתון נשמר בהצלחה' : 'Data saved successfully';
+        this.snackBar.open(successMsg, '✓', { duration: 3000 });
+        // Refresh the data
+        this.generation.next(this.generation.value + 1);
+      },
+      error: (err) => {
+        const errorMsg = lang === 'he' ? 'שגיאה בשמירת הנתון' : 'Error saving data';
+        this.snackBar.open(errorMsg, '✗', { duration: 3000 });
+        console.error('Error saving multiAnnual entry:', err);
+      },
     });
   }
 

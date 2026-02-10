@@ -16,6 +16,7 @@ import { ClientDetailsComponent } from './features/clients/client-details.compon
 import { ClientsComponent } from './features/clients/clients.component';
 import { ManagementComponent } from './features/management/management.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { ReportEvaluationComponent } from './features/reports/components/report-evaluation/report-evaluation.component';
 import { authGuard } from './core/roles/auth.guard';
 import { adminGuard } from './core/roles/admin.guard';
 
@@ -104,5 +105,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   { path: 'washes', component: WashesComponent, canActivate: [authGuard] },
+  {
+    path: 'report-evaluation',
+    component: ReportEvaluationComponent,
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: 'systems' },
 ];

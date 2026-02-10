@@ -1,0 +1,351 @@
+<app-header-portal-remote>
+  <span>Report Evaluation</span>
+</app-header-portal-remote>
+
+<div class="eval-controls">
+  <mat-form-field appearance="outline" class="control-field">
+    <mat-select [formControl]="dateControl" placeholder="Period">
+      @for (month of [0,1,2,3,4,5,6,7,8,9,10,11]; track month) {
+        <mat-option [value]="month">{{ 'months.' + month | translate }}</mat-option>
+      }
+      <mat-option [value]="ANNUAL_REPORT" class="annual-option">
+        <strong>Annual</strong>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="control-field year-field">
+    <input matInput type="number" [formControl]="yearControl" placeholder="Year" />
+  </mat-form-field>
+
+  <span class="field-label">Client ID</span>
+  <mat-form-field appearance="outline" class="control-field client-field">
+    <input matInput [formControl]="clientIdControl" placeholder="All clients" />
+  </mat-form-field>
+
+  <button
+    mat-flat-button
+    color="primary"
+    class="create-button"
+    (click)="create()"
+    [disabled]="loading | async"
+  >
+    @if (loading | async) {
+      <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+    } @else {
+      <mat-icon>play_arrow</mat-icon>
+    }
+    Create
+  </button>
+
+  @if (progress | async; as prog) {
+    <span class="progress-label">{{ prog }}</span>
+  }
+</div>
+
+<div class="eval-results">
+  @if (loading | async) {
+    <div class="center-spinner">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>{{ progress | async }}</p>
+    </div>
+  }
+
+  @if (results | async; as items) {
+    @if (!items.length && !(loading | async)) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">assessment</mat-icon>
+        <p>Select period, year and click <strong>Create</strong> to evaluate reports.</p>
+      </div>
+    }
+
+    @for (item of items; track item.systemId) {
+      <mat-expansion-panel class="system-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="panel-system-name">{{ item.systemName }}</span>
+          </mat-panel-title>
+          <mat-panel-description>
+            <span class="panel-client">{{ item.clientName }}</span>
+            <mat-chip-set class="panel-chips">
+              <mat-chip class="chip-kwp">{{ formatNumber(item.raw.KWP, 1) }} kWp</mat-chip>
+              @if (item.processed.totalYear) {
+                <mat-chip class="chip-energy">{{ formatNumber(item.processed.totalYear, 0) }} kWh/yr</mat-chip>
+              }
+              @if (item.processed.productionPredictionRatio) {
+                <mat-chip
+                  [class]="item.processed.productionPredictionRatio >= 0.95 ? 'chip-good' : item.processed.productionPredictionRatio >= 0.85 ? 'chip-warn' : 'chip-bad'">
+                  {{ formatPercent(item.processed.productionPredictionRatio) }}
+                </mat-chip>
+              }
+            </mat-chip-set>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="report-body">
+          <!-- General Info -->
+          <section class="report-section">
+            <h3 class="section-title">General Info</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">System ID</span>
+                <span class="info-value">{{ item.systemId }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">System Type</span>
+                <span class="info-value">{{ item.processed.systemType || '—' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">KWP</span>
+                <span class="info-value">{{ formatNumber(item.processed.KWP, 2) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Report Date</span>
+                <span class="info-value">{{ formatUtcDate(item.processed.date) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Annual</span>
+                <span class="info-value">{{ item.processed.isAnnual ? 'Yes' : 'No' }}</span>
+              </div>
+              @if (item.raw.startDate) {
+                <div class="info-item">
+                  <span class="info-label">Start Date</span>
+                  <span class="info-value">{{ formatUtcDate(item.raw.startDate) }}</span>
+                </div>
+              }
+            </div>
+          </section>
+
+          <mat-divider></mat-divider>
+
+          <!-- Production -->
+          <section class="report-section">
+            <h3 class="section-title">Production</h3>
+            <div class="info-grid">
+              @if (!item.processed.isAnnual) {
+                <div class="info-item highlight">
+                  <span class="info-label">Month Total</span>
+                  <span class="info-value">{{ formatNumber(item.processed.totalMonth) }} kWh</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Month Norm (per kWp)</span>
+                  <span class="info-value">{{ formatNumber(item.processed.totalMonthNorm) }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Month Last Year</span>
+                  <span class="info-value">{{ formatNumber(item.processed.totalMonthLastYear) }} kWh</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Month Prediction</span>
+                  <span class="info-value">{{ formatNumber(item.processed.monthPrediction) }} kWh</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Month Environment Ratio</span>
+                  <span class="info-value">{{ formatPercent(item.processed.monthEnvironmentRatio) }}</span>
+                </div>
+              }
+              <div class="info-item highlight">
+                <span class="info-label">Year Total</span>
+                <span class="info-value">{{ formatNumber(item.processed.totalYear) }} kWh</span>
+              </div>
+              @if (item.processed.totalLastYear) {
+                <div class="info-item">
+                  <span class="info-label">Last Year Total</span>
+                  <span class="info-value">{{ formatNumber(item.processed.totalLastYear) }} kWh</span>
+                </div>
+              }
+              <div class="info-item">
+                <span class="info-label">Annual Environment Ratio</span>
+                <span class="info-value">{{ formatPercent(item.processed.annualEnvironmentRatio) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Production/Prediction Ratio</span>
+                <span class="info-value"
+                  [class.good-ratio]="item.processed.productionPredictionRatio >= 0.95"
+                  [class.warn-ratio]="item.processed.productionPredictionRatio >= 0.85 && item.processed.productionPredictionRatio < 0.95"
+                  [class.bad-ratio]="item.processed.productionPredictionRatio < 0.85"
+                >{{ formatPercent(item.processed.productionPredictionRatio) }}</span>
+              </div>
+            </div>
+          </section>
+
+          <mat-divider></mat-divider>
+
+          <!-- Environment Production -->
+          <section class="report-section">
+            <h3 class="section-title">Environment Production (Related Systems)</h3>
+            <div class="info-grid">
+              @if (item.raw.environmentAnnualMeanEnergy !== undefined) {
+                <div class="info-item highlight">
+                  <span class="info-label">Environment Annual Mean (per kWp)</span>
+                  <span class="info-value">{{ formatNumber(item.raw.environmentAnnualMeanEnergy, 2) }} kWh/kWp</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Environment Annual Mean &times; KWP</span>
+                  <span class="info-value">{{ formatNumber(item.raw.environmentAnnualMeanEnergy * item.raw.KWP, 0) }} kWh</span>
+                </div>
+              }
+              <div class="info-item">
+                <span class="info-label">Annual Environment Ratio</span>
+                <span class="info-value"
+                  [class.good-ratio]="item.processed.annualEnvironmentRatio >= 0.95"
+                  [class.warn-ratio]="item.processed.annualEnvironmentRatio >= 0.85 && item.processed.annualEnvironmentRatio < 0.95"
+                  [class.bad-ratio]="item.processed.annualEnvironmentRatio < 0.85"
+                >{{ formatPercent(item.processed.annualEnvironmentRatio) }}</span>
+              </div>
+              @if (!item.processed.isAnnual) {
+                <div class="info-item">
+                  <span class="info-label">Month Environment Ratio</span>
+                  <span class="info-value"
+                    [class.good-ratio]="item.processed.monthEnvironmentRatio >= 0.95"
+                    [class.warn-ratio]="item.processed.monthEnvironmentRatio >= 0.85 && item.processed.monthEnvironmentRatio < 0.95"
+                    [class.bad-ratio]="item.processed.monthEnvironmentRatio < 0.85"
+                  >{{ formatPercent(item.processed.monthEnvironmentRatio) }}</span>
+                </div>
+              }
+            </div>
+
+            @if (item.raw.environmentMonthEnergy?.length) {
+              <h4 class="subsection-title">Environment Daily Production (month)</h4>
+              <div class="env-daily-table">
+                <div class="env-daily-header">
+                  <span class="env-cell head">Date</span>
+                  <span class="env-cell head">kWh/kWp</span>
+                  <span class="env-cell head">&times; KWP (kWh)</span>
+                </div>
+                @for (e of item.raw.environmentMonthEnergy; track $index) {
+                  <div class="env-daily-row">
+                    <span class="env-cell">{{ formatUtcDate(e.time) }}</span>
+                    <span class="env-cell num">{{ formatNumber(e.valueKwh, 3) }}</span>
+                    <span class="env-cell num">{{ formatNumber(e.valueKwh * item.raw.KWP, 1) }}</span>
+                  </div>
+                }
+                <div class="env-daily-row env-total-row">
+                  <span class="env-cell"><strong>Total</strong></span>
+                  <span class="env-cell num"><strong>{{ formatNumber(sumEnvEnergy(item.raw.environmentMonthEnergy), 2) }}</strong></span>
+                  <span class="env-cell num"><strong>{{ formatNumber(sumEnvEnergy(item.raw.environmentMonthEnergy) * item.raw.KWP, 0) }}</strong> kWh</span>
+                </div>
+              </div>
+            }
+          </section>
+
+          <mat-divider></mat-divider>
+
+          <!-- Monthly Breakdown -->
+          <section class="report-section">
+            <h3 class="section-title">Monthly Breakdown (kWh)</h3>
+            <div class="monthly-table">
+              <div class="monthly-header">
+                <span class="month-cell head">Month</span>
+                <span class="month-cell head">Production</span>
+                <span class="month-cell head">Last Year</span>
+                <span class="month-cell head">Prediction</span>
+                <span class="month-cell head">Environment</span>
+              </div>
+              @for (val of item.processed.productionPerMonth; track $index) {
+                <div class="monthly-row" [class.current-month]="!item.processed.isAnnual && $index === item.processed.productionPerMonth.length - 1">
+                  <span class="month-cell">{{ getMonthName($index) }}</span>
+                  <span class="month-cell num">{{ formatNumber(val, 0) }}</span>
+                  <span class="month-cell num">{{ formatNumber(item.processed.productionPerMonthLastYear[$index], 0) }}</span>
+                  <span class="month-cell num">{{ formatNumber(item.processed.predictionPerMonth[$index], 0) }}</span>
+                  <span class="month-cell num env-clickable" (click)="openEnvDetail(item, $index)">{{ formatNumber(item.environmentPerMonth[$index], 0) }}</span>
+                </div>
+              }
+            </div>
+          </section>
+
+          <mat-divider></mat-divider>
+
+          <!-- Profit -->
+          <section class="report-section">
+            <h3 class="section-title">Profit</h3>
+            <div class="info-grid">
+              @if (item.processed.monthProfit !== undefined) {
+                <div class="info-item">
+                  <span class="info-label">Month Profit</span>
+                  <span class="info-value">{{ formatNumber(item.processed.monthProfit) }} &#8362;</span>
+                </div>
+              }
+              <div class="info-item">
+                <span class="info-label">Annual Profit</span>
+                <span class="info-value">{{ formatNumber(item.processed.annualProfit) }} &#8362;</span>
+              </div>
+            </div>
+          </section>
+
+          <mat-divider></mat-divider>
+
+          <!-- Multi Annual -->
+          @if (item.processed.multiAnnual?.length) {
+            <section class="report-section">
+              <h3 class="section-title">Multi-Annual Energy</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Multi-Annual Mean</span>
+                  <span class="info-value">{{ formatNumber(item.processed.multiAnnualMean, 0) }} kWh</span>
+                </div>
+              </div>
+              <div class="multi-annual-list">
+                @for (entry of item.processed.multiAnnual; track $index) {
+                  <div class="ma-entry">
+                    <span class="ma-year">{{ formatUtcDate(entry.time) }}</span>
+                    <span class="ma-value">{{ formatNumber(entry.valueKwh, 0) }} kWh</span>
+                  </div>
+                }
+              </div>
+            </section>
+            <mat-divider></mat-divider>
+          }
+
+          <!-- Malfunctions -->
+          @if (item.processed.malfunctions?.length) {
+            <section class="report-section">
+              <h3 class="section-title">Malfunctions ({{ item.processed.malfunctions.length }})</h3>
+              <div class="malfunctions-table">
+                <div class="malf-header">
+                  <span class="malf-cell head">Type</span>
+                  <span class="malf-cell head">Status</span>
+                  <span class="malf-cell head">Opened</span>
+                  <span class="malf-cell head">Closed</span>
+                  <span class="malf-cell head">Handler</span>
+                  <span class="malf-cell head wide">Report Text</span>
+                </div>
+                @for (m of item.processed.malfunctions; track $index) {
+                  <div class="malf-row">
+                    <span class="malf-cell">{{ m.type?.[0] || '—' }}</span>
+                    <span class="malf-cell" [class.status-open]="m.status !== 'closed'" [class.status-closed]="m.status === 'closed'">{{ m.status || '—' }}</span>
+                    <span class="malf-cell">{{ formatUtc(m.openTime) }}</span>
+                    <span class="malf-cell">{{ m.closeTime ? formatUtc(m.closeTime) : 'Open' }}</span>
+                    <span class="malf-cell">{{ m.handler || '—' }}</span>
+                    <span class="malf-cell wide">{{ m.reportText || '—' }}</span>
+                  </div>
+                }
+              </div>
+            </section>
+            <mat-divider></mat-divider>
+          }
+
+          <!-- Washes -->
+          @if (item.processed.washesDates?.length) {
+            <section class="report-section">
+              <h3 class="section-title">Washes ({{ item.processed.washesDates.length }})</h3>
+              <div class="washes-list">
+                @for (w of item.processed.washesDates; track $index) {
+                  <mat-chip>{{ formatUtcDate(w) }}</mat-chip>
+                }
+              </div>
+            </section>
+          }
+
+          <!-- Comment -->
+          @if (item.processed.comment) {
+            <section class="report-section">
+              <h3 class="section-title">Comment</h3>
+              <p class="comment-text">{{ item.processed.comment }}</p>
+            </section>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+  }
+</div>

@@ -33,6 +33,10 @@ export const system_details: Dictionary = {
     en: 'Today',
     he: 'היום',
   },
+  months: {
+    en: 'Months',
+    he: 'חודשים',
+  },
   manual_edit: {
     header: {
       he: 'עריכת נתונים ידנית',

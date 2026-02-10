@@ -27,6 +27,10 @@ export class RoutineCheckService {
       first(),
       switchMap((user) => {
         const docRef = doc(this.collection, id);
+        const checkObject = {
+          uid: user.uid,
+          date: new Date().toJSON(),
+        };
 
         return from(getDoc(docRef)).pipe(
           switchMap((docSnap) => {
@@ -34,10 +38,7 @@ export class RoutineCheckService {
               const currentData = docSnap.data() as RoutineCheck;
 
               const checks = currentData.checks;
-              checks.unshift({
-                uid: user.uid,
-                date: new Date().toJSON(),
-              });
+              checks.unshift(checkObject);
               const lastMonthIdx = checks.findIndex(
                 (c) => !DateUtil.IsSameMonth(c.date, Date.now())
               );
@@ -55,7 +56,16 @@ export class RoutineCheckService {
                 )
               );
             } else {
-              return of(null);
+              return from(
+                setDoc(
+                  docRef,
+                  {
+                    checks: [checkObject],
+                    systemId: id,
+                  },
+                  { merge: true }
+                )
+              );
             }
           })
         );

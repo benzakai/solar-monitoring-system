@@ -220,7 +220,9 @@ export class ReportsTableComponent {
   ]).pipe(
     map(([month, year]) => {
       this.isAnnual = month === this.ANNUAL_REPORT;
-      const effectiveMonth = this.isAnnual ? 0 : (month ?? this.d.getMonth() - 1);
+      const effectiveMonth = this.isAnnual
+        ? 0
+        : (month ?? this.d.getMonth() - 1);
       const newDate = Date.UTC(
         year || this.d.getUTCFullYear(),
         effectiveMonth,
@@ -463,10 +465,7 @@ export class ReportsTableComponent {
     return item?._id;
   }
 
-  preview(
-    client: Person,
-    existingReport?: ReportData
-  ) {
+  preview(client: Person, existingReport?: ReportData) {
     const isAnnual = this.isAnnual;
     this.selectedDate.pipe(first()).subscribe((date) => {
       const reportTime =
@@ -494,10 +493,7 @@ export class ReportsTableComponent {
     return tags.join('_');
   }
 
-  download(
-    client: Person,
-    existingReportTime: number
-  ) {
+  download(client: Person, existingReportTime: number) {
     const dialog = this.dialogService.loader();
     const isAnnual = this.isAnnual;
     this.selectedDate
@@ -520,10 +516,7 @@ export class ReportsTableComponent {
       });
   }
 
-  recreateReport(
-    systems: System[],
-    comment?: string
-  ) {
+  recreateReport(systems: System[], comment?: string) {
     const dialog = this.dialogService.loader();
     const isAnnual = this.isAnnual;
     this.selectedDate
@@ -600,8 +593,10 @@ export class ReportsTableComponent {
                         system,
                         energy: energies.find((e) => e.id === system.id),
                       }))
-                      .filter((see): see is See =>
-                        Boolean(see.system && see.energy)
+                      .filter(
+                        (see): see is See =>
+                          !see.system.excludeFromAverage &&
+                          Boolean(see.system && see.energy)
                       );
                     const meanEnergy = EnergyCalc.GetMeanCalculationReport(
                       systemsAndEnergies,

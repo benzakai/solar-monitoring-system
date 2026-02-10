@@ -704,3 +704,13 @@ mat-sidenav-content.mat-drawer-content {
     color: #f44336 !important;
   }
 }
+
+.fullscreen-dialog.cdk-overlay-pane {
+  max-width: 100vw !important;
+}
+.fullscreen-dialog .mat-mdc-dialog-container,
+.fullscreen-dialog .mat-mdc-dialog-container .mdc-dialog__surface,
+.fullscreen-dialog .mat-mdc-dialog-surface {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}

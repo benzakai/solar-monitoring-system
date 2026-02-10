@@ -77,6 +77,13 @@
               </button>
             }
 
+            @if (feature.reportEvaluation) {
+              <button mat-button color="white" (click)="redirect('report-evaluation')">
+                Report Evaluation
+                <mat-icon color="yellow">assessment</mat-icon>
+              </button>
+            }
+
             <button mat-button color="white" (click)="logout()">
               {{ 'sidenav.go_out' | translate }}
               <mat-icon color="red">follow_the_signs</mat-icon>

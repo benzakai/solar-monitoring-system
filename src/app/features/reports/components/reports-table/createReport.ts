@@ -40,6 +40,10 @@ export const createReport = (
 
   const prediction = calcedAnnualPredictionPerMonth.map((v) => v * KWP);
 
+  let multiAnnualAll = systemEnergy
+    ? [...(systemEnergy?.multiAnnual || [])]
+    : [];
+
   if (systemEnergy) {
     systemEnergy.annual = systemEnergy.annual?.filter(
       (e) => !startDate || e.time >= startDate
@@ -48,9 +52,9 @@ export const createReport = (
       (e) => !startDate || e.time >= startDate
     );
   }
-  environmentMeanEnergy = environmentMeanEnergy.filter(
-    (e) => !startDate || e.time >= startDate
-  );
+  environmentMeanEnergy = environmentMeanEnergy.filter((e) => {
+    return !startDate || e.time >= startDate;
+  });
 
   let environmentAnnualMeanEnergy;
   let environmentMonthEnergy;
@@ -76,24 +80,33 @@ export const createReport = (
     monthProfit = TaarifCalculator.calcProfit(system, energyInMonth, tarifs);
   }
 
-  const monthsForEnergy = DateUtil.GetMonths(date);
+  const monthsForEnergy = DateUtil.GetUTCMonths(date);
 
   const annualEnergy = monthsForEnergy
-    .filter((m) => isAnnual || m.getUTCMonth() <= date.getUTCMonth())
-    .map(
-      (d) =>
+    .filter((m) => {
+      return isAnnual || m.getUTCMonth() <= date.getUTCMonth();
+    })
+    .map((d) => {
+      return (
         systemEnergy?.multiAnnual?.find((e) =>
           DateUtil.IsSameMonthUTC(e.time, d)
         )?.valueKwh || 0
-    );
+      );
+    });
 
   const lastYear = new Date(date.getTime());
   lastYear.setFullYear(lastYear.getFullYear() - 1);
-  const lastAnnualEnergy = DateUtil.GetMonths(lastYear).map(
-    (d) =>
-      systemEnergy?.multiAnnual?.find((e) => DateUtil.IsSameMonth(e.time, d))
-        ?.valueKwh || 0
-  );
+
+  const lastAnnualEnergy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((d) => {
+    return (
+      multiAnnualAll.find((e) => {
+        const dm = new Date(e.time).getUTCMonth();
+        const dy = new Date(e.time).getUTCFullYear();
+        const hit = dm === d && dy === lastYear.getFullYear();
+        return hit;
+      })?.valueKwh || 0
+    );
+  });
 
   const multiAnnual =
     getAnnualEnergy(systemEnergy?.multiAnnual || [])
@@ -213,6 +226,7 @@ export const reportFileName = (
 export const alignDateToReport = (date: Date) => {
   const newDate = new Date(date);
   newDate.setUTCDate(1);
+  newDate.setUTCFullYear(date.getFullYear());
   newDate.setUTCHours(0, 0, 0, 0);
   return newDate;
 };

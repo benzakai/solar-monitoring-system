@@ -149,4 +149,48 @@ export class EnergyService {
     const docRef = doc(this.collection, systemId);
     return from(setDoc(docRef, { annual }, { merge: true }));
   }
+
+  updateMultiAnnualEnergy(systemId: string, multiAnnual: EnergySample[]) {
+    const docRef = doc(this.collection, systemId);
+    return from(setDoc(docRef, { multiAnnual }, { merge: true }));
+  }
+
+  addMultiAnnualEntry(systemId: string, entry: EnergySample): Observable<void> {
+    const docRef = doc(this.collection, systemId);
+    return from(
+      getDoc(docRef).then(async (snapshot) => {
+        const data = snapshot.data();
+        const multiAnnual = (data?.['multiAnnual'] || []) as EnergySample[];
+        
+        // Get UTC month/year for comparison
+        const entryDate = new Date(entry.time);
+        const entryMonth = entryDate.getUTCMonth();
+        const entryYear = entryDate.getUTCFullYear();
+        
+        // Check if entry for this month already exists (using UTC)
+        const existingIndex = multiAnnual.findIndex((e) => {
+          const existingDate = new Date(e.time);
+          return existingDate.getUTCMonth() === entryMonth &&
+                 existingDate.getUTCFullYear() === entryYear;
+        });
+        
+        if (existingIndex >= 0) {
+          // Update existing entry - keep original timestamp, update value
+          multiAnnual[existingIndex].valueKwh = entry.valueKwh;
+        } else {
+          // Add new entry with UTC midnight timestamp
+          const utcTimestamp = Date.UTC(entryYear, entryMonth, 1, 0, 0, 0, 0);
+          multiAnnual.push({
+            time: utcTimestamp,
+            valueKwh: entry.valueKwh,
+          });
+        }
+        
+        // Sort by time
+        multiAnnual.sort((a, b) => a.time - b.time);
+        
+        await setDoc(docRef, { multiAnnual }, { merge: true });
+      })
+    );
+  }
 }

@@ -49,8 +49,22 @@ export function createSystemReportData(json: SystemReportDoc) {
       return e;
     }) || [];
   const totalYear = EnergyCalc.Sum(json.annualEnergy) || 0;
+
+  // Ensure multiAnnual contains current year with totalYear value
+  const currentYear = new Date(json.date).getUTCFullYear();
+  const currentYearUtc = Date.UTC(currentYear, 0, 1);
+  const multiAnnual = [...(json.multiAnnual || [])];
+  const currentYearIndex = multiAnnual.findIndex(
+    (e) => new Date(e.time).getUTCFullYear() === currentYear
+  );
+  if (currentYearIndex >= 0) {
+    multiAnnual[currentYearIndex] = { time: currentYearUtc, valueKwh: totalYear };
+  } else {
+    multiAnnual.push({ time: currentYearUtc, valueKwh: totalYear });
+  }
+
   const multiAnnualMean = EnergyCalc.Mean(
-    json.multiAnnual?.map((e) => e.valueKwh)
+    multiAnnual.map((e) => e.valueKwh)
   );
   const annualMalfunctions = json.malfunctions.sort(
     (a, b) => +new Date(a.openTime || 0) - +new Date(b.openTime || 0)
@@ -82,7 +96,7 @@ export function createSystemReportData(json: SystemReportDoc) {
       EnergyCalc.Sum(environmentMonthEnergy.map((e) => e.valueKwh)),
     totalYear: totalYear,
     totalLastYear: EnergyCalc.Sum(json.lastAnnualEnergy) || undefined,
-    multiAnnual: json.multiAnnual,
+    multiAnnual: multiAnnual,
     multiAnnualMean: multiAnnualMean,
     annualEnvironmentRatio:
       totalYear / json.KWP / (json.environmentAnnualMeanEnergy || 0),

@@ -71,6 +71,19 @@ export class DateUtil {
     return m;
   }
 
+  static GetUTCMonths(date: Date = new Date()) {
+    const m: Date[] = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(date);
+      d.setUTCFullYear(date.getFullYear());
+      d.setUTCMonth(i, 1);
+      d.setUTCDate(1);
+      d.setUTCHours(0, 0, 0, 0);
+      m.push(d);
+    }
+    return m;
+  }
+
   /** Get the number of days of the given month (of the current year if not specified) */
   static DaysInMonth(month: number, year?: number): number {
     const d = new Date();
