@@ -95,35 +95,43 @@ export class SystemDashboardComponent implements OnInit {
       {
         label: () => 'ביחס לחודש מקביל אשתקד',
         value: (data) => {
-          // Use productionPerMonth for consistency with chart (both use multiAnnual data)
           const currentMonth = new Date(data.date).getMonth();
-          const thisYear = data.productionPerMonth[currentMonth] || 0;
+          const thisYear = (data.monthProduction || []).reduce(
+            (sum: number, e: { valueKwh?: number }) => sum + (e?.valueKwh || 0),
+            0
+          );
           const lastYear = data.productionPerMonthLastYear[currentMonth] || 0;
-          return thisYear / lastYear || 0;
+          return lastYear > 0 ? thisYear / lastYear : NaN;
         },
         displayValue: this.formatPercent,
         withArrow: true,
         noData: (data) => {
           const currentMonth = new Date(data.date).getMonth();
-          return !data.productionPerMonthLastYear[currentMonth];
+          return (
+            !data.productionPerMonthLastYear[currentMonth] ||
+            !(data.monthProduction?.length > 0)
+          );
         },
       },
       {
         label: () => 'ביחס לסביבה',
+        // Recalculate from daily samples to avoid relying on precomputed ratio.
         value: (data) => {
-          // Use productionPerMonth for consistency with chart (both use multiAnnual data)
-          const currentMonth = new Date(data.date).getMonth();
-          const thisMonthProduction =
-            data.productionPerMonth[currentMonth] || 0;
-          const environmentSum = data.environmentMonthEnergy.reduce(
-            (sum: number, e: { valueKwh: number }) => sum + (e.valueKwh || 0),
+          const productionSum = (data.monthProduction || []).reduce(
+            (sum: number, e: { valueKwh?: number }) => sum + (e?.valueKwh || 0),
             0
           );
-          return thisMonthProduction / environmentSum || 0;
+          const environmentSum = (data.environmentMonthEnergy || []).reduce(
+            (sum: number, e: { valueKwh?: number }) => sum + (e?.valueKwh || 0),
+            0
+          );
+          return environmentSum > 0 ? productionSum / environmentSum : NaN;
         },
         displayValue: this.formatPercent,
         withArrow: true,
-        noData: (data) => !data.environmentMonthEnergy.length,
+        noData: (data) =>
+          !data.environmentMonthEnergy?.length ||
+          !(data.monthProduction?.length > 0),
         lineSection: true,
       },
       {
