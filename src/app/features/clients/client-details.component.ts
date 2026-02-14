@@ -141,7 +141,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
 
   coordinators$ = this.coordinatorsService.coordinators;
 
-  monitorItems$ = this.monitorFacade.monitorItems;
+  monitorItems$ = this.monitorFacade.monitorItemsAll;
 
   client$ = this.activatedRoute.params.pipe(
     takeUntilDestroyed(this.destroyRef),
@@ -188,6 +188,7 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       return (systems || []).map((x: any) => {
         const sys = systemById.get(x.id);
         const mi = misById.get(x.id);
+        const systemId = mi?.id ?? sys?.id ?? x.id;
         const monitorPriceKw = sys?.monitorPriceKw;
         const taoz = sys?.taoz ?? null;
         const regulation = sys?.regulation;
@@ -198,9 +199,12 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
             : undefined;
         return {
           ...mi,
+          id: systemId,
+          system_name: mi?.system_name ?? sys?.name ?? '',
+          system_active: mi?.system_active ?? Boolean(sys?.isActive),
           sys,
           kwp,
-          portal: mi?.portal ?? '',
+          portal: mi?.portal ?? sys?.portalUrl ?? '',
           _monitorPriceKw: monitorPriceKw,
           _priceTotal: priceTotal,
           _taoz: taoz,

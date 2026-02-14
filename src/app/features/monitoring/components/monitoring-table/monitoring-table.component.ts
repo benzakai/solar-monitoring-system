@@ -171,7 +171,7 @@ export class MonitoringTableComponent {
           ? DateUtil.DaysFromToday(new Date(item?.lastCheck?.date || 0))
           : undefined;
         const checkedByAnybodyToday = daysFromCheck === 0;
-        const toBeChecked = (daysFromCheck || 100) > 10;
+        const toBeChecked = (daysFromCheck ?? 100) > 10;
         return {
           ...item,
           daysFromCheck,
@@ -309,7 +309,7 @@ export class MonitoringTableComponent {
     map((data) => data.filter((item) => item.checkedByAnybodyToday).length)
   );
 
-  needsTest = this.monitorFiltered.pipe(
+  needsTest = this.monitorItemsForUser.pipe(
     map((data) => data.filter((item) => item.toBeChecked).length)
   );
   element: any;
