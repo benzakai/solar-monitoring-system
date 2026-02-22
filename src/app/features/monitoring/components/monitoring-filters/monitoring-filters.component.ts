@@ -104,4 +104,14 @@ export class MonitoringFiltersComponent {
   maxUpdate(val: number) {
     this.controls.kwpControl.setValue([this.controls.kwpControl.value[0], val]);
   }
+
+  compareByEntityId = (a: any, b: any): boolean => {
+    if (!a && !b) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    return (a._id || a.id) === (b._id || b.id);
+  };
 }

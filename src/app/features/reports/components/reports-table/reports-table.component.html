@@ -36,14 +36,14 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="custom-select">
-    <mat-select [placeholder]="'all_clients' | translate" multiple [formControl]="controls.clientsControl" panelClass="filter-multi-selector">
+    <mat-select [placeholder]="'all_clients' | translate" multiple [formControl]="controls.clientsControl" [compareWith]="compareByEntityId" panelClass="filter-multi-selector">
       <mat-select-trigger>
         {{ (numberOfClients | async) + ' ' + ('selected' | translate)   }}
       </mat-select-trigger>
       <mat-form-field class="input" appearance="outline">
         <input matInput [placeholder]="'search' | translate" [formControl]="controls.clientsSearchControl" />
       </mat-form-field>
-      @for (clients of (controls.clientsControl.valueChanges | async); track clients) {
+      @for (clients of (controls.clientsControlState | async); track clients) {
         <mat-option [value]="clients">{{ clients.name || '' }}</mat-option>
       }
       <div class="filter-multi-selector-scroll">

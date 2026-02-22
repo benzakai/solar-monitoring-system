@@ -86,4 +86,14 @@ export class WashesFiltersComponent {
   numberOfClients = this.controls.clientsControlState.pipe(
     map((systems) => systems?.length || 'All')
   );
+
+  compareByEntityId = (a: any, b: any): boolean => {
+    if (!a && !b) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    return (a._id || a.id) === (b._id || b.id);
+  };
 }

@@ -671,6 +671,16 @@ export class ReportsTableComponent {
     });
   }
 
+  compareByEntityId = (a: any, b: any): boolean => {
+    if (!a && !b) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    return (a._id || a.id) === (b._id || b.id);
+  };
+
   sendEmail(client: Person, time: number) {
     const dialog = this.dialogService.loader();
     const isAnnual = this.isAnnual;

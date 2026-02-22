@@ -8,11 +8,13 @@ import {
   combineLatest,
   Observable,
   filter,
+  tap,
 } from 'rxjs';
 import { MonitorFacade } from '../../../state/monitor/monitor.facade';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CoordinatorsService } from '../../people/services/coordinators.service';
+import { FiltersService } from './filters.service';
 
 @Injectable()
 export class FiltersControlService {
@@ -91,9 +93,12 @@ export class FiltersControlService {
     })
   );
 
-  clientsControl = new FormControl();
-  clientsControlState = this.clientsControl.valueChanges.pipe(
-    startWith(this.clientsControl.value || [])
+  filtersService = inject(FiltersService);
+  clientsControl = new FormControl(this.filtersService.clientsSelectionSnapshot);
+  clientsControlState: Observable<any[]> = this.clientsControl.valueChanges.pipe(
+    startWith(this.clientsControl.value || []),
+    map((data) => data || []),
+    tap((data) => this.filtersService.setClientsSelection(data))
   );
   clientsSearchControl = new FormControl();
   clients = combineLatest([
