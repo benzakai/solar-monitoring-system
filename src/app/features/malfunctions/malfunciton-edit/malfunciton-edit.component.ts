@@ -213,8 +213,12 @@ export class MalfuncitonEditComponent {
     this.malfunction.pipe(take(1), takeUntilDestroyed()).subscribe((data) => {
       if (data) {
         const type = data?.type ? data?.type[0] : '';
+        const hasDescription = !!data.description?.trim();
+        const hasReportText = !!data.reportText?.trim();
         this.form.patchValue({
           ...data,
+          reportText:
+            hasDescription && !hasReportText ? data.description : data.reportText,
           openTime: DateUtil.FromUtcMidnightIso(data.openTime) ?? null,
           closeTime: DateUtil.FromUtcMidnightIso(data.closeTime) ?? null,
           tracingTime: DateUtil.FromUtcMidnightIso(data.tracingTime) ?? null,

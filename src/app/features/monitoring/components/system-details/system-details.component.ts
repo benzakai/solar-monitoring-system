@@ -112,9 +112,14 @@ export class SystemDetailsComponent implements AfterViewInit {
   energyService = inject(EnergyService);
   snackBar = inject(MatSnackBar);
   protected readonly DateUtil = DateUtil;
-  
+
   // Store current chart data for click handling
-  currentMonthlyChartData: { calculatedData: { x: number; y: number }[]; multiAnnualData: { x: number; y: number }[]; predictionData: { x: number; y: number }[]; system: System | null } | null = null;
+  currentMonthlyChartData: {
+    calculatedData: { x: number; y: number }[];
+    multiAnnualData: { x: number; y: number }[];
+    predictionData: { x: number; y: number }[];
+    system: System | null;
+  } | null = null;
   activeSort = new BehaviorSubject({
     sortField: 'tracingDate',
     sortDirection: 'desc',
@@ -160,7 +165,8 @@ export class SystemDetailsComponent implements AfterViewInit {
   chart?: ApexCharts;
   monthsChart?: ApexCharts;
   @ViewChild('chart', { static: true }) chartDiv?: ElementRef<HTMLDivElement>;
-  @ViewChild('monthsChartDiv', { static: false }) monthsChartDiv?: ElementRef<HTMLDivElement>;
+  @ViewChild('monthsChartDiv', { static: false })
+  monthsChartDiv?: ElementRef<HTMLDivElement>;
 
   generation = new BehaviorSubject<number>(0);
 
@@ -260,29 +266,41 @@ export class SystemDetailsComponent implements AfterViewInit {
     map(({ energy, system, prediction }) => {
       const multiAnnual = energy?.multiAnnual || [];
       const annual = energy?.annual || [];
-      
+
       if (multiAnnual.length === 0 && annual.length === 0) {
-        return { calculatedData: [], multiAnnualData: [], predictionData: [], system };
+        return {
+          calculatedData: [],
+          multiAnnualData: [],
+          predictionData: [],
+          system,
+        };
       }
 
       // Sort chronologically from oldest to newest
-      const sortedMultiAnnual = [...multiAnnual].sort((a, b) => a.time - b.time);
+      const sortedMultiAnnual = [...multiAnnual].sort(
+        (a, b) => a.time - b.time
+      );
       const sortedAnnual = [...annual].sort((a, b) => a.time - b.time);
-      
+
       // Get date range - from first data point to current month (using UTC)
       const firstMultiAnnual = sortedMultiAnnual[0]?.time || Infinity;
       const firstAnnual = sortedAnnual[0]?.time || Infinity;
       const firstTime = Math.min(firstMultiAnnual, firstAnnual);
-      
+
       if (firstTime === Infinity) {
-        return { calculatedData: [], multiAnnualData: [], predictionData: [], system };
+        return {
+          calculatedData: [],
+          multiAnnualData: [],
+          predictionData: [],
+          system,
+        };
       }
 
       // Use UTC for consistent timestamps
       const firstDateObj = new Date(firstTime);
       const firstYear = firstDateObj.getUTCFullYear();
       const firstMonth = firstDateObj.getUTCMonth();
-      
+
       const nowObj = new Date();
       const lastYear = nowObj.getUTCFullYear();
       const lastMonth = nowObj.getUTCMonth();
@@ -291,9 +309,14 @@ export class SystemDetailsComponent implements AfterViewInit {
       const allMonthTimestamps: number[] = [];
       let currentYear = firstYear;
       let currentMonth = firstMonth;
-      
-      while (currentYear < lastYear || (currentYear === lastYear && currentMonth <= lastMonth)) {
-        allMonthTimestamps.push(Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0));
+
+      while (
+        currentYear < lastYear ||
+        (currentYear === lastYear && currentMonth <= lastMonth)
+      ) {
+        allMonthTimestamps.push(
+          Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0)
+        );
         currentMonth++;
         if (currentMonth > 11) {
           currentMonth = 0;
@@ -309,27 +332,36 @@ export class SystemDetailsComponent implements AfterViewInit {
         const monthDate = new Date(monthTimestamp);
         const monthUtc = monthDate.getUTCMonth();
         const yearUtc = monthDate.getUTCFullYear();
-        
+
         // Calculate from annual (daily) data - RED
         const monthStart = monthTimestamp;
         const monthEnd = Date.UTC(yearUtc, monthUtc + 1, 1, 0, 0, 0, 0);
-        
+
         const dailyForMonth = sortedAnnual.filter(
           (e) => e.time >= monthStart && e.time < monthEnd
         );
-        const calculatedValue = dailyForMonth.reduce((sum, e) => sum + e.valueKwh, 0);
+        const calculatedValue = dailyForMonth.reduce(
+          (sum, e) => sum + e.valueKwh,
+          0
+        );
         calculatedData.push({ x: monthTimestamp, y: calculatedValue });
 
         // Data from multiAnnual - BLUE (compare using UTC month/year)
         const found = sortedMultiAnnual.find((e) => {
           const eDate = new Date(e.time);
-          return eDate.getUTCMonth() === monthUtc && eDate.getUTCFullYear() === yearUtc;
+          return (
+            eDate.getUTCMonth() === monthUtc &&
+            eDate.getUTCFullYear() === yearUtc
+          );
         });
         multiAnnualData.push({ x: monthTimestamp, y: found?.valueKwh || 0 });
       });
 
       // Create prediction data for each month
-      const predictionCalc = PredictionCalculator.getPredictionCalculation(system, prediction);
+      const predictionCalc = PredictionCalculator.getPredictionCalculation(
+        system,
+        prediction
+      );
       const predictionData = allMonthTimestamps.map((monthTimestamp) => ({
         x: monthTimestamp,
         y: predictionCalc[new Date(monthTimestamp).getUTCMonth()] || 0,
@@ -459,16 +491,23 @@ export class SystemDetailsComponent implements AfterViewInit {
     });
 
     // Subscribe to months chart data
-    this.periodTypeChange.pipe(
-      takeUntilDestroyed(),
-      filter((type) => type === 'months'),
-      switchMap(() => this.monthlyChartData)
-    ).subscribe((chartData) => {
-      setTimeout(() => this.buildMonthsChart(chartData));
-    });
+    this.periodTypeChange
+      .pipe(
+        takeUntilDestroyed(),
+        filter((type) => type === 'months'),
+        switchMap(() => this.monthlyChartData)
+      )
+      .subscribe((chartData) => {
+        setTimeout(() => this.buildMonthsChart(chartData));
+      });
   }
 
-  buildMonthsChart(chartData: { calculatedData: { x: number; y: number }[]; multiAnnualData: { x: number; y: number }[]; predictionData: { x: number; y: number }[]; system: System | null }) {
+  buildMonthsChart(chartData: {
+    calculatedData: { x: number; y: number }[];
+    multiAnnualData: { x: number; y: number }[];
+    predictionData: { x: number; y: number }[];
+    system: System | null;
+  }) {
     if (!this.monthsChartDiv?.nativeElement) return;
 
     // Store chart data for click handling
@@ -478,7 +517,8 @@ export class SystemDetailsComponent implements AfterViewInit {
     this.monthsChart?.destroy();
 
     const lang = this.languageService.getCurrentLang();
-    const calculatedLabel = lang === 'he' ? 'חישוב מימים (לחץ להוספה)' : 'Calculated (click to add)';
+    const calculatedLabel =
+      lang === 'he' ? 'חישוב מימים (לחץ להוספה)' : 'Calculated (click to add)';
     const multiAnnualLabel = lang === 'he' ? 'נתוני חודש' : 'Monthly data';
     const predictionLabel = lang === 'he' ? 'צפי' : 'Prediction';
 
@@ -523,7 +563,7 @@ export class SystemDetailsComponent implements AfterViewInit {
       xaxis: {
         type: 'category',
         labels: {
-          formatter: (val: any) => val ? formatDate(val, 'MMM yy', lang) : '',
+          formatter: (val: any) => (val ? formatDate(val, 'MMM yy', lang) : ''),
           rotate: -45,
           rotateAlways: true,
           style: { fontSize: '10px' },
@@ -538,7 +578,7 @@ export class SystemDetailsComponent implements AfterViewInit {
       stroke: { width: [0, 0, 2] },
       markers: { size: [0, 0, 3] },
       plotOptions: {
-        bar: { 
+        bar: {
           columnWidth: '80%',
         },
       },
@@ -549,7 +589,8 @@ export class SystemDetailsComponent implements AfterViewInit {
       dataLabels: { enabled: false },
       tooltip: {
         x: {
-          formatter: (val: any) => val ? formatDate(val, 'MMMM yyyy', lang) : '',
+          formatter: (val: any) =>
+            val ? formatDate(val, 'MMMM yyyy', lang) : '',
         },
         y: {
           formatter: (v: number) => twoDecimalNumber(v) + ' kWh',
@@ -557,28 +598,35 @@ export class SystemDetailsComponent implements AfterViewInit {
       },
     };
 
-    this.monthsChart = new ApexCharts(this.monthsChartDiv.nativeElement, options);
+    this.monthsChart = new ApexCharts(
+      this.monthsChartDiv.nativeElement,
+      options
+    );
     this.monthsChart.render();
   }
 
   onMonthsChartClick(seriesIndex: number, dataPointIndex: number) {
     // Only handle clicks on the red (calculated) series - seriesIndex 0
     if (seriesIndex !== 0) return;
-    
-    if (!this.currentMonthlyChartData || !this.currentMonthlyChartData.system) return;
 
-    const calculatedPoint = this.currentMonthlyChartData.calculatedData[dataPointIndex];
-    const multiAnnualPoint = this.currentMonthlyChartData.multiAnnualData[dataPointIndex];
-    
+    if (!this.currentMonthlyChartData || !this.currentMonthlyChartData.system)
+      return;
+
+    const calculatedPoint =
+      this.currentMonthlyChartData.calculatedData[dataPointIndex];
+    const multiAnnualPoint =
+      this.currentMonthlyChartData.multiAnnualData[dataPointIndex];
+
     // Only save if there's a calculated value and it's different from multiAnnual
     if (calculatedPoint.y <= 0) return;
-    
+
     const lang = this.languageService.getCurrentLang();
     const monthName = formatDate(calculatedPoint.x, 'MMMM yyyy', lang);
-    const confirmMsg = lang === 'he' 
-      ? `להוסיף ${twoDecimalNumber(calculatedPoint.y)} kWh ל-${monthName}?`
-      : `Add ${twoDecimalNumber(calculatedPoint.y)} kWh to ${monthName}?`;
-    
+    const confirmMsg =
+      lang === 'he'
+        ? `להוסיף ${twoDecimalNumber(calculatedPoint.y)} kWh ל-${monthName}?`
+        : `Add ${twoDecimalNumber(calculatedPoint.y)} kWh to ${monthName}?`;
+
     if (confirm(confirmMsg)) {
       this.saveCalculatedToMultiAnnual(
         this.currentMonthlyChartData.system.id,
@@ -588,25 +636,33 @@ export class SystemDetailsComponent implements AfterViewInit {
     }
   }
 
-  saveCalculatedToMultiAnnual(systemId: string, timestamp: number, value: number) {
+  saveCalculatedToMultiAnnual(
+    systemId: string,
+    timestamp: number,
+    value: number
+  ) {
     const lang = this.languageService.getCurrentLang();
-    
-    this.energyService.addMultiAnnualEntry(systemId, {
-      time: timestamp,
-      valueKwh: value,
-    }).subscribe({
-      next: () => {
-        const successMsg = lang === 'he' ? 'הנתון נשמר בהצלחה' : 'Data saved successfully';
-        this.snackBar.open(successMsg, '✓', { duration: 3000 });
-        // Refresh the data
-        this.generation.next(this.generation.value + 1);
-      },
-      error: (err) => {
-        const errorMsg = lang === 'he' ? 'שגיאה בשמירת הנתון' : 'Error saving data';
-        this.snackBar.open(errorMsg, '✗', { duration: 3000 });
-        console.error('Error saving multiAnnual entry:', err);
-      },
-    });
+
+    this.energyService
+      .addMultiAnnualEntry(systemId, {
+        time: timestamp,
+        valueKwh: value,
+      })
+      .subscribe({
+        next: () => {
+          const successMsg =
+            lang === 'he' ? 'הנתון נשמר בהצלחה' : 'Data saved successfully';
+          this.snackBar.open(successMsg, '✓', { duration: 3000 });
+          // Refresh the data
+          this.generation.next(this.generation.value + 1);
+        },
+        error: (err) => {
+          const errorMsg =
+            lang === 'he' ? 'שגיאה בשמירת הנתון' : 'Error saving data';
+          this.snackBar.open(errorMsg, '✗', { duration: 3000 });
+          console.error('Error saving multiAnnual entry:', err);
+        },
+      });
   }
 
   ngAfterViewInit() {
@@ -675,7 +731,7 @@ export class SystemDetailsComponent implements AfterViewInit {
 
     if (this.todayView) {
       const start = new Date().setHours(0, 0, 0, 0);
-      const end = Date.now();
+      const end = Infinity;
 
       energyPath = (energy.daily || [])
         .filter((e) => e.time >= start && e.time <= end)
