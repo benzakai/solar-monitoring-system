@@ -19,12 +19,23 @@ export class FiltersService {
   private readonly clientsSelectionSubject = new BehaviorSubject<any[]>([]);
   readonly clientsSelection$ = this.clientsSelectionSubject.asObservable();
 
+  private readonly systemsSelectionSubject = new BehaviorSubject<any[]>([]);
+  readonly systemsSelection$ = this.systemsSelectionSubject.asObservable();
+
   get clientsSelectionSnapshot(): any[] {
     return this.clientsSelectionSubject.getValue();
   }
 
   setClientsSelection(value: any[]): void {
     this.clientsSelectionSubject.next(value || []);
+  }
+
+  get systemsSelectionSnapshot(): any[] {
+    return this.systemsSelectionSubject.getValue();
+  }
+
+  setSystemsSelection(value: any[]): void {
+    this.systemsSelectionSubject.next(value || []);
   }
 
   constructor(private firestore: Firestore) {}

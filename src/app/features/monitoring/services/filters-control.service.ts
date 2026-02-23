@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   BehaviorSubject,
+  defer,
   debounceTime,
   distinctUntilChanged,
   map,
@@ -22,6 +23,14 @@ export class FiltersControlService {
   monitorFacade = inject(MonitorFacade);
   router = inject(Router);
   route = inject(ActivatedRoute);
+  constructor(private readonly filtersService: FiltersService) {
+    this.systemsControl.setValue(this.filtersService.systemsSelectionSnapshot, {
+      emitEvent: false,
+    });
+    this.clientsControl.setValue(this.filtersService.clientsSelectionSnapshot, {
+      emitEvent: false,
+    });
+  }
 
   kwpControl = new FormControl();
   kwpControlState = this.kwpControl.valueChanges.pipe(
@@ -54,11 +63,29 @@ export class FiltersControlService {
       filter((data): data is string[] => Boolean(data))
     );
 
-  systemsControl = new FormControl();
-  systemsControlState = this.systemsControl.valueChanges.pipe(
-    startWith(this.systemsControl.value || [])
+  systemsControl = new FormControl<any[]>([]);
+  systemsControlState: Observable<any[]> = defer(() =>
+    this.systemsControl.valueChanges.pipe(
+      startWith(this.systemsControl.value || []),
+      map((data) => data || []),
+      tap((data) => this.filtersService.setSystemsSelection(data))
+    )
   );
   systemsSearchControl = new FormControl();
+  private readonly systemsResetLoadingSubject = new BehaviorSubject(false);
+  readonly systemsResetLoading$ = this.systemsResetLoadingSubject.asObservable();
+
+  clearSystemsSelectionWithDelay(delayMs = 600): void {
+    if (this.systemsResetLoadingSubject.value) {
+      return;
+    }
+
+    this.systemsResetLoadingSubject.next(true);
+    setTimeout(() => {
+      this.systemsControl.setValue([]);
+      this.systemsResetLoadingSubject.next(false);
+    }, delayMs);
+  }
   systems = combineLatest([
     this.monitorFacade.fulltext,
     this.systemsSearchControl.valueChanges.pipe(startWith(null)),
@@ -94,12 +121,13 @@ export class FiltersControlService {
     })
   );
 
-  filtersService = inject(FiltersService);
-  clientsControl = new FormControl(this.filtersService.clientsSelectionSnapshot);
-  clientsControlState: Observable<any[]> = this.clientsControl.valueChanges.pipe(
-    startWith(this.clientsControl.value || []),
-    map((data) => data || []),
-    tap((data) => this.filtersService.setClientsSelection(data))
+  clientsControl = new FormControl<any[]>([]);
+  clientsControlState: Observable<any[]> = defer(() =>
+    this.clientsControl.valueChanges.pipe(
+      startWith(this.clientsControl.value || []),
+      map((data) => data || []),
+      tap((data) => this.filtersService.setClientsSelection(data))
+    )
   );
   clientsSearchControl = new FormControl();
   private readonly clientsResetLoadingSubject = new BehaviorSubject(false);
