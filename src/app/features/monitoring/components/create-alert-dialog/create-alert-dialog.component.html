@@ -5,69 +5,151 @@
 </h2>
 <mat-dialog-content class="mat-typography">
   <form [formGroup]="alertForm">
-    <div class="form-line">
-      <span>{{ data.system_name }}</span>
-      <label>{{ 'create_alert_dialog.system_name' | translate }}</label>
-    </div>
-    <div class="form-line">
-      <mat-form-field class="inline-form" appearance="outline">
-        <input class="inp" matInput [matDatepicker]="picker" formControlName="openingDate" />
-        <mat-datepicker-toggle
-          [disableRipple]="true"
-          matIconPrefix
-          [for]="picker"
-        ></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-      <label>{{ 'create_alert_dialog.opening_date' | translate }}</label>
-    </div>
+    <div class="level">
+      <div class="side">
+        <div class="container">
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput type="number" formControlName="customerPrice" />
+              <span matSuffix>₪</span>
+            </mat-form-field>
+            <label>{{ 'malfunction.customerPrice' | translate }}</label>
+          </div>
 
-    <div class="form-line">
-      <mat-form-field appearance="outline">
-        <input class="inp" matInput formControlName="requestNumber" />
-      </mat-form-field>
-      <label>{{ 'create_alert_dialog.request_number' | translate }}</label>
-    </div>
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput type="number" formControlName="golanSolarPrice" />
+              <span matSuffix>₪</span>
+            </mat-form-field>
+            <label>{{ 'malfunction.golanSolarPrice' | translate }}</label>
+          </div>
+        </div>
 
-    <div class="form-line">
-      <mat-form-field appearance="outline" class="custom-select-single">
-        <mat-select formControlName="issueType">
-          <mat-option *ngFor="let type of issueTypes" [value]="type">{{ malfunctionTypesMap[type] }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <label>{{ 'create_alert_dialog.issue_type' | translate }}</label>
-    </div>
+        <div class="container">
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput type="text" formControlName="code" />
+            </mat-form-field>
+            <label>{{ 'malfunction.code' | translate }}</label>
+          </div>
 
-    <div class="form-line">
-      <mat-form-field appearance="outline">
-        <input class="inp" matInput [matDatepicker]="pickerb" formControlName="followUpDate" />
-        <mat-datepicker-toggle
-          [disableRipple]="true"
-          matIconPrefix
-          [for]="pickerb"
-        ></mat-datepicker-toggle>
-        <mat-datepicker #pickerb></mat-datepicker>
-      </mat-form-field>
-      <label>{{ 'create_alert_dialog.follow_up_date' | translate }}</label>
-    </div>
+          <div class="form-line">
+            <mat-form-field appearance="outline">
+              <input class="inp" matInput formControlName="requestNumber" />
+            </mat-form-field>
+            <label>{{ 'create_alert_dialog.request_number' | translate }}</label>
+          </div>
 
-    <div class="form-line area">
-      <mat-form-field appearance="outline">
-        <textarea matInput formControlName="reportStatus"></textarea>
-      </mat-form-field>
-      <label>{{ 'create_alert_dialog.report_status' | translate }}</label>
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput [matDatepicker]="tracingPicker" formControlName="tracingTime" />
+              <mat-datepicker-toggle matSuffix [for]="tracingPicker"></mat-datepicker-toggle>
+              <mat-datepicker #tracingPicker></mat-datepicker>
+            </mat-form-field>
+            <label>{{ 'malfunction.tracingTime' | translate }}</label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <mat-select formControlName="handler">
+                @for (h of handlers; track h) {
+                  <mat-option [value]="h">
+                    {{ 'malfunction.handler_names.' + h | translate }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <label>{{ 'malfunction.handler' | translate }}</label>
+          </div>
+
+          <div class="form-line area">
+            <mat-form-field appearance="outline" class="txt">
+              <textarea matInput formControlName="reportText"></textarea>
+            </mat-form-field>
+            <label>{{ 'malfunction.reportText' | translate }}</label>
+          </div>
+          <div class="buttons">
+            @for(s of statusKeys; track s) {
+              @if('create_alert_dialog.statuses.'+s | translate; as tag) {
+                <button type="button" mat-flat-button [disabled]="alertForm.disabled" (click)="addToTextarea(tag, 'reportText')">{{tag}}</button>
+              }
+            }
+          </div>
+
+          <div class="form-line">
+            <mat-checkbox formControlName="notToReport"></mat-checkbox>
+            <label>{{ 'malfunction.notToReport' | translate }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="container">
+          <div class="form-line system-line">
+            <span>{{ data.system_name }}</span>
+            <label>{{ 'create_alert_dialog.system_name' | translate }}</label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput [matDatepicker]="openPicker" formControlName="openTime" />
+              <mat-datepicker-toggle matSuffix [for]="openPicker"></mat-datepicker-toggle>
+              <mat-datepicker #openPicker></mat-datepicker>
+            </mat-form-field>
+            <label>{{ 'malfunction.openTime' | translate }}</label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <input matInput [matDatepicker]="closePicker" formControlName="closeTime" />
+              <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
+              <mat-datepicker #closePicker></mat-datepicker>
+            </mat-form-field>
+            <label>{{ 'malfunction.closeTime' | translate }}</label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <mat-select formControlName="type">
+                @for (type of issueTypes; track type) {
+                  <mat-option [value]="type">{{ 'malfunction.types.' + type | translate }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <label>{{ 'malfunction.type' | translate }}</label>
+          </div>
+
+          <div class="form-line">
+            <mat-form-field class="inline-form" appearance="outline">
+              <mat-select formControlName="severity">
+                @for (severity of severityLevels; track severity) {
+                  <mat-option [value]="severity">
+                    {{ 'malfunction.severityType.' + severity | translate }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <label>{{ 'malfunction.severity' | translate }}</label>
+          </div>
+
+          <div class="form-line area">
+            <mat-form-field class="txt" appearance="outline">
+              <textarea matInput formControlName="description"></textarea>
+            </mat-form-field>
+            <label>{{ 'malfunction.description' | translate }}</label>
+          </div>
+
+          <div class="buttons">
+            @for(s of statusKeys; track s) {
+              @if('create_alert_dialog.statuses.'+s | translate; as tag) {
+                <button type="button" mat-flat-button [disabled]="alertForm.disabled" (click)="addToTextarea(tag, 'description')">{{tag}}</button>
+              }
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </form>
-
-  <div class="buttons">
-    @for(s of statusKeys; track s) {
-      @if('create_alert_dialog.statuses.'+s | translate; as tag) {
-        <button mat-flat-button [disabled]="alertForm.disabled" (click)="addToTextarea(tag)">{{tag}}</button>
-      }
-    }
-  </div>
-
-
 </mat-dialog-content>
 <mat-dialog-actions align="end" >
   <button mat-stroked-button mat-dialog-close [disabled]="alertForm.disabled">

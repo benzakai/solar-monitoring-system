@@ -23,10 +23,12 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { NgForOf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
 import { MonitorItem } from '../../../../domain/monitor-item';
 import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 import {
+  MalfunctionHandler,
   MalfunctionStatus,
   malfunctionTypesMap,
 } from '../../../../domain/malfunction';
@@ -61,6 +63,7 @@ export const DATE_FORMATS: MatDateFormats = {
     MatSelect,
     NgForOf,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
   ],
   templateUrl: './create-alert-dialog.component.html',
   styleUrl: './create-alert-dialog.component.css',
@@ -71,15 +74,25 @@ export class CreateAlertDialogComponent {
   malfunctionsService = inject(MalfunctionsService);
 
   alertForm: FormGroup = new FormGroup({
-    openingDate: new FormControl(new Date()),
+    customerPrice: new FormControl<number | null>(null),
+    golanSolarPrice: new FormControl<number | null>(null),
+    code: new FormControl(''),
+    tracingTime: new FormControl<Date | null>(null),
+    handler: new FormControl<MalfunctionHandler | string>(''),
+    reportText: new FormControl(''),
+    notToReport: new FormControl(false),
+    openTime: new FormControl(new Date()),
+    closeTime: new FormControl<Date | null>(null),
+    type: new FormControl(''),
+    severity: new FormControl<number>(2),
+    description: new FormControl(''),
     requestNumber: new FormControl(''),
-    issueType: new FormControl(''),
-    followUpDate: new FormControl(''),
-    reportStatus: new FormControl(''),
   });
 
   malfunctionTypesMap = malfunctionTypesMap;
   issueTypes: string[] = Object.keys(malfunctionTypesMap);
+  handlers = Object.values(MalfunctionHandler);
+  severityLevels = [1, 2, 3];
 
   statusKeys: string[] = [
     'faulty_optimization',
@@ -97,9 +110,9 @@ export class CreateAlertDialogComponent {
     'found_ok_after_follow_up',
   ];
 
-  addToTextarea(text: string) {
-    const val = this.alertForm.get('reportStatus')?.value;
-    this.alertForm.get('reportStatus')?.setValue(val + ' ' + text);
+  addToTextarea(text: string, field: 'reportText' | 'description') {
+    const val = this.alertForm.get(field)?.value || '';
+    this.alertForm.get(field)?.setValue(`${val} ${text}`.trim());
   }
 
   constructor(
@@ -112,26 +125,39 @@ export class CreateAlertDialogComponent {
     if (!this.alertForm.disabled) {
       this.alertForm.disable();
 
-      const openDate = this.alertForm.get('openingDate')?.value || new Date();
-      const followUpDate = this.alertForm.get('followUpDate')?.value;
+      const openDate = this.alertForm.get('openTime')?.value || new Date();
+      const followUpDate = this.alertForm.get('tracingTime')?.value;
+      const closeDate = this.alertForm.get('closeTime')?.value;
+
+      const parseNumber = (value: unknown): number | null => {
+        if (value === null || value === undefined || value === '') {
+          return null;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+      };
+
       const malfunction = {
-        code: null,
-        customerPrice: null,
-        description: this.alertForm.get('reportStatus')?.value,
-        golanSolarPrice: null,
-        handler: null,
+        code: this.alertForm.get('code')?.value || null,
+        customerPrice: parseNumber(this.alertForm.get('customerPrice')?.value),
+        description: this.alertForm.get('description')?.value || '',
+        golanSolarPrice: parseNumber(this.alertForm.get('golanSolarPrice')?.value),
+        handler: this.alertForm.get('handler')?.value || null,
         kwhKwpSnapshot: null,
-        notToReport: false,
+        notToReport: Boolean(this.alertForm.get('notToReport')?.value),
         openTime: DateUtil.ToUtcMidnightIso(openDate) || '',
-        reportText: '',
-        severity: 2,
+        reportText: this.alertForm.get('reportText')?.value || '',
+        severity: Number(this.alertForm.get('severity')?.value) || 2,
         status: MalfunctionStatus.OPEN,
         serial: 0,
         tracingTime: followUpDate?.toISOString
           ? DateUtil.ToUtcMidnightIso(followUpDate) || ''
           : null,
+        closeTime: closeDate?.toISOString
+          ? DateUtil.ToUtcMidnightIso(closeDate) || ''
+          : '',
         systemId: this.data.id,
-        type: [String(this.alertForm.get('issueType')?.value), ''] as [
+        type: [String(this.alertForm.get('type')?.value), ''] as [
           string,
           string,
         ],
