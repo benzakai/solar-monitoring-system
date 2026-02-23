@@ -576,9 +576,44 @@ button.mat-flat-button {
 .filter-multi-selector {
   max-height: unset!important;
   overflow-y: hidden!important;
+
+  .filter-reset-option {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: start;
+    color: inherit;
+    cursor: pointer;
+    justify-content: flex-start;
+  }
+
+  .filter-reset-option:disabled {
+    cursor: default;
+    opacity: 0.75;
+  }
+
+  .filter-reset-loader {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #c9c9c9;
+    border-top-color: #1287DE;
+    border-radius: 50%;
+    display: inline-block;
+    animation: filter-reset-spin 0.7s linear infinite;
+  }
+
   .filter-multi-selector-scroll {
     overflow: auto;
     max-height: 300px;
+  }
+}
+
+@keyframes filter-reset-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 

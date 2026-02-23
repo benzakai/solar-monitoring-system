@@ -13,6 +13,10 @@ export const mainLang: Dictionary = {
     en: 'Search...',
     he: 'חיפוש...',
   },
+  clear_selection: {
+    en: 'Clear selection',
+    he: 'נקה בחירה',
+  },
   all_regions: {
     en: 'All regions',
     he: 'כל האזורים',

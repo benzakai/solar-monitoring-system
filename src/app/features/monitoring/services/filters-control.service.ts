@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
+  BehaviorSubject,
   debounceTime,
   distinctUntilChanged,
   map,
@@ -101,6 +102,20 @@ export class FiltersControlService {
     tap((data) => this.filtersService.setClientsSelection(data))
   );
   clientsSearchControl = new FormControl();
+  private readonly clientsResetLoadingSubject = new BehaviorSubject(false);
+  readonly clientsResetLoading$ = this.clientsResetLoadingSubject.asObservable();
+
+  clearClientsSelectionWithDelay(delayMs = 600): void {
+    if (this.clientsResetLoadingSubject.value) {
+      return;
+    }
+
+    this.clientsResetLoadingSubject.next(true);
+    setTimeout(() => {
+      this.clientsControl.setValue([]);
+      this.clientsResetLoadingSubject.next(false);
+    }, delayMs);
+  }
   clients = combineLatest([
     this.coordinatorsService.allCustomersOfSelectedCoordinatorsMap.pipe(
       map((data) => Array.from(data.values()))
