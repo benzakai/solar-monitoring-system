@@ -117,6 +117,7 @@ export class MonitoringTableComponent {
     'portal',
     'KWP',
     'name',
+    'daysFromCheck',
     'tested',
   ];
   displayedHColumns: string[] = ['l', ...this.displayedColumns, 'r'];
@@ -268,11 +269,20 @@ export class MonitoringTableComponent {
   monitorSorted = combineLatest([this.monitorFiltered, this.sortParams]).pipe(
     map(([filteredData, sortConfig]) => {
       if (sortConfig.sortField) {
-        return filteredData.sort((a, b) => {
+        return [...filteredData].sort((a, b) => {
           // @ts-ignore
           const aValue = a[sortConfig.sortField];
           // @ts-ignore
           const bValue = b[sortConfig.sortField];
+
+          const aMissing = aValue === undefined || aValue === null;
+          const bMissing = bValue === undefined || bValue === null;
+
+          // Keep missing values (rendered as '-') at the end.
+          if (aMissing && bMissing) return 0;
+          if (aMissing) return 1;
+          if (bMissing) return -1;
+
           if (aValue < bValue) return -1 * sortConfig.sortDirection;
           if (aValue > bValue) return 1 * sortConfig.sortDirection;
           return 0;
@@ -309,7 +319,7 @@ export class MonitoringTableComponent {
     map((data) => data.filter((item) => item.checkedByAnybodyToday).length)
   );
 
-  needsTest = this.monitorItemsForUser.pipe(
+  needsTest = this.monitorFiltered.pipe(
     map(
       (data) =>
         data.filter((item) => item.system_active && item.toBeChecked).length

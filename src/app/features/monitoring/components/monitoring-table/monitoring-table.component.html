@@ -262,6 +262,18 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="daysFromCheck">
+        <th mat-header-cell *matHeaderCellDef>
+          <app-sort-header [active]="sortParams | async" column="daysFromCheck" (onSort)="onSort($event)"></app-sort-header>
+          LDC
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <span>{{ element.daysFromCheck ?? '-' }}</span>
+          @if (element.daysFromCheck < 10) {
+          }
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="tested">
         <th mat-header-cell *matHeaderCellDef>
           <app-sort-header [active]="sortParams | async" column="tested" (onSort)="onSort($event)"></app-sort-header>
