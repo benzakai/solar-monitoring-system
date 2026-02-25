@@ -310,7 +310,10 @@ export class MonitoringTableComponent {
   );
 
   needsTest = this.monitorItemsForUser.pipe(
-    map((data) => data.filter((item) => item.toBeChecked).length)
+    map(
+      (data) =>
+        data.filter((item) => item.system_active && item.toBeChecked).length
+    )
   );
   element: any;
 
