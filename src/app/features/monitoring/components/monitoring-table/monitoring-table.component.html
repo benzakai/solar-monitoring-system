@@ -290,11 +290,11 @@
             </span>
           } @else {
             @if(element.checkedByAnybodyToday) {
-              <button mat-icon-button class="checked-button" (click)="removeLastCheck(element.id)">
+              <button mat-icon-button class="checked-button" (click)="removeLastCheck(element.id)" [matTooltip]="getLastCheckTooltip(element)">
                 <mat-icon *ngIf="!element.tested">done</mat-icon>
               </button>
             } @else {
-              <button mat-icon-button class="not-checked-button" (click)="checked(element.id)">
+              <button mat-icon-button class="not-checked-button" (click)="checked(element.id)" [matTooltip]="getLastCheckTooltip(element)">
                 <mat-icon *ngIf="!element.tested">remove</mat-icon>
               </button>
             }

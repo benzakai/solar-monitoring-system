@@ -64,6 +64,7 @@ import { AppEndpointService } from '../../../../endpoint/app-endpoint.service';
 import { SystemsService } from '../../../../endpoint/systems.service';
 import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
 import { DialogService } from '../../../../core/dialog/services/dialog.service';
+import { UsersService } from '../../../../endpoint/users.service';
 
 @Component({
   selector: 'app-monitoring-table',
@@ -131,6 +132,7 @@ export class MonitoringTableComponent {
   systemsService = inject(SystemsService);
   environmentalEnergyService = inject(EnvironmentalEnergyService);
   dialogService = inject(DialogService);
+  usersService = inject(UsersService);
 
   israelTime$ = interval(1000).pipe(
     startWith(0),
@@ -314,6 +316,8 @@ export class MonitoringTableComponent {
   waitingComments: { [key: string]: any } = {};
   waitingChecks: { [key: string]: any } = {};
   waitingSync: { [key: string]: any } = {};
+  checkerNamesByUid: { [uid: string]: string } = {};
+  requestedCheckerUids = new Set<string>();
 
   testedByMeTodayCount = this.monitorFiltered.pipe(
     map((data) => data.filter((item) => item.checkedByAnybodyToday).length)
@@ -339,7 +343,52 @@ export class MonitoringTableComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.dataSource.data = data;
+        this.loadCheckerNames(data);
       });
+  }
+
+  loadCheckerNames(items: Partial<MonitorItem>[]) {
+    const missingUids = Array.from(
+      new Set(
+        items
+          .map((item) => item.lastCheck?.uid)
+          .filter(
+            (uid): uid is string =>
+              Boolean(uid) &&
+              !this.checkerNamesByUid[uid!] &&
+              !this.requestedCheckerUids.has(uid!)
+          )
+      )
+    );
+
+    if (!missingUids.length) {
+      return;
+    }
+
+    missingUids.forEach((uid) => this.requestedCheckerUids.add(uid));
+
+    this.usersService
+      .getUsersByUids(missingUids)
+      .pipe(take(1))
+      .subscribe((users) => {
+        users.forEach((user) => {
+          this.checkerNamesByUid[user.uid] = user.displayName || user.email;
+        });
+        this.changeDetectorRef.markForCheck();
+      });
+  }
+
+  getLastCheckTooltip(item: Partial<MonitorItem>) {
+    if (!item?.lastCheck?.date) {
+      return '-';
+    }
+
+    const date = DateUtil.ToAppDate(item.lastCheck.date, '-');
+    const checkerUid = item.lastCheck.uid;
+    const checkerName =
+      (checkerUid && this.checkerNamesByUid[checkerUid]) || checkerUid || '-';
+
+    return `${date}: ${checkerName}`;
   }
 
   onSort(sortState: Sort) {
