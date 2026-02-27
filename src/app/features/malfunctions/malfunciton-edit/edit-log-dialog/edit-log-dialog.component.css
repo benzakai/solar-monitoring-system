@@ -1,0 +1,29 @@
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+mat-dialog-content {
+  min-width: 420px;
+}
+
+.form-line {
+  width: 100%;
+}
+
+.form-line.area {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.form-line label {
+  padding-top: 10px;
+  white-space: nowrap;
+}
+
+mat-form-field {
+  flex: 1;
+  width: 100%;
+}

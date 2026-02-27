@@ -172,6 +172,37 @@ export class MalfunctionsService {
     );
   }
 
+  public updateLogEntry(malfunctionId: string, logIndex: number, text: string) {
+    const now = new Date().getTime();
+
+    return from(getDoc(doc(this.collection, malfunctionId))).pipe(
+      switchMap((docSnap) => {
+        const existingMalfunction = docSnap.exists() ? docSnap.data() : {};
+        const existingLogs = existingMalfunction['log'] || [];
+
+        if (!existingLogs[logIndex]) {
+          return from(Promise.resolve());
+        }
+
+        const newLogs = existingLogs.map((log: any, idx: number) =>
+          idx === logIndex ? { ...log, text } : log
+        );
+
+        const docRef = doc(this.collection, malfunctionId);
+        return from(
+          setDoc(
+            docRef,
+            {
+              log: newLogs,
+              '#modified': now,
+            },
+            { merge: true }
+          )
+        );
+      })
+    );
+  }
+
   deleteMalfunction(id: string): Observable<void> {
     const docRef = doc(this.collection, id);
     return from(deleteDoc(docRef));

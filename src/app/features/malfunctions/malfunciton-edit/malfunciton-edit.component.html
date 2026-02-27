@@ -242,6 +242,11 @@
           <ng-container matColumnDef="btts">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let log; let idx = index">
+              <button mat-icon-button class="edit-button" (click)="editLog(log, idx)" [disabled]="editingLog | async">
+                <mat-icon>
+                  edit
+                </mat-icon>
+              </button>
               @if (log.action === 'comment' && log.by === cu) {
                 <button mat-icon-button class="button-red" (click)="deleteLog(idx)" [disabled]="deletingLog | async">
                   <mat-icon>

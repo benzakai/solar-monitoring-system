@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import {
+  MalfunctionAction,
   Malfunction,
   MalfunctionActionType,
   MalfunctionHandler,
@@ -61,6 +62,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../core/dialog/components/confirmation-dialog/confirmation-dialog.component';
 import { DateUtil } from '../../../core/date/DateUtil';
 import { RoutineCheckService } from '../../../endpoint/routine-check.service';
+import { EditLogDialogComponent } from './edit-log-dialog/edit-log-dialog.component';
 
 @Component({
   selector: 'app-malfunciton-edit',
@@ -103,6 +105,7 @@ export class MalfuncitonEditComponent {
   energyService = inject(EnergyService);
   malfunctionsService = inject(MalfunctionsService);
   auth = inject(AngularFireAuth);
+  dialog = inject(MatDialog);
   malfunctionId = this.activatedRoute.params.pipe(
     map((params) => params['id']),
     filter(Boolean)
@@ -412,6 +415,7 @@ export class MalfuncitonEditComponent {
   }
 
   deletingLog = new BehaviorSubject(false);
+  editingLog = new BehaviorSubject(false);
 
   deleteLog(idx: number) {
     this.deletingLog.next(true);
@@ -424,6 +428,36 @@ export class MalfuncitonEditComponent {
       )
       .subscribe(() => {
         this.deletingLog.next(false);
+      });
+  }
+
+  editLog(log: MalfunctionAction, idx: number) {
+    const dialogRef = this.dialog.open(EditLogDialogComponent, {
+      data: { text: log.text || '' },
+      width: '520px',
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter((result): result is { text: string } => !!result),
+        switchMap((result) => {
+          this.editingLog.next(true);
+          return this.malfunction.pipe(
+            take(1),
+            switchMap((malfunction) =>
+              this.malfunctionsService.updateLogEntry(
+                malfunction.id,
+                idx,
+                result.text
+              )
+            )
+          );
+        })
+      )
+      .subscribe({
+        next: () => this.editingLog.next(false),
+        error: () => this.editingLog.next(false),
       });
   }
 

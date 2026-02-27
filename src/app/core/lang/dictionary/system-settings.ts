@@ -58,7 +58,7 @@ export const systemSettings: Dictionary = {
   },
   start_time: {
     en: 'Start Date',
-    he: 'תאריך התחלה',
+    he: 'הקמת מערכת',
   },
   contract_start_time: {
     en: 'Contract Start Time',
@@ -467,7 +467,7 @@ export const systemSettings: Dictionary = {
     portalUrl: { en: 'Portal URL', he: 'כתובת פורטל' },
     client: { en: 'Client', he: 'לקוח' },
     contactsIds: { en: 'Contacts', he: 'אנשי קשר' },
-    startTime: { en: 'Start Time', he: 'תאריך התחלה' },
+    startTime: { en: 'Start Time', he: 'הקמת מערכת' },
     contractStartTime: { en: 'Contract Start', he: 'תחילת חוזה' },
     annualCheckDate: { en: 'Annual Check Date', he: 'תאריך בדיקה שנתית' },
     taoz: { en: 'Taoz', he: 'תעוז' },
