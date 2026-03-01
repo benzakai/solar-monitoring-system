@@ -177,7 +177,10 @@
           </div>
         </th>
         <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
-          <span>{{ element?.monthly_percent | number: '1.0-0' }}%</span>
+          <span>{{ formatComparePercentWithWarning(element?.monthly_percent, element, 3) }}</span>
+          @if (hasCompareWarning(element, 3)) {
+            <span class="red"> ⯆</span>
+          }
         </td>
       </ng-container>
 
@@ -185,8 +188,16 @@
         <th mat-header-cell *matHeaderCellDef>
           <app-sort-header [active]="sortParams | async" column="weekly_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'weekly' | translate }}</th>
-        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
-          <span>{{ element?.weekly_percent | number: '1.0-0' }}%</span>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="clickable"
+          (click)="openEnvironmental(element)"
+        >
+          <span>{{ formatComparePercentWithWarning(element?.weekly_percent, element, 2) }}</span>
+          @if (hasCompareWarning(element, 2)) {
+            <span class="red"> ⯆</span>
+          }
         </td>
       </ng-container>
 
@@ -195,8 +206,16 @@
           <app-sort-header [active]="sortParams | async" column="three_days_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'three_days' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
-          {{ element?.three_days_percent | number: '1.0-0' }}%
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="clickable"
+          (click)="openEnvironmental(element)"
+        >
+          <span>{{ formatComparePercentWithWarning(element?.three_days_percent, element, 1) }}</span>
+          @if (hasCompareWarning(element, 1)) {
+            <span class="red"> ⯆</span>
+          }
         </td>
       </ng-container>
 
@@ -204,8 +223,16 @@
         <th mat-header-cell *matHeaderCellDef>
           <app-sort-header [active]="sortParams | async" column="yesterday_percent" (onSort)="onSort($event)"></app-sort-header>
           {{ 'yesterday' | translate }}</th>
-        <td mat-cell *matCellDef="let element" class="clickable" (click)="openEnvironmental(element)">
-          {{ element?.yesterday_percent | number: '1.0-0' }}%
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="clickable"
+          (click)="openEnvironmental(element)"
+        >
+          <span>{{ formatComparePercentWithWarning(element?.yesterday_percent, element, 0) }}</span>
+          @if (hasCompareWarning(element, 0)) {
+            <span class="red"> ⯆</span>
+          }
         </td>
       </ng-container>
 

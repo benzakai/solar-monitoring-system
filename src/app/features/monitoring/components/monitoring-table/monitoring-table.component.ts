@@ -100,6 +100,11 @@ import { UsersService } from '../../../../endpoint/users.service';
 export class MonitoringTableComponent {
   isRTL = document.documentElement.dir === 'rtl';
   lang = inject(LANGUAGE);
+  private readonly innerCompareWarningTrigger = 0.8;
+  private readonly comparePercentFormatter = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
   displayedColumns: string[] = [
     'notes',
     'actions',
@@ -175,11 +180,13 @@ export class MonitoringTableComponent {
           : undefined;
         const checkedByAnybodyToday = daysFromCheck === 0;
         const toBeChecked = (daysFromCheck ?? 100) > 10;
+        const innerCompareWarning = this.getInnerCompareWarning(item);
         return {
           ...item,
           daysFromCheck,
           checkedByAnybodyToday,
           toBeChecked,
+          innerCompareWarning,
         };
       })
     )
@@ -389,6 +396,44 @@ export class MonitoringTableComponent {
       (checkerUid && this.checkerNamesByUid[checkerUid]) || checkerUid || '-';
 
     return `${date}: ${checkerName}`;
+  }
+
+  getInnerCompareWarning(item: Partial<MonitorItem>) {
+    const compareValues = [
+      item.yesterday_percent,
+      item.three_days_percent,
+      item.weekly_percent,
+      item.monthly_percent,
+    ];
+    return compareValues.map((value, index, values) => {
+      const nextValue = values[index + 1];
+      const hasBothValues =
+        typeof value === 'number' &&
+        Number.isFinite(value) &&
+        typeof nextValue === 'number' &&
+        Number.isFinite(nextValue);
+      if (!hasBothValues) {
+        return false;
+      }
+      return value / nextValue < this.innerCompareWarningTrigger;
+    });
+  }
+
+  formatComparePercentWithWarning(
+    value: number | undefined,
+    item: Partial<MonitorItem>,
+    warningIndex: number
+  ) {
+    const numericValue =
+      typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+    const formattedValue = numericValue !== undefined
+      ? `${this.comparePercentFormatter.format(numericValue)}%`
+      : '-';
+    return formattedValue;
+  }
+
+  hasCompareWarning(item: Partial<MonitorItem>, warningIndex: number) {
+    return Boolean(item.innerCompareWarning?.[warningIndex]);
   }
 
   onSort(sortState: Sort) {

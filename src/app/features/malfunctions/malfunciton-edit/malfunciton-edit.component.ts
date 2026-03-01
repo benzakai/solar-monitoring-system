@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  Inject,
   inject,
 } from '@angular/core';
 import {
@@ -27,6 +26,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   filter,
+  of,
   map,
   Observable,
   shareReplay,
@@ -59,7 +59,6 @@ import { EnergyCalc } from '../../../core/energy/energy-calculator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { DialogService } from '../../../core/dialog/services/dialog.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../../../core/dialog/components/confirmation-dialog/confirmation-dialog.component';
 import { DateUtil } from '../../../core/date/DateUtil';
 import { RoutineCheckService } from '../../../endpoint/routine-check.service';
 import { EditLogDialogComponent } from './edit-log-dialog/edit-log-dialog.component';
@@ -333,7 +332,7 @@ export class MalfuncitonEditComponent {
             .then(async () => {
               loader.close();
               await firstValueFrom(
-                this.routineCheckService.addCheck(malfunction.systemId)
+                this.routineCheckService.ensureTodayChecked(malfunction.systemId)
               );
               dial.confirm({
                 message: this.translatePipe.transform('malfunction.dataSaved'),
@@ -411,6 +410,7 @@ export class MalfuncitonEditComponent {
       .subscribe(() => {
         this.commentUpdating.next(false);
         this.comment.setValue('');
+        this.ensureTodayChecked();
       });
   }
 
@@ -428,6 +428,7 @@ export class MalfuncitonEditComponent {
       )
       .subscribe(() => {
         this.deletingLog.next(false);
+        this.ensureTodayChecked();
       });
   }
 
@@ -456,9 +457,25 @@ export class MalfuncitonEditComponent {
         })
       )
       .subscribe({
-        next: () => this.editingLog.next(false),
+        next: () => {
+          this.editingLog.next(false);
+          this.ensureTodayChecked();
+        },
         error: () => this.editingLog.next(false),
       });
+  }
+
+  private ensureTodayChecked() {
+    this.malfunction
+      .pipe(
+        take(1),
+        switchMap((malfunction) =>
+          malfunction?.systemId
+            ? this.routineCheckService.ensureTodayChecked(malfunction.systemId)
+            : of(null)
+        )
+      )
+      .subscribe();
   }
 
   protected readonly Boolean = Boolean;

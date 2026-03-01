@@ -43,7 +43,7 @@ export class MalfunctionsService {
           })
         ).pipe(
           switchMap(() =>
-            this.routineCheckService.addCheck(malfunction.systemId)
+            this.routineCheckService.ensureTodayChecked(malfunction.systemId)
           ),
           map(() => void 0)
         );
