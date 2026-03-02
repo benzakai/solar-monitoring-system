@@ -11,13 +11,10 @@ import {
   combineLatest,
   filter,
   map,
-  of,
   shareReplay,
   switchMap,
-  tap,
 } from 'rxjs';
 import { EmailsService } from '../../endpoint/emails.service';
-import { ReportFilesService } from '../../endpoint/report-files.service';
 
 @Component({
   selector: 'app-recent-client-reports',
@@ -46,7 +43,7 @@ import { ReportFilesService } from '../../endpoint/report-files.service';
       <ng-container matColumnDef="count">
         <th mat-header-cell *matHeaderCellDef>#</th>
         <td mat-cell *matCellDef="let g">
-          {{ g.date | date: 'dd/MM/yyyy HH:mm' }}
+          {{ g.sentDate | date: 'dd/MM/yyyy HH:mm' }}
         </td>
       </ng-container>
       <ng-container matColumnDef="actions">
@@ -78,8 +75,60 @@ export class RecentClientReportsComponent {
 
   private reports = inject(ReportsService);
   private emails = inject(EmailsService);
-  private files = inject(ReportFilesService);
   private currentClientId?: string;
+
+  private toEpochMs(value: unknown): number | undefined {
+    if (value === null || value === undefined) {
+      return undefined;
+    }
+
+    if (value instanceof Date) {
+      return value.getTime();
+    }
+
+    // Handle Firestore Timestamp-like objects { seconds, nanoseconds }.
+    if (typeof value === 'object') {
+      const seconds = (value as { seconds?: unknown }).seconds;
+      if (typeof seconds === 'number' && Number.isFinite(seconds)) {
+        return seconds * 1000;
+      }
+      return undefined;
+    }
+
+    const raw = Number(value);
+    if (!Number.isFinite(raw)) {
+      return undefined;
+    }
+
+    // Normalize seconds / milliseconds / microseconds to milliseconds.
+    if (raw < 1e11) {
+      return raw * 1000;
+    }
+    if (raw > 1e14) {
+      return Math.floor(raw / 1000);
+    }
+    return raw;
+  }
+
+  private reportKey(
+    clientId: string | undefined,
+    dateValue: unknown,
+    isAnnual: boolean
+  ): string | undefined {
+    if (!clientId) {
+      return undefined;
+    }
+
+    const ms = this.toEpochMs(dateValue);
+    if (!ms) {
+      return undefined;
+    }
+
+    const d = new Date(ms);
+    const y = d.getUTCFullYear();
+    const m = isAnnual ? 0 : d.getUTCMonth();
+    return [clientId, y, m, isAnnual ? 'A' : 'M'].join('_');
+  }
 
   rows$ = this.client$.pipe(
     filter((c): c is Person => !!c && !!c._id),
@@ -87,8 +136,30 @@ export class RecentClientReportsComponent {
     shareReplay({ refCount: true, bufferSize: 1 })
   );
 
-  grouped$ = this.rows$.pipe(
-    map((items) => {
+  private recentEmails$ = this.emails.getNewestEmails(300).pipe(
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
+
+  grouped$ = combineLatest([this.rows$, this.recentEmails$, this.client$]).pipe(
+    map(([items, emails, client]) => {
+      const clientId = client?._id || this.currentClientId;
+      const sentByReportKey: Record<string, number> = {};
+
+      (emails || []).forEach((email) => {
+        const emailClientId =
+          (email as any)?.template?.data?.clientId ||
+          (Array.isArray(email.toUids) ? email.toUids[0] : undefined);
+        const reportDate = (email as any)?.template?.data?.date;
+        const isAnnual = (email as any)?.template?.name === 'annualReport';
+        const sentAt = this.toEpochMs(email?.delivery?.startTime);
+        const key = this.reportKey(emailClientId, reportDate, isAnnual);
+
+        if (!key || !sentAt) {
+          return;
+        }
+        sentByReportKey[key] = Math.max(sentByReportKey[key] || 0, sentAt);
+      });
+
       const groups = new Map<string, any[]>();
       for (const r of items) {
         const parts = (r?.id || '').split('_');
@@ -105,18 +176,26 @@ export class RecentClientReportsComponent {
           const month = Number(monthStr);
           const monthKey = `months.${month}`;
           const periodDate = new Date(Date.UTC(year, month, 1));
+          const latest = sorted[0];
+          const reportDate = this.toEpochMs(latest?.date) || latest?.date;
+          const isAnnual = !!latest?.isAnnual;
+          const sentKey = this.reportKey(clientId, reportDate, isAnnual);
+          const sentDate =
+            (sentKey && sentByReportKey[sentKey]) ||
+            this.toEpochMs(reportDate) ||
+            reportDate;
           return {
             key,
             items: sorted,
-            date: sorted[0]?.date,
-            isAnnual: !!sorted[0]?.isAnnual,
+            date: reportDate,
+            sentDate,
+            isAnnual,
             month: monthKey,
             periodDate,
           };
         })
-        .sort((a, b) => b.date - a.date);
-    }),
-    tap((a) => console.log(a))
+        .sort((a, b) => (b.sentDate || b.date) - (a.sentDate || a.date));
+    })
   );
 
   openPreviewGroup(group: {
