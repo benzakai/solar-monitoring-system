@@ -183,6 +183,7 @@ export class MonitoringTableComponent {
         const innerCompareWarning = this.getInnerCompareWarning(item);
         return {
           ...item,
+          portal_alerts_quantity: this.getPortalAlertsQuantity(item),
           daysFromCheck,
           checkedByAnybodyToday,
           toBeChecked,
@@ -417,6 +418,19 @@ export class MonitoringTableComponent {
       }
       return value / nextValue < this.innerCompareWarningTrigger;
     });
+  }
+
+  private getPortalAlertsQuantity(item: Partial<MonitorItem>): number {
+    const alertsFromPortal = item.alerts_from_portal;
+    if (
+      alertsFromPortal &&
+      typeof alertsFromPortal === 'object' &&
+      typeof alertsFromPortal.quantity === 'number' &&
+      Number.isFinite(alertsFromPortal.quantity)
+    ) {
+      return alertsFromPortal.quantity;
+    }
+    return 0;
   }
 
   formatComparePercentWithWarning(

@@ -77,6 +77,10 @@ export const mainLang: Dictionary = {
     en: 'Cleared Alerts',
     he: 'התראות מפורטל',
   },
+  portal_alerts: {
+    en: 'Portal Alerts',
+    he: 'התראות מפורטל',
+  },
   start_of_year: {
     en: 'Start of Year',
     he: 'מתחילת השנה',

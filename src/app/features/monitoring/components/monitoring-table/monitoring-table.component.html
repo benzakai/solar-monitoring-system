@@ -113,11 +113,11 @@
 
       <ng-container matColumnDef="clearedAlerts">
         <th mat-header-cell *matHeaderCellDef>
-          <app-sort-header [active]="sortParams | async" column="close_issues" (onSort)="onSort($event)"></app-sort-header>
-          {{ 'cleared_alerts' | translate }}
+          <app-sort-header [active]="sortParams | async" column="portal_alerts_quantity" (onSort)="onSort($event)"></app-sort-header>
+          {{ 'portal_alerts' | translate }}
         </th>
-        <td mat-cell *matCellDef="let element" [class.red]="element.close_issues > 0">
-          {{ element.close_issues }}
+        <td mat-cell *matCellDef="let element" [class.red]="element.portal_alerts_quantity > 0">
+          {{ element.portal_alerts_quantity }}
         </td>
       </ng-container>
 
