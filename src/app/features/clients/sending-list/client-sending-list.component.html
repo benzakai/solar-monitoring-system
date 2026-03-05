@@ -19,6 +19,16 @@
     <td mat-cell *matCellDef="let row">{{ row.email || row._raw }}</td>
   </ng-container>
 
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef>{{ 'personInfo.view.position' | translate }}</th>
+    <td mat-cell *matCellDef="let row">
+      <ng-container *ngIf="row?._id && client?._id && row._id === client._id; else contactPosition">
+        לקוח
+      </ng-container>
+      <ng-template #contactPosition>{{ row.position || row.roleDescription || row.role || '-' }}</ng-template>
+    </td>
+  </ng-container>
+
   <ng-container matColumnDef="role">
     <th mat-header-cell *matHeaderCellDef>{{ 'client.is_client' | translate }}</th>
     <td mat-cell *matCellDef="let row">
@@ -36,8 +46,8 @@
     </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="['actions','email','role','clientName']"></tr>
-  <tr mat-row *matRowDef="let row; columns: ['actions','email','role','clientName']"></tr>
+  <tr mat-header-row *matHeaderRowDef="['actions','email','position','role','clientName']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['actions','email','position','role','clientName']"></tr>
 </table>
 
 
