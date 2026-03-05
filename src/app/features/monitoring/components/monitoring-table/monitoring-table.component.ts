@@ -100,6 +100,10 @@ import { UsersService } from '../../../../endpoint/users.service';
 export class MonitoringTableComponent {
   isRTL = document.documentElement.dir === 'rtl';
   lang = inject(LANGUAGE);
+  private readonly stringCollator = new Intl.Collator(undefined, {
+    sensitivity: 'base',
+    numeric: true,
+  });
   private readonly innerCompareWarningTrigger = 0.8;
   private readonly comparePercentFormatter = new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 0,
@@ -292,6 +296,13 @@ export class MonitoringTableComponent {
           if (aMissing && bMissing) return 0;
           if (aMissing) return 1;
           if (bMissing) return -1;
+
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return (
+              this.stringCollator.compare(aValue, bValue) *
+              sortConfig.sortDirection
+            );
+          }
 
           if (aValue < bValue) return -1 * sortConfig.sortDirection;
           if (aValue > bValue) return 1 * sortConfig.sortDirection;
