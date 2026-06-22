@@ -13,10 +13,12 @@ import {
 import { MonitorFacade } from '../../../state/monitor/monitor.facade';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CoordinatorsService } from '../../people/services/coordinators.service';
 
 @Injectable()
 export class MalfunctionsFiltersControlService {
   monitorFacade = inject(MonitorFacade);
+  coordinatorsService = inject(CoordinatorsService);
   router = inject(Router);
   route = inject(ActivatedRoute);
 
@@ -94,8 +96,21 @@ export class MalfunctionsFiltersControlService {
     startWith(this.clientsControl.value || [])
   );
   clientsSearchControl = new FormControl();
+  clientsForMalfunctions = this.coordinatorsService.allClientsOfSelectedCoordinatorsMap.pipe(
+    map((clientsMap) =>
+      Array.from(clientsMap.values()).map((client: any) => {
+        const name = client?.clientName || client?.name || '';
+        return {
+          ...client,
+          id: client?._id || client?.id,
+          name,
+          fulltext: name.toLowerCase(),
+        };
+      })
+    )
+  );
   clients = combineLatest([
-    this.monitorFacade.clients,
+    this.clientsForMalfunctions,
     this.clientsSearchControl.valueChanges.pipe(startWith(null)),
     this.clientsControlState,
   ]).pipe(
@@ -109,18 +124,20 @@ export class MalfunctionsFiltersControlService {
       }
 
       const selectedSet: Record<string, any> = {};
-      selected.forEach((item: { id: string }) => {
-        selectedSet[item.id] = true;
+      selected.forEach((item: { _id?: string; id?: string }) => {
+        selectedSet[item._id || item.id || ''] = true;
       });
 
-      return result.filter((item) => !selectedSet[item.id]);
+      return result.filter(
+        (item) => !selectedSet[item._id || item.id || '']
+      );
     })
   );
   clientsControlStateMap = this.clientsControlState.pipe(
     map((data) => {
       const result: Record<string, boolean> = {};
       data.forEach((item: any) => {
-        result[item.id] = true;
+        result[item._id || item.id] = true;
       });
       return result;
     })
@@ -199,7 +216,7 @@ export class MalfunctionsFiltersControlService {
       .pipe(takeUntilDestroyed())
       .subscribe((value) => {
         const ids = (value || [])
-          .map((client: any) => client?.id)
+          .map((client: any) => client?._id || client?.id)
           .filter(Boolean);
         this.router.navigate([], {
           relativeTo: this.route,
@@ -210,7 +227,7 @@ export class MalfunctionsFiltersControlService {
 
     combineLatest([
       this.route.queryParams.pipe(startWith(this.route.snapshot.queryParams)),
-      this.monitorFacade.clients,
+      this.clientsForMalfunctions,
     ])
       .pipe(takeUntilDestroyed())
       .subscribe(([params, clients]) => {
@@ -220,7 +237,7 @@ export class MalfunctionsFiltersControlService {
         const v = params['clients'] || [];
         const urlValue = Array.isArray(v) ? v : [v];
         const controlValue = (this.clientsControl.value || []).map(
-          (client: any) => client?.id
+          (client: any) => client?._id || client?.id
         );
         const strUrl = urlValue.sort().join(',');
         const strVal = controlValue.sort().join(',');

@@ -70,6 +70,8 @@ import { PeopleService } from '../../../../endpoint/people.service';
 import { LanguageService } from '../../../../core/lang/language.service';
 import { EnergyService } from '../../../../endpoint/energy.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { env } from '../../../../env/env';
 
 @Component({
   selector: 'app-system-details',
@@ -99,6 +101,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatSortModule,
     SortHeaderComponent,
     RouterModule,
+    MatTooltipModule,
   ],
   providers: [MatNativeDateModule],
   templateUrl: './system-details.component.html',
@@ -106,6 +109,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemDetailsComponent implements AfterViewInit {
+  readonly feature = env.feature;
   translator = new TranslatePipe();
   people = inject(PeopleService);
   languageService = inject(LanguageService);

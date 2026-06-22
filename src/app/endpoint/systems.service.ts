@@ -23,6 +23,25 @@ export class SystemsService {
   private collection = collection(this.firestore, 'systems');
   private http = inject(HttpClient);
 
+  private normalizeApiIdValue(value: unknown): string | number | null {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    return null;
+  }
+
+  private normalizeApiId(
+    apiId: Array<string | number | null | undefined>
+  ): Array<string | number | null> {
+    return apiId.map((value) => this.normalizeApiIdValue(value));
+  }
+
   public getById(id: string): Observable<System | null> {
     const docRef = doc(this.collection, id);
     return from(getDoc(docRef)).pipe(
@@ -96,7 +115,8 @@ export class SystemsService {
    * Returns the existing system id if found, otherwise undefined.
    */
   checkExistApi(type: string, apiId: Array<string | number | null>, currentSystemId?: string): Observable<string | undefined> {
-    const q = query(this.collection, where('type', '==', type as any), where('apiId', '==', apiId as any));
+    const normalizedApiId = this.normalizeApiId(apiId);
+    const q = query(this.collection, where('type', '==', type as any), where('apiId', '==', normalizedApiId as any));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         const ids = snapshot.docs
@@ -113,11 +133,12 @@ export class SystemsService {
    */
   updateApiId(type: string, apiId: Array<string | number | null>, systemId: string): Observable<boolean> {
     const docRef = doc(this.collection, systemId);
+    const normalizedApiId = this.normalizeApiId(apiId);
     if (!type || !systemId) {
       return of(false);
     }
     const url = `https://golan-api.onrender.com/api/updateNow/${type}/${systemId}`;
-    return from(updateDoc(docRef, { type: type as any, apiId: apiId as any })).pipe(
+    return from(updateDoc(docRef, { type: type as any, apiId: normalizedApiId as any })).pipe(
       switchMap(() => this.http.get<any>(url)),
       map(() => true),
       catchError((e: unknown) => {

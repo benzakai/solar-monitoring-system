@@ -497,6 +497,34 @@ export const systemSettings: Dictionary = {
     comments: { en: 'Comments', he: 'הערות' },
   },
 
+  // API ID Dialog
+  api_id_dialog: {
+    system_id: { en: 'System ID', he: 'מזהה מערכת' },
+    api_key: { en: 'API Key', he: 'API Key' },
+    username: { en: 'Username', he: 'שם משתמש' },
+    password: { en: 'Password', he: 'סיסמא' },
+  },
+
+  // SMA authorization dialog
+  sma_token_refresh_failed_message: {
+    en: 'Unable to refresh SMA token. Open a new authorization window to get an authorization code?',
+    he: 'לא ניתן לרענן טוקן SMA. האם לפתוח חלון הרשאה חדש לקבלת authorization code?',
+  },
+  sma_token_refresh_failed_confirm: {
+    en: 'Continue',
+    he: 'המשך',
+  },
+
+  // Validation dialog
+  invalid_fields_title: {
+    en: 'Fix fields',
+    he: 'תיקון שדות',
+  },
+  invalid_fields_message: {
+    en: 'Invalid Fields',
+    he: 'שדות לא תקינים',
+  },
+
   // External portals & API import messages
   external_portal_save_first_title: {
     en: 'Save new system',

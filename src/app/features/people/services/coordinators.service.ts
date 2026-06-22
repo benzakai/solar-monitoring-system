@@ -43,6 +43,10 @@ export class CoordinatorsService {
     .getAllPeople()
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
+  allClients = this.peopleService
+    .getAllClients()
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
   allCustomersOfSelectedCoordinatorsMap = combineLatest([
     this.allCustomers,
     this.coordinatorsSelected,
@@ -59,6 +63,26 @@ export class CoordinatorsService {
       );
 
       return new Map(allCustomers.map((c) => [c._id, c]));
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  allClientsOfSelectedCoordinatorsMap = combineLatest([
+    this.allClients,
+    this.coordinatorsSelected,
+    this.coordinatorsShowAllSource,
+  ]).pipe(
+    map(([clients, coordinators, allCoords]) => {
+      const map: Record<string, boolean> = (coordinators || []).reduce(
+        (acc, c) => Object.assign(acc, { [c]: true }),
+        {}
+      );
+
+      const allClients = clients.filter(
+        (c) => c?.coordinatorUid && map[c.coordinatorUid]
+      );
+
+      return new Map(allClients.map((c) => [c._id, c]));
     }),
     shareReplay({ bufferSize: 1, refCount: true })
   );

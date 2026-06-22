@@ -58,8 +58,10 @@ import { RoutineCheckService } from '../../../../endpoint/routine-check.service'
 import { MalfunctionsService } from '../../../../endpoint/malfunctions.service';
 import { EnvironmentalSystemsDialogComponent } from '../environmental-systems-dialog/environmental-systems-dialog.component';
 import { EnergyCalc } from '../../../../core/energy/energy-calculator';
+import { ConnectionStatus } from '../../../../core/energy/connection-status';
 import { EnergyService } from '../../../../endpoint/energy.service';
 import { Energy } from '../../../../domain/energy';
+import { selectEnergyItems } from '../../../../state/energy/energy.selectors';
 import { AppEndpointService } from '../../../../endpoint/app-endpoint.service';
 import { SystemsService } from '../../../../endpoint/systems.service';
 import { EnvironmentalEnergyService } from '../../../../endpoint/environmental-energy.service';
@@ -176,25 +178,38 @@ export class MonitoringTableComponent {
   monitorItemsForUser = combineLatest([
     this.monitorFacade.monitorItems.pipe(debounceTime(500)),
     this.currentUserService.user,
+    this.store.select(selectEnergyItems),
   ]).pipe(
-    map(([items, user]) =>
-      (items || []).map((item) => {
+    map(([items, user, energyItems]) => {
+      const energyById = new Map(
+        (energyItems || []).map((energy) => [energy.id, energy])
+      );
+      return (items || []).map((item) => {
         const daysFromCheck = item?.lastCheck?.date
           ? DateUtil.DaysFromToday(new Date(item?.lastCheck?.date || 0))
           : undefined;
         const checkedByAnybodyToday = daysFromCheck === 0;
         const toBeChecked = (daysFromCheck ?? 100) > 10;
         const innerCompareWarning = this.getInnerCompareWarning(item);
+        const energy = energyById.get(item.id);
+        const lastUpdated = energy
+          ? ConnectionStatus.isOnline(
+              energy['#modified'],
+              energy.daily,
+              item.portal
+            )
+          : item.lastUpdated;
         return {
           ...item,
+          lastUpdated,
           portal_alerts_quantity: this.getPortalAlertsQuantity(item),
           daysFromCheck,
           checkedByAnybodyToday,
           toBeChecked,
           innerCompareWarning,
         };
-      })
-    )
+      });
+    })
   );
 
   monitorFiltered = combineLatest([

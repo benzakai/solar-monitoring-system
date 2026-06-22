@@ -19,6 +19,8 @@ import { SettingsComponent } from './features/settings/settings.component';
 import { ReportEvaluationComponent } from './features/reports/components/report-evaluation/report-evaluation.component';
 import { authGuard } from './core/roles/auth.guard';
 import { adminGuard } from './core/roles/admin.guard';
+import { SmaAuthCallbackComponent } from './core/sma/sma-auth-callback.component';
+import { SystemEnergyRefetchComponent } from './features/monitoring/components/system-energy-refetch/system-energy-refetch.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'systems', pathMatch: 'full' },
@@ -32,7 +34,17 @@ export const routes: Routes = [
     component: SystemDetailsComponent,
     canActivate: [authGuard],
   },
+  {
+    path: 'system/:id/energy-refetch',
+    component: SystemEnergyRefetchComponent,
+    canActivate: [authGuard],
+  },
   { path: 'login', component: LoginPageComponent },
+  {
+    path: 'energy-update-check/:systemId',
+    component: UpdateCheckComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'energy-update-check',
     component: UpdateCheckComponent,
@@ -76,6 +88,7 @@ export const routes: Routes = [
   { path: 'report-preview/:id/:botpass', component: ReportPreviewComponent },
   { path: 'report-preview/:id', component: ReportPreviewComponent },
   { path: 'report-preview', component: ReportPreviewComponent },
+  { path: 'sma-auth-callback', component: SmaAuthCallbackComponent },
   {
     path: 'management',
     component: ManagementComponent,

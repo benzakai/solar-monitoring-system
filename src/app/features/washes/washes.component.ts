@@ -42,6 +42,7 @@ import { WashesFiltersComponent } from './components/washes-filters/washes-filte
 import { FiltersControlService } from '../monitoring/services/filters-control.service';
 import { MonitorItem } from '../../domain/monitor-item';
 import { RoutingService } from '../../core/routing/routing.service';
+import { CoordinatorsService } from '../people/services/coordinators.service';
 
 @Component({
   selector: 'app-washes',
@@ -84,6 +85,7 @@ export class WashesComponent implements OnInit {
   energyService = inject(EnergyService);
   dialog = inject(MatDialog);
   filtersControls = inject(FiltersControlService);
+  coordinatorsService = inject(CoordinatorsService);
   cdf = inject(ChangeDetectorRef);
   destroyRef = inject(DestroyRef);
   routingService = inject(RoutingService);
@@ -139,16 +141,20 @@ export class WashesComponent implements OnInit {
         }))
       )
     ),
+    this.coordinatorsService.allCustomersOfSelectedCoordinatorsMap,
   ]).pipe(
     takeUntilDestroyed(this.destroyRef),
     filter(([monitorItems, washes]) => Boolean(monitorItems && washes)),
-    map(([monitorItems, washes]) => {
+    map(([monitorItems, washes, customers]) => {
       const washesMap = new Map(washes.map((wash) => [wash.id, wash]));
 
       return monitorItems.map((item) => {
         const washData = washesMap.get(item.id);
+        const clientName = item.client?.id
+          ? customers.get(item.client.id)?.clientName
+          : undefined;
 
-        return new WashRow(item, washData);
+        return new WashRow(item, washData, clientName);
       });
     }),
     shareReplay({ bufferSize: 1, refCount: true })

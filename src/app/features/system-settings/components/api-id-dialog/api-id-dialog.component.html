@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{'חיבור לפורטל (' + data?.type + ')'}}</h2>
+<h2 mat-dialog-title>{{ 'system_settings.connect_to_portal' | translate }} ({{ data?.type }})</h2>
 
 <mat-dialog-content>
   <div class="app-input-field">
@@ -12,7 +12,7 @@
                    [formControl]="systemApi.at(i)"
             >
           </mat-form-field>
-          <label>{{input}}</label>
+          <label>{{ input | translate }}</label>
         </div>
       }
     }
@@ -20,10 +20,10 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>ביטול</button>
+  <button mat-button mat-dialog-close>{{ 'system_settings.cancel' | translate }}</button>
   <button mat-flat-button color="primary"
-          [mat-dialog-close]="systemApi.value"
+          [mat-dialog-close]="getNormalizedApiId()"
           [disabled]="systemApi.invalid">
-    אישור
+    {{ 'system_settings.save' | translate }}
   </button>
 </mat-dialog-actions>

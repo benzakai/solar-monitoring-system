@@ -17,7 +17,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, shareReplay, startWith } from 'rxjs';
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+} from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
 
 // Angular Material imports
@@ -45,6 +52,9 @@ import { DialogService } from '../../core/dialog/services/dialog.service';
 import { EnergyCalc } from '../../core/energy/energy-calculator';
 import { PredictionCalculator } from '../../core/energy/prediction-calculator';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { LanguageService } from '../../core/lang/language.service';
+import { LANGUAGE_DICTIONARY } from '../../core/lang/index';
+import { Dictionary, DictionaryRecord } from '../../core/lang/types/dictionary';
 import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { RoutingService } from '../../core/routing/routing.service';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
@@ -63,6 +73,7 @@ import {
   deleteObject,
   getDownloadURL,
 } from '@angular/fire/storage';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { MonitorFacade } from '../../state/monitor/monitor.facade';
 import { SystemType } from '../systems/system-type';
 import { SystemContract } from '../systems/system-contract';
@@ -117,8 +128,25 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
   private appService = inject(AppEndpointService);
   private peopleService = inject(PeopleService);
   private storage = inject(Storage);
+  private functions = inject(Functions);
   dialogService = inject(DialogService);
   translatePipe = new TranslatePipe();
+  private languageService = inject(LanguageService);
+  private dictionary = inject(LANGUAGE_DICTIONARY);
+
+  private t(key: string): string {
+    const keys = key.split('.');
+    let node: Dictionary | DictionaryRecord | undefined = this.dictionary;
+    for (const k of keys) {
+      if (node && (node as Dictionary)[k] !== undefined) {
+        node = (node as Dictionary)[k] as Dictionary | DictionaryRecord;
+      } else {
+        return key;
+      }
+    }
+    const lang = this.languageService.getCurrentLang();
+    return (node as DictionaryRecord)?.[lang] ?? key;
+  }
   @ViewChild('map') set mapElement(el: ElementRef) {
     if (el && !this.map) {
       this.initMap(el);
@@ -191,7 +219,11 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     { type: 'wash_type_6', value: 6 },
   ];
 
-  externalPortals = ['GW', 'NTC', 'SLX', 'GDW', 'FSN'];
+  externalPortals = ['NTC', 'SLX', 'GDW'];
+  private static readonly SMA_CLIENT_ID = 'GolanSolar';
+  private static readonly SMA_AUTH_URL = 'https://auth.smaapis.de/oauth2/';
+  private static readonly SMA_LEGACY_REDIRECT_URI =
+    'https://solar-golan.web.app/';
 
   ngOnInit() {
     combineLatest([
@@ -588,6 +620,119 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     this.setApiId();
   }
 
+  private isSmaType(type: string): boolean {
+    return type === SystemType.SMA || type === SystemType.ENNEX;
+  }
+
+  private async refreshSmaToken(
+    smaUser: string,
+    code?: string,
+    redirectUri?: string
+  ): Promise<string> {
+    const setSmaToken = httpsCallable<
+      { smaUser: string; code?: string; redirectUri?: string },
+      string
+    >(this.functions, 'smaAuth-setSmaToken');
+    const result = await setSmaToken({ smaUser, code, redirectUri });
+    return result.data;
+  }
+
+  private async authorizeSmaWithCode(
+    smaUser: string,
+    password: string
+  ): Promise<string> {
+    const redirectUri = SystemSettingsComponent.SMA_LEGACY_REDIRECT_URI;
+    const authUrl =
+      `${SystemSettingsComponent.SMA_AUTH_URL}auth` +
+      `?client_id=${encodeURIComponent(SystemSettingsComponent.SMA_CLIENT_ID)}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&state=${encodeURIComponent(smaUser)}` +
+      `&password=${encodeURIComponent(password)}`;
+
+    const popup = window.open(authUrl, '_blank');
+    if (!popup) {
+      throw new Error('SMA auth popup was blocked');
+    }
+
+    const maxAttempts = 90; // ~3 minutes
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        return await this.refreshSmaToken(smaUser);
+      } catch {
+        if (popup.closed) {
+          throw new Error(
+            'SMA auth popup closed before authorization completed'
+          );
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+      }
+    }
+
+    throw new Error('Timed out waiting for SMA authorization');
+  }
+
+  private async ensureSmaAuthorization(
+    newApiId: Array<string | number | null>
+  ): Promise<void> {
+    const smaUser = this.getStringCredential(newApiId[2]);
+    const password = this.getStringCredential(newApiId[3]);
+    if (!smaUser) {
+      return;
+    }
+
+    try {
+      await this.refreshSmaToken(smaUser);
+      return;
+    } catch (e) {
+      const proceed = await firstValueFrom(
+        this.dialogService.confirm({
+          message: this.t('system_settings.sma_token_refresh_failed_message'),
+          confirmText: this.t(
+            'system_settings.sma_token_refresh_failed_confirm'
+          ),
+          cancelText: this.t('system_settings.cancel'),
+        })
+      );
+      if (!proceed) {
+        throw e;
+      }
+    }
+
+    if (!password) {
+      throw new Error('SMA password is required for authorization flow');
+    }
+
+    await this.authorizeSmaWithCode(smaUser, password);
+  }
+
+  private normalizeApiIdValues(values: unknown): Array<string | number | null> {
+    if (!Array.isArray(values)) {
+      return [];
+    }
+    return values.map((value) => this.normalizeCredentialValue(value));
+  }
+
+  private normalizeCredentialValue(value: unknown): string | number | null {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    return null;
+  }
+
+  private getStringCredential(value: unknown): string | null {
+    const normalized = this.normalizeCredentialValue(value);
+    return typeof normalized === 'string' && normalized.length > 0
+      ? normalized
+      : null;
+  }
+
   setApiId() {
     const apiId = this.form.get('apiId')?.value;
     const type = this.form.get('type')?.value;
@@ -607,6 +752,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       if (!newApiId) {
         return;
       }
+      const normalizedApiId = this.normalizeApiIdValues(newApiId);
+      if (!normalizedApiId.length) {
+        return;
+      }
 
       const isExternal = this.externalPortals.includes(type);
 
@@ -615,12 +764,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         const currentId = this.activatedRoute.snapshot.params['id'];
         if (!currentId || currentId === 'new') {
           this.dialogService.confirm({
-            message: this.translatePipe.transform(
-              'system-settings.external_portal_save_first_message'
+            message: this.t(
+              'system_settings.external_portal_save_first_message'
             ),
-            title: this.translatePipe.transform(
-              'system-settings.external_portal_save_first_title'
-            ),
+            title: this.t('system_settings.external_portal_save_first_title'),
             displayCancel: false,
           });
           return;
@@ -632,17 +779,13 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
         // Check duplicate
         this.systemsService
-          .checkExistApi(type, newApiId, currentId)
+          .checkExistApi(type, normalizedApiId, currentId)
           .pipe(take(1))
           .subscribe(async (existingId) => {
             if (existingId) {
               this.dialogService.confirm({
-                message: this.translatePipe.transform(
-                  'system-settings.system_exists_message'
-                ),
-                title: this.translatePipe.transform(
-                  'system-settings.system_exists_title'
-                ),
+                message: this.t('system_settings.system_exists_message'),
+                title: this.t('system_settings.system_exists_title'),
                 displayCancel: false,
               });
               this.router.navigate(['/system-settings', existingId]);
@@ -652,26 +795,22 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
             // Update and trigger server import
             this.loading$.next(true);
             this.systemsService
-              .updateApiId(type, newApiId, currentId)
+              .updateApiId(type, normalizedApiId, currentId)
               .pipe(take(1))
               .subscribe((ok) => {
                 this.loading$.next(false);
                 if (ok) {
                   this.dialogService.confirm({
-                    message: this.translatePipe.transform(
-                      'system-settings.portal_update_success'
-                    ),
+                    message: this.t('system_settings.portal_update_success'),
                     displayCancel: false,
                   });
                   this.router.navigate(['/system-settings', currentId]);
                 } else {
                   this.dialogService.confirm({
-                    message: this.translatePipe.transform(
-                      'system-settings.portal_update_failed_message'
+                    message: this.t(
+                      'system_settings.portal_update_failed_message'
                     ),
-                    title: this.translatePipe.transform(
-                      'system-settings.portal_update_failed_title'
-                    ),
+                    title: this.t('system_settings.portal_update_failed_title'),
                     displayCancel: false,
                   });
                 }
@@ -682,7 +821,14 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
 
       // Non-external portals: just set api id on form
       if (newApiId) {
-        this.form.get('apiId')?.setValue(newApiId);
+        if (this.isSmaType(type)) {
+          try {
+            await this.ensureSmaAuthorization(normalizedApiId);
+          } catch {
+            return;
+          }
+        }
+        this.form.get('apiId')?.setValue(normalizedApiId);
         this.form.markAsDirty();
       }
     });
@@ -702,8 +848,11 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
         .map(([k]) => k);
 
       dial.confirm({
-        message: 'Invalid Fields: ' + errorsIn.join(', '),
-        title: 'Fix fields',
+        message:
+          this.t('system_settings.invalid_fields_message') +
+          ': ' +
+          errorsIn.join(', '),
+        title: this.t('system_settings.invalid_fields_title'),
       });
 
       return;
@@ -765,7 +914,7 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
       }
 
       dial.confirm({
-        message: this.translatePipe.transform('malfunction.dataSaved'),
+        message: this.t('malfunction.dataSaved'),
         displayCancel: false,
       });
 

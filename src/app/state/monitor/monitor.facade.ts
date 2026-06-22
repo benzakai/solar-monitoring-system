@@ -16,6 +16,7 @@ import { Store } from '@ngrx/store';
 import { selectMonitorInited, selectMonitorItems } from './monitor.selectors';
 import { MonitorItem } from '../../domain/monitor-item';
 import { loadMonitorItems } from './monitor.actions';
+import { loadEnergyItems } from '../energy/energy.actions';
 import { CoordinatorsService } from '../../features/people/services/coordinators.service';
 import { CurrentUserService } from '../../features/people/services/current-user.service';
 
@@ -32,6 +33,7 @@ export class MonitorFacade {
     tap((inited) => {
       if (!inited) {
         this.store.dispatch(loadMonitorItems());
+        this.store.dispatch(loadEnergyItems());
       }
     }),
     switchMap(() =>
@@ -69,6 +71,7 @@ export class MonitorFacade {
     tap((inited) => {
       if (!inited) {
         this.store.dispatch(loadMonitorItems());
+        this.store.dispatch(loadEnergyItems());
       }
     }),
     switchMap(() => this.store.select(selectMonitorItems)),

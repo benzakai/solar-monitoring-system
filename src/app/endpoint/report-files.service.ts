@@ -10,7 +10,7 @@ export class ReportFilesService {
 
   generatePdf(page: string, docId: string) {
     return this.http.get(
-      'https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/' +
+      'https://us-central1-solar-golan.cloudfunctions.net/pdfV2-createPdfV2/' +
         page +
         '/' +
         docId,
@@ -21,7 +21,7 @@ export class ReportFilesService {
   generatePdfForEmail(page: string, docId: string): Observable<string> {
     const headers = new HttpHeaders().set('X-Url-Only', 'true');
     const url =
-      'https://us-central1-solar-golan.cloudfunctions.net/pdf-createPdf/' +
+      'https://us-central1-solar-golan.cloudfunctions.net/pdfV2-createPdfV2/' +
       page +
       '-M' +
       '/' +

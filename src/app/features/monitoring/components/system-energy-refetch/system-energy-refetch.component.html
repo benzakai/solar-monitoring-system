@@ -1,0 +1,47 @@
+@if (system | async; as sys) {
+  <app-header-portal-remote>
+    <div class="header-portal-content">
+      <div class="header-portal-text">
+        <span class="header-portal-label">Refetch energii</span>
+        <span class="header-portal-name">{{ sys.name }}</span>
+      </div>
+    </div>
+  </app-header-portal-remote>
+}
+
+<div class="container">
+  <div class="toolbar">
+    <button mat-stroked-button color="primary" [routerLink]="['/system', (systemId | async)]">
+      <mat-icon>arrow_back</mat-icon>
+      Powrót do systemu
+    </button>
+
+    <button mat-flat-button color="accent" (click)="refetch()" [disabled]="refetching | async">
+      @if (refetching | async) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        <mat-icon>refresh</mat-icon>
+      }
+      Refetch
+    </button>
+  </div>
+
+  <mat-tab-group [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="onTabChange($event)">
+    <mat-tab label="HOUR"></mat-tab>
+    <mat-tab label="DAY"></mat-tab>
+    <mat-tab label="MONTH"></mat-tab>
+  </mat-tab-group>
+
+  <div class="filters">
+    <mat-form-field appearance="outline" class="custom-select-single">
+      <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+        <input matStartDate formControlName="start" placeholder="Start date" />
+        <input matEndDate formControlName="end" placeholder="End date" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconPrefix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+  </div>
+
+  <div #chart class="chart"></div>
+</div>

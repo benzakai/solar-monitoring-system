@@ -16,6 +16,16 @@
         <button mat-icon-button class="edit-button" (click)="gotoEdit(s.id)">
           <mat-icon color="primary">edit</mat-icon>
         </button>
+        @if (feature.reportEvaluation) {
+          <button
+            mat-icon-button
+            class="edit-button"
+            [routerLink]="['/energy-update-check', s.id]"
+            matTooltip="Energy fetch errors (last 3 days)"
+          >
+            <mat-icon color="primary">bolt</mat-icon>
+          </button>
+        }
         <h1 >
 
           <span>שם מערכת: {{s.name}}</span>
@@ -38,6 +48,15 @@
     <button mat-mini-fab (click)="environmentals()" color="accent">
       <mat-icon>share_location</mat-icon>
     </button>
+    @if (system | async; as currentSystem) {
+      <button
+        mat-mini-fab
+        color="accent"
+        [routerLink]="['/system', currentSystem.id, 'energy-refetch']"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+    }
 
     <mat-button-toggle-group [formControl]="periodType">
       <mat-button-toggle value="day">{{ 'system_details.today' | translate }}</mat-button-toggle>

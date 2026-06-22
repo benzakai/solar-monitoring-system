@@ -31,7 +31,12 @@ import { TranslatePipe } from '../../../../core/lang/translate.pipe';
 export class ApiIdDialogComponent {
   SystemType = SystemType;
 
-  inputs = ['מזהה מערכת', 'API Key', 'שם משתמש', 'סיסמא'];
+  inputs = [
+    'system_settings.api_id_dialog.system_id',
+    'system_settings.api_id_dialog.api_key',
+    'system_settings.api_id_dialog.username',
+    'system_settings.api_id_dialog.password',
+  ];
 
   systemApi;
 
@@ -48,6 +53,25 @@ export class ApiIdDialogComponent {
       )
     );
     console.log(data);
+  }
+
+  getNormalizedApiId(): Array<string | number | null> {
+    return this.systemApi.controls.map((control: { value: unknown }) =>
+      this.normalizeCredentialValue(control.value)
+    );
+  }
+
+  private normalizeCredentialValue(value: unknown): string | number | null {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (typeof value === 'number') {
+      return `${value}`.trim();
+    }
+    return null;
   }
 
   isRequired(idx: number): boolean {

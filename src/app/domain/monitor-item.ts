@@ -35,7 +35,7 @@ export interface MonitorItem {
   yesterday_percent: number;
   innerCompareWarning?: boolean[];
   lastCheck?: Check;
-  lastUpdated?: number;
+  lastUpdated?: boolean;
   lastSync?: number;
 
   washControl: boolean;

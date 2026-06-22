@@ -51,6 +51,9 @@ import { SystemsService } from '../../endpoint/systems.service';
 import { Person } from '../../domain/person';
 import { System } from '../../domain/system';
 import { TranslatePipe } from '../../core/lang/translate.pipe';
+import { LanguageService } from '../../core/lang/language.service';
+import { LANGUAGE_DICTIONARY } from '../../core/lang/index';
+import { Dictionary, DictionaryRecord } from '../../core/lang/types/dictionary';
 import { HeaderPortalRemoteComponent } from '../../core/header/header-portal-remote.component';
 import { ClientSystemsChartComponent } from './client-systems-chart.component';
 import { PersonInfoDialogComponent } from '../system-settings/components/person-info-dialog/person-info-dialog.component';
@@ -113,6 +116,22 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
 
   translate = new TranslatePipe();
+  private languageService = inject(LanguageService);
+  private dictionary = inject(LANGUAGE_DICTIONARY);
+
+  private t(key: string): string {
+    const keys = key.split('.');
+    let node: Dictionary | DictionaryRecord | undefined = this.dictionary;
+    for (const k of keys) {
+      if (node && (node as Dictionary)[k] !== undefined) {
+        node = (node as Dictionary)[k] as Dictionary | DictionaryRecord;
+      } else {
+        return key;
+      }
+    }
+    const lang = this.languageService.getCurrentLang();
+    return (node as DictionaryRecord)?.[lang] ?? key;
+  }
 
   // Delete client state
   deleting$ = new BehaviorSubject<boolean>(false);
@@ -519,9 +538,9 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
         this.dialog.open(ConfirmationDialogComponent, {
           width: '400px',
           data: {
-            title: this.translate.transform('client.delete_has_systems_title'),
-            message: `${this.translate.transform('client.delete_has_systems_message')} ${firstSystem.name}`,
-            confirmText: this.translate.transform('client.go_to_system'),
+            title: this.t('client.delete_has_systems_title'),
+            message: `${this.t('client.delete_has_systems_message')} ${firstSystem.name}`,
+            confirmText: this.t('client.go_to_system'),
             displayCancel: false,
           } as ConfirmationDialogData,
         }).afterClosed().subscribe((result) => {
@@ -536,10 +555,10 @@ export class ClientDetailsComponent implements OnInit, AfterViewInit {
       const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
         width: '400px',
         data: {
-          title: this.translate.transform('client.delete_confirm_title'),
-          message: this.translate.transform('client.delete_confirm_message'),
-          confirmText: this.translate.transform('client.delete_client'),
-          cancelText: this.translate.transform('cancel'),
+          title: this.t('client.delete_confirm_title'),
+          message: this.t('client.delete_confirm_message'),
+          confirmText: this.t('client.delete_client'),
+          cancelText: this.t('cancel'),
         } as ConfirmationDialogData,
       });
 

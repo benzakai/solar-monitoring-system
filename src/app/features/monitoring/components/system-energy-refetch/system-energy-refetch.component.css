@@ -1,0 +1,22 @@
+.container {
+  margin: 0 16px 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #20212a;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.filters {
+  margin: 12px 0 6px;
+}
+
+.chart {
+  height: 340px;
+}

@@ -1,20 +1,593 @@
-Systems updated more than 2h ago {{ updatesCount1 | async }}<br>
-Errorrs: {{errorsCount | async}}<br>
+@if (view$ | async; as view) {
+  <app-header-portal-remote>
+    @if (view.kind === 'system') {
+      <span>Energy fetch errors</span>
+    } @else {
+      <span>Energy update check</span>
+    }
+  </app-header-portal-remote>
 
-<section>
-  <div>
-    @for (update of updates | async; track update.id) {
-      <div class="update">
-        <div class="update-header">
-          <div class="update-title">{{ update.date }}: <a class="link" href="https://solar-golan.web.app/solar-system/{{ update.id }}">{{ update.id }}</a></div>
+  @if (view.kind === 'system') {
+    <div class="eval-controls">
+      <a mat-stroked-button routerLink="/energy-update-check">
+        <mat-icon>bolt</mat-icon>
+        All runs
+      </a>
+      <a mat-stroked-button routerLink="/systems">
+        <mat-icon>arrow_back</mat-icon>
+        Systems
+      </a>
+      <a mat-stroked-button [routerLink]="['/system', view.systemId]">
+        <mat-icon>solar_power</mat-icon>
+        System details
+      </a>
+      <a
+        mat-stroked-button
+        [href]="'https://solar-golan.web.app/solar-system-settings/' + view.systemId"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <mat-icon>open_in_new</mat-icon>
+        System settings
+      </a>
+      <button
+        mat-stroked-button
+        color="primary"
+        type="button"
+        [disabled]="fetchState() === 'loading'"
+        (click)="runSingleSystemEnergy(view.systemId)"
+      >
+        @if (fetchState() === 'loading') {
+          <mat-spinner diameter="16" class="btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>play_circle_outline</mat-icon>
+        }
+        Run energy fetch (dry-run)
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="toggleRangeExpanded()"
+      >
+        <mat-icon>{{ rangeExpanded() ? 'expand_less' : 'date_range' }}</mat-icon>
+        Run for days range
+      </button>
+    </div>
+
+    @if (rangeExpanded()) {
+      <div class="range-panel">
+        <div class="range-fields">
+          <mat-form-field appearance="outline" class="range-date-field">
+            <mat-label>From</mat-label>
+            <input matInput [matDatepicker]="pickerFrom" [ngModel]="rangeFromDate()" (ngModelChange)="setRangeFromDate($event)">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFrom></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="range-date-field">
+            <mat-label>To</mat-label>
+            <input matInput [matDatepicker]="pickerTo" [ngModel]="rangeToDate()" (ngModelChange)="setRangeToDate($event)">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+            <mat-datepicker #pickerTo></mat-datepicker>
+          </mat-form-field>
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            class="range-run-btn"
+            [disabled]="rangeFetchState() === 'loading'"
+            (click)="runForDaysRange(view.systemId)"
+          >
+            @if (rangeFetchState() === 'loading') {
+              <mat-spinner diameter="16" class="btn-spinner"></mat-spinner>
+            } @else {
+              <mat-icon>play_arrow</mat-icon>
+            }
+            Run
+          </button>
         </div>
+
+        @if (rangeFetchState() !== 'idle') {
+          <div class="fetch-result-panel range-result"
+               [class.fetch-result-success]="rangeFetchState() === 'success'"
+               [class.fetch-result-error]="rangeFetchState() === 'error'"
+               [class.fetch-result-loading]="rangeFetchState() === 'loading'">
+            @if (rangeFetchState() === 'loading') {
+              <div class="fetch-result-row">
+                <mat-spinner diameter="18"></mat-spinner>
+                <span>Running energy fetch for days range…</span>
+              </div>
+            } @else if (rangeFetchState() === 'error') {
+              <div class="fetch-result-row">
+                <mat-icon class="fetch-icon fetch-icon-error">error_outline</mat-icon>
+                <span><strong>Error:</strong> {{ rangeFetchError() }}</span>
+              </div>
+              @if (rangeFetchErrorDetails()) {
+                <pre class="json-block fetch-json">{{ rangeFetchErrorDetails() | json }}</pre>
+              }
+            } @else if (rangeFetchState() === 'success') {
+              <div class="fetch-result-row">
+                <mat-icon class="fetch-icon fetch-icon-success">check_circle_outline</mat-icon>
+                <span>
+                  <strong>Success</strong> · {{ rangeFetchResult()?.['count'] }} records ·
+                  period: <span class="mono">{{ rangeFetchResult()?.['period'] }}</span>
+                </span>
+              </div>
+              <pre class="json-block fetch-json">{{ rangeFetchResult() | json }}</pre>
+            }
+          </div>
+        }
       </div>
     }
 
-  </div>
-  <div>
-    <pre>
-      {{errors | async | json}}
-    </pre>
-  </div>
-</section>
+    <div class="eval-results">
+      <div class="page-intro">
+        <h2 class="intro-title">{{ view.systemName }}</h2>
+        <p class="intro-sub mono">{{ view.systemId }}</p>
+
+        @if (view.system; as sys) {
+          <div class="api-info">
+            <div class="api-info-row">
+              <span class="api-info-label">Type</span>
+              <span class="api-pill">{{ sys.type || '—' }}</span>
+            </div>
+            <div class="api-info-row">
+              <span class="api-info-label">API ID</span>
+              @if (sys.apiId?.length) {
+                <span class="api-info-value mono">{{ sys.apiId.join(', ') }}</span>
+              } @else {
+                <span class="api-info-value muted">—</span>
+              }
+            </div>
+            @if (sys.type === 'SMA' && sys.apiId?.[2]) {
+              <div class="api-info-row">
+                <span class="api-info-label">SMA user</span>
+                <span class="api-info-value mono">{{ sys.apiId[2] }}</span>
+              </div>
+            }
+            @if (sys.portalUrl) {
+              <div class="api-info-row">
+                <span class="api-info-label">Portal URL</span>
+                <a class="link api-info-value" [href]="sys.portalUrl" target="_blank" rel="noopener noreferrer">
+                  {{ sys.portalUrl }}
+                </a>
+              </div>
+            }
+            @if (sys.communication) {
+              <div class="api-info-row">
+                <span class="api-info-label">Communication</span>
+                <span class="api-info-value mono">{{ sys.communication }}</span>
+              </div>
+            }
+            @if (sys.lastConnectionTime) {
+              <div class="api-info-row">
+                <span class="api-info-label">Last connection</span>
+                <span class="api-info-value mono">{{ sys.lastConnectionTime }}</span>
+              </div>
+            }
+            @if (sys.type === 'SMA') {
+              @if (view.smaTokenInfo; as ti) {
+                <div class="token-section">
+                  <span class="api-info-label token-section-label">SMA user</span>
+                  <span class="api-info-value mono">{{ ti.smaUser }}</span>
+                </div>
+                <div class="token-grid">
+                  <div class="token-card" [class.token-expired]="ti.access?.isExpired" [class.token-ok]="ti.access && !ti.access.isExpired">
+                    <div class="token-card-title">Access token</div>
+                    @if (ti.access) {
+                      <div class="token-row">
+                        <span class="token-label">Created</span>
+                        <span class="token-value mono">{{ ti.access.issuedAt.toISOString() }}</span>
+                      </div>
+                      <div class="token-row">
+                        <span class="token-label">Expires</span>
+                        <span class="token-value mono">{{ ti.access.expiresAt.toISOString() }}</span>
+                      </div>
+                      <div class="token-status" [class.expired]="ti.access.isExpired">
+                        <mat-icon>{{ ti.access.isExpired ? 'cancel' : 'check_circle' }}</mat-icon>
+                        {{ ti.access.isExpired ? 'Expired' : 'Valid' }}
+                      </div>
+                    } @else {
+                      <span class="token-missing">No token</span>
+                    }
+                  </div>
+
+                  <div class="token-card" [class.token-expired]="ti.refresh?.isExpired" [class.token-ok]="ti.refresh && !ti.refresh.isExpired">
+                    <div class="token-card-title">Refresh token</div>
+                    @if (ti.refresh) {
+                      <div class="token-row">
+                        <span class="token-label">Created</span>
+                        <span class="token-value mono">{{ ti.refresh.issuedAt.toISOString() }}</span>
+                      </div>
+                      <div class="token-row">
+                        <span class="token-label">Expires</span>
+                        <span class="token-value mono">{{ ti.refresh.expiresAt.toISOString() }}</span>
+                      </div>
+                      <div class="token-status" [class.expired]="ti.refresh.isExpired">
+                        <mat-icon>{{ ti.refresh.isExpired ? 'cancel' : 'check_circle' }}</mat-icon>
+                        {{ ti.refresh.isExpired ? 'Expired' : 'Valid' }}
+                      </div>
+                    } @else {
+                      <span class="token-missing">No token</span>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="token-section">
+                  <span class="api-info-label token-section-label">SMA tokens</span>
+                  <span class="api-info-value muted">Loading…</span>
+                </div>
+              }
+            }
+          </div>
+        }
+
+        <p class="intro-hint">
+          Last <strong>3 days</strong> of <span class="mono">energyErrors</span> documents (run key:
+          UTC date + hour in <strong>Asia/Jerusalem</strong>, same as the recursive energy Cloud Function).
+        </p>
+      </div>
+
+      @if (fetchState() !== 'idle') {
+        <div class="fetch-result-panel"
+             [class.fetch-result-success]="fetchState() === 'success'"
+             [class.fetch-result-error]="fetchState() === 'error'"
+             [class.fetch-result-loading]="fetchState() === 'loading'">
+          @if (fetchState() === 'loading') {
+            <div class="fetch-result-row">
+              <mat-spinner diameter="18"></mat-spinner>
+              <span>Calling energy-runSingleSystemEnergy…</span>
+            </div>
+          } @else if (fetchState() === 'error') {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-error">error_outline</mat-icon>
+              <span><strong>Error:</strong> {{ fetchError() }}</span>
+            </div>
+            @if (fetchErrorDetails()) {
+              <pre class="json-block fetch-json">{{ fetchErrorDetails() | json }}</pre>
+            }
+          } @else if (fetchState() === 'success') {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-success">check_circle_outline</mat-icon>
+              <span>
+                <strong>Success</strong> · {{ fetchResult()?.['count'] }} records ·
+                period: <span class="mono">{{ fetchResult()?.['period'] }}</span>
+              </span>
+            </div>
+            <pre class="json-block fetch-json">{{ fetchResult() | json }}</pre>
+          }
+        </div>
+      }
+
+      @if (view.failuresLoading) {
+        <div class="center-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading errors…</p>
+        </div>
+      } @else if (!view.failureRows?.length) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">check_circle_outline</mat-icon>
+          <p>No logged energy fetch failures for this system in the selected window.</p>
+        </div>
+      } @else {
+        <h3 class="section-title">Failure log</h3>
+        <div class="errors-table">
+          <div class="errors-header">
+            <span class="errors-cell head">Run</span>
+            <span class="errors-cell head">API</span>
+            <span class="errors-cell head wide">Message</span>
+            <span class="errors-cell head">Code</span>
+            <span class="errors-cell head">Status</span>
+            <span class="errors-cell head">Actions</span>
+          </div>
+          @for (row of view.failureRows; track $index) {
+            <div class="errors-row">
+              <span class="errors-cell">{{ formatRunId(row.runId) }}</span>
+              <span class="errors-cell">
+                <span class="api-pill">{{ row.api }}</span>
+              </span>
+              <span class="errors-cell wide">{{ row.error.message || '—' }}</span>
+              <span class="errors-cell mono">{{ row.error.code || '—' }}</span>
+              <span class="errors-cell mono">{{ row.error.status || '—' }}</span>
+              <span class="errors-cell">
+                <button
+                  mat-button
+                  type="button"
+                  color="primary"
+                  (click)="navigateToSystemApi(view.systemId)"
+                >
+                  Legacy API
+                </button>
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  } @else {
+    <div class="eval-controls global-toolbar">
+      <span class="field-label">Energy update check</span>
+      <span class="stale-badge">
+        Stale systems: <strong>{{ updatesCount1 | async }}</strong>
+      </span>
+    </div>
+
+    <div class="range-panel">
+      <p class="global-hint">
+        <strong>FusionSolar</strong> · fetch daily energy for the selected range across
+        <strong>all accounts</strong> (batched per Northbound account, same flow as the morning cron).
+      </p>
+      <div class="range-fields">
+        <mat-form-field appearance="outline" class="range-date-field">
+          <mat-label>From</mat-label>
+          <input matInput [matDatepicker]="fusionPickerFrom" [ngModel]="fusionFromDate()" (ngModelChange)="setFusionFromDate($event)">
+          <mat-datepicker-toggle matIconSuffix [for]="fusionPickerFrom"></mat-datepicker-toggle>
+          <mat-datepicker #fusionPickerFrom></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="range-date-field">
+          <mat-label>To</mat-label>
+          <input matInput [matDatepicker]="fusionPickerTo" [ngModel]="fusionToDate()" (ngModelChange)="setFusionToDate($event)">
+          <mat-datepicker-toggle matIconSuffix [for]="fusionPickerTo"></mat-datepicker-toggle>
+          <mat-datepicker #fusionPickerTo></mat-datepicker>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="range-run-btn"
+          [disabled]="fusionFetchState() === 'loading'"
+          (click)="runFusionRangeAllAccounts()"
+        >
+          @if (fusionFetchState() === 'loading') {
+            <mat-spinner diameter="16" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>play_arrow</mat-icon>
+          }
+          Run Fusion (all accounts)
+        </button>
+      </div>
+
+      @if (fusionFetchState() !== 'idle') {
+        <div class="fetch-result-panel range-result"
+             [class.fetch-result-success]="fusionFetchState() === 'success'"
+             [class.fetch-result-error]="fusionFetchState() === 'error'"
+             [class.fetch-result-loading]="fusionFetchState() === 'loading'">
+          @if (fusionFetchState() === 'loading') {
+            <div class="fetch-result-row">
+              <mat-spinner diameter="18"></mat-spinner>
+              <span>Starting FusionSolar batch for all accounts…</span>
+            </div>
+          } @else if (fusionFetchState() === 'error') {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-error">error_outline</mat-icon>
+              <span><strong>Error:</strong> {{ fusionFetchError() }}</span>
+            </div>
+            @if (fusionFetchErrorDetails()) {
+              <pre class="json-block fetch-json">{{ fusionFetchErrorDetails() | json }}</pre>
+            }
+          } @else if (fusionFetchState() === 'success') {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-success">check_circle_outline</mat-icon>
+              <span>
+                <strong>Started</strong> · {{ fusionFetchResult()?.['accountsStarted'] }} account(s) ·
+                period: <span class="mono">{{ fusionFetchResult()?.['period'] }}</span>
+              </span>
+            </div>
+            <pre class="json-block fetch-json">{{ fusionFetchResult() | json }}</pre>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="range-panel">
+      <p class="global-hint">
+        <strong>Annual cleanup</strong> · scan all <strong>Growatt &amp; FusionSolar</strong> systems for
+        duplicate / wrong-timezone day entries in <span class="mono">annual</span>. Preview first, then apply
+        only what you approve. Past completed days only — user-edited values (<span class="mono">apiValue</span>)
+        are preserved.
+      </p>
+      <div class="range-fields">
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="range-run-btn"
+          [disabled]="cleanupPreviewState() === 'loading'"
+          (click)="previewAnnualCleanup()"
+        >
+          @if (cleanupPreviewState() === 'loading') {
+            <mat-spinner diameter="16" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>cleaning_services</mat-icon>
+          }
+          Preview cleanup
+        </button>
+
+        @if (cleanupPreview(); as prev) {
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            class="range-run-btn"
+            [disabled]="!prev.affected || cleanupCommitState() === 'loading'"
+            (click)="commitAnnualCleanup()"
+          >
+            @if (cleanupCommitState() === 'loading') {
+              <mat-spinner diameter="16" class="btn-spinner"></mat-spinner>
+            } @else {
+              <mat-icon>check</mat-icon>
+            }
+            Apply to {{ prev.affected }} system(s)
+          </button>
+        }
+      </div>
+
+      @if (cleanupPreviewState() === 'error') {
+        <div class="fetch-result-panel fetch-result-error">
+          <div class="fetch-result-row">
+            <mat-icon class="fetch-icon fetch-icon-error">error_outline</mat-icon>
+            <span><strong>Error:</strong> {{ cleanupPreviewError() }}</span>
+          </div>
+        </div>
+      }
+
+      @if (cleanupPreview(); as prev) {
+        <div class="fetch-result-panel"
+             [class.fetch-result-success]="cleanupCommitState() !== 'error'"
+             [class.fetch-result-error]="cleanupCommitState() === 'error'">
+          <div class="fetch-result-row">
+            <mat-icon class="fetch-icon fetch-icon-success">fact_check</mat-icon>
+            <span>
+              Scanned <strong>{{ prev.scanned }}</strong> · affected <strong>{{ prev.affected }}</strong> ·
+              would remove <strong>{{ prev.totals.removed }}</strong> entr(ies),
+              re-time <strong>{{ prev.totals.retimed }}</strong> ·
+              sum <span class="mono">{{ prev.totals.sumBefore }}</span> →
+              <span class="mono">{{ prev.totals.sumAfter }}</span>
+              (Δ <span class="mono">{{ prev.totals.sumDelta }}</span> kWh)
+            </span>
+          </div>
+
+          @if (cleanupCommitState() === 'success' && cleanupCommitResult(); as done) {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-success">check_circle_outline</mat-icon>
+              <span><strong>Applied</strong> to {{ done.applied }} / {{ done.requested }} system(s).</span>
+            </div>
+          }
+          @if (cleanupCommitState() === 'error') {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-error">error_outline</mat-icon>
+              <span><strong>Apply failed:</strong> {{ cleanupCommitError() }}</span>
+            </div>
+          }
+
+          @if (prev.affected) {
+            <mat-accordion class="run-accordion" multi>
+              @for (sys of prev.systems; track sys.systemId) {
+                <mat-expansion-panel class="run-panel">
+                  <mat-expansion-panel-header class="run-panel-header">
+                    <mat-panel-title class="run-panel-title">
+                      <a class="link mono" [routerLink]="['/energy-update-check', sys.systemId]">{{ sys.systemId }}</a>
+                      <span class="api-pill">{{ sys.type }}</span>
+                    </mat-panel-title>
+                    <mat-panel-description class="run-panel-desc">
+                      <span class="fail-badge">−{{ sys.removedCount }} / re-time {{ sys.retimedCount }}</span>
+                      <span class="mono">Δ {{ sys.sumDelta }} kWh</span>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <p class="global-hint">
+                    {{ sys.beforeCount }} → {{ sys.afterCount }} entries ·
+                    {{ sys.duplicateDays }} duplicate day(s) ·
+                    sum <span class="mono">{{ sys.sumBefore }}</span> → <span class="mono">{{ sys.sumAfter }}</span>
+                  </p>
+
+                  @if (sys.sampleChanges?.length) {
+                    <div class="run-systems-table">
+                      <div class="run-systems-header">
+                        <span class="rsc head">Day</span>
+                        <span class="rsc head">Keep (kWh)</span>
+                        <span class="rsc head wide">Remove</span>
+                      </div>
+                      @for (ch of sys.sampleChanges; track ch.key) {
+                        <div class="run-systems-row">
+                          <span class="rsc mono">
+                            {{ ch.date }}
+                            @if (ch.retimed) { <span class="fail-badge">re-timed</span> }
+                          </span>
+                          <span class="rsc mono">
+                            {{ ch.result.valueKwh }}
+                            @if (ch.result.apiValue !== undefined) {
+                              <span class="sma-user-sub mono">apiValue: {{ ch.result.apiValue }}</span>
+                            }
+                          </span>
+                          <span class="rsc wide mono">
+                            @for (rm of ch.removed; track $index) {
+                              <span class="muted">{{ rm.valueKwh }}{{ $last ? '' : ', ' }}</span>
+                            }
+                            @if (!ch.removed.length) { <span class="muted">—</span> }
+                          </span>
+                        </div>
+                      }
+                    </div>
+                    @if (sys.removedCount + sys.retimedCount > (sys.sampleChanges?.length ?? 0)) {
+                      <p class="global-hint muted">… more changes not shown (sample capped).</p>
+                    }
+                  }
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
+          } @else {
+            <div class="fetch-result-row">
+              <mat-icon class="fetch-icon fetch-icon-success">check_circle_outline</mat-icon>
+              <span>No duplicate / wrong-timezone entries found. Nothing to clean.</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="eval-results">
+      @if (recentRunDocs$ | async; as docs) {
+        @if (!docs.length) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">check_circle_outline</mat-icon>
+            <p>No energy error records in the last 7 days.</p>
+          </div>
+        } @else {
+          <p class="global-hint">
+            Showing <strong>{{ docs.length }}</strong> run{{ docs.length === 1 ? '' : 's' }} with failures from the last 7 days · newest first
+          </p>
+          @if (smaUsersBySystemId$ | async; as smaUsers) {
+            <mat-accordion class="run-accordion" multi>
+              @for (doc of docs; track doc.id) {
+                <mat-expansion-panel class="run-panel">
+                  <mat-expansion-panel-header class="run-panel-header">
+                    <mat-panel-title class="run-panel-title">
+                      <span class="run-id mono">{{ formatRunId(doc.id) }}</span>
+                    </mat-panel-title>
+                    <mat-panel-description class="run-panel-desc">
+                      <span class="fail-badge">{{ doc.failedSystems.length }} failed</span>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <div class="run-systems-table">
+                    <div class="run-systems-header">
+                      <span class="rsc head">System ID</span>
+                      <span class="rsc head">API</span>
+                      <span class="rsc head wide">Message</span>
+                      <span class="rsc head">Code</span>
+                      <span class="rsc head">Status</span>
+                    </div>
+                    @for (sys of doc.failedSystems; track sys.systemId) {
+                      <div class="run-systems-row">
+                        <span class="rsc">
+                          <a class="link" [routerLink]="['/energy-update-check', sys.systemId]">
+                            {{ sys.systemId }}
+                          </a>
+                          @if (sys.api === 'SMA' && smaUsers[sys.systemId]) {
+                            <span class="sma-user-sub mono">{{ smaUsers[sys.systemId] }}</span>
+                          }
+                        </span>
+                        <span class="rsc">
+                          <span class="api-pill">{{ sys.api }}</span>
+                        </span>
+                        <span class="rsc wide">{{ sys.error?.message || '—' }}</span>
+                        <span class="rsc mono">{{ sys.error?.code || '—' }}</span>
+                        <span class="rsc mono">{{ sys.error?.status || '—' }}</span>
+                      </div>
+                    }
+                  </div>
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
+          }
+        }
+      } @else {
+        <div class="center-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading run history…</p>
+        </div>
+      }
+    </div>
+  }
+}

@@ -27,11 +27,12 @@ export class WashRow {
 
   constructor(
     public system: MonitorItem,
-    public systemWash: SystemWash | undefined
+    public systemWash: SystemWash | undefined,
+    clientName?: string
   ) {
     this.id = system.id;
     this.name = system.system_name;
-    this.clientName = system.client?.name ?? '';
+    this.clientName = clientName ?? system.client?.name ?? '';
     this.clientId = system.client?.id ?? '';
     this.KWP = system.kwp;
     this.washRate = system.washRate;
