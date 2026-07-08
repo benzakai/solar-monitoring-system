@@ -63,13 +63,13 @@ export class MalfunctionsFiltersComponent {
     ENX: 'Ennex',
     HWI: 'Huawei',
     MTC: 'Meteo Control',
-    UNKNOWN_CODE_REFU: 'Refu',
-    UNKNOWN_CODE_TIGO: 'Tigo',
+    RFU: 'Refu',
+    TGO: 'Tigo',
     SGR: 'Sun Grow',
     GW: 'Growatt',
-    UNKNOWN_CODE_NETECO: 'Neteco',
-    UNKNOWN_CODE_SOLAX: 'Solax',
-    UNKNOWN_CODE_GOODWE: 'Goodwe',
+    NTC: 'Neteco',
+    SLX: 'Solax',
+    GDW: 'Goodwe',
     FSN: 'Fusion',
   };
   portalsList: string[] = Object.keys(this.portalNames);
