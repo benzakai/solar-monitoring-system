@@ -8,7 +8,10 @@ import { DateUtil } from '../date/DateUtil';
  * because hourly saves exclude the current hour. External portals use same-hour.
  */
 export class ConnectionStatus {
-  private static readonly EXTERNAL_PORTALS = ['GW', 'NTC', 'SLX', 'GDW'];
+  // GDW (Goodwe) moved to the standard-portal convention when it switched from
+  // the Render scraper to the direct SEMS API integration (hourly saves exclude
+  // the current hour, so connectionHour === dataHour + 1).
+  private static readonly EXTERNAL_PORTALS = ['GW', 'NTC', 'SLX'];
 
   static isConnected(lastModified: number | undefined): boolean {
     if (!lastModified) {

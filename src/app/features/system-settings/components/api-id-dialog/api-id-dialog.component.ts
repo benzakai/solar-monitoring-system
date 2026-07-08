@@ -79,6 +79,10 @@ export class ApiIdDialogComponent {
       case SystemType.SMA:
       case SystemType.ENNEX:
       case SystemType.FUSION:
+      case SystemType.GOODWE:
+      case SystemType.TIGO:
+        // apiId[0] = station/system id, apiId[2] = account email/username,
+        // apiId[3] = password (credentials are per-system, like SMA/Fusion).
         return [0, 2, 3].includes(idx);
       case SystemType.HUAWEI:
       case SystemType.NETECO:

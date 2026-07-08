@@ -219,7 +219,10 @@ export class SystemSettingsComponent implements OnInit, AfterViewInit {
     { type: 'wash_type_6', value: 6 },
   ];
 
-  externalPortals = ['NTC', 'SLX', 'GDW'];
+  // GDW (Goodwe) was removed from this list when it switched from the Render
+  // scraper (`golan-api.onrender.com/api/updateNow`) to the direct SEMS API
+  // integration in Cloud Functions - it now saves like a standard portal.
+  externalPortals = ['NTC', 'SLX'];
   private static readonly SMA_CLIENT_ID = 'GolanSolar';
   private static readonly SMA_AUTH_URL = 'https://auth.smaapis.de/oauth2/';
   private static readonly SMA_LEGACY_REDIRECT_URI =
